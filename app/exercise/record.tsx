@@ -1,23 +1,31 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '@/constants/theme';
+// app/exercise/record.tsx
+// 运动记录页面
+
+import React from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
+import { ExerciseRecordForm } from '@/components/exercise';
 
 export default function ExerciseRecordScreen() {
+  const params = useLocalSearchParams<{
+    recordId?: string;
+    exerciseType?: string;
+    duration?: string;
+    calories?: string;
+    distance?: string;
+    note?: string;
+  }>();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>运动记录页面 - 开发中</Text>
-    </View>
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <ExerciseRecordForm
+        recordId={params.recordId ? Number(params.recordId) : undefined}
+        initialType={params.exerciseType}
+        initialDuration={params.duration ? Number(params.duration) : undefined}
+        initialCalories={params.calories ? Number(params.calories) : undefined}
+        initialDistance={params.distance ? Number(params.distance) : undefined}
+        initialNote={params.note}
+      />
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background.primary,
-  },
-  text: {
-    fontSize: theme.fontSize.body,
-    color: theme.colors.text.secondary,
-  },
-});
