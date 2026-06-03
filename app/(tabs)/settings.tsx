@@ -142,9 +142,12 @@ export default function SettingsScreen() {
         {/* 健康数据 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('settings.health.title')}</Text>
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push('/settings/health-connect')}
+          >
             <Text style={styles.menuLabel}>{t('settings.health.healthConnect')}</Text>
-            <Text style={styles.menuValue}>{t('settings.health.notConnected')}</Text>
+            <Text style={styles.menuArrow}>→</Text>
           </TouchableOpacity>
         </View>
 
