@@ -1,7 +1,7 @@
 // hooks/useWeightRecords.ts
 // 体重记录 Hook
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { weightQueries } from '@/database/queries';
 import { WeightRecord, WeightStats } from '@/types/weight';
 
@@ -61,8 +61,27 @@ interface UseWeightRecordsReturn {
 export function useWeightRecords(): UseWeightRecordsReturn {
   const [records, setRecords] = useState<WeightRecord[]>([]);
   const [latestWeight, setLatestWeight] = useState<WeightRecord | null>(null);
+  const [yesterdayWeight, setYesterdayWeight] = useState<WeightRecord | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 自动加载最新数据
+  useEffect(() => {
+    loadLatest();
+    loadYesterday();
+  }, []);
+
+  const loadYesterday = useCallback(async () => {
+    try {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const dateStr = yesterday.toISOString().split('T')[0];
+      const result = await weightQueries.getByDate(dateStr);
+      setYesterdayWeight(result);
+    } catch (err) {
+      console.error('[useWeightRecords] loadYesterday 失败:', err);
+    }
+  }, []);
 
   const loadLatest = useCallback(async () => {
     try {
@@ -196,6 +215,7 @@ export function useWeightRecords(): UseWeightRecordsReturn {
   return {
     records,
     latestWeight,
+    yesterdayWeight,
     isLoading,
     error,
 
@@ -204,6 +224,7 @@ export function useWeightRecords(): UseWeightRecordsReturn {
     loadByDate,
     loadByDateRange,
 
+    createRecord: addRecord,
     addRecord,
     deleteRecord,
 

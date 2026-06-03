@@ -1,7 +1,7 @@
 // hooks/useDietRecords.ts
 // 饮食记录 Hook
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { dietQueries } from '@/database/queries';
 import { DietRecord } from '@/types/diet';
 
@@ -68,7 +68,7 @@ interface UseDietRecordsReturn {
  * );
  * ```
  */
-export function useDietRecords(): UseDietRecordsReturn {
+export function useDietRecords(date?: string): UseDietRecordsReturn {
   const [records, setRecords] = useState<DietRecord[]>([]);
   const [todayRecords, setTodayRecords] = useState<DietRecord[]>([]);
   const [todayNutrition, setTodayNutrition] = useState({
@@ -79,6 +79,21 @@ export function useDietRecords(): UseDietRecordsReturn {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 自动加载今日数据
+  useEffect(() => {
+    loadToday();
+  }, []);
+
+  // 按日期加载
+  useEffect(() => {
+    if (date) {
+      loadByDate(date);
+    }
+  }, [date]);
+
+  // 计算属性
+  const todayCalories = todayNutrition.calories;
 
   const loadToday = useCallback(async () => {
     try {
@@ -241,6 +256,7 @@ export function useDietRecords(): UseDietRecordsReturn {
     records,
     todayRecords,
     todayNutrition,
+    todayCalories,
     isLoading,
     error,
 

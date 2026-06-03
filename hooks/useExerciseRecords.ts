@@ -1,7 +1,7 @@
 // hooks/useExerciseRecords.ts
 // 运动记录 Hook
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { exerciseQueries } from '@/database/queries';
 import { ExerciseRecord } from '@/types/exercise';
 
@@ -65,13 +65,29 @@ interface UseExerciseRecordsReturn {
  * );
  * ```
  */
-export function useExerciseRecords(): UseExerciseRecordsReturn {
+export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
   const [records, setRecords] = useState<ExerciseRecord[]>([]);
   const [todayRecords, setTodayRecords] = useState<ExerciseRecord[]>([]);
   const [todayDuration, setTodayDuration] = useState(0);
   const [todayCalories, setTodayCalories] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 自动加载今日数据
+  useEffect(() => {
+    loadToday();
+  }, []);
+
+  // 按日期加载
+  useEffect(() => {
+    if (date) {
+      loadByDate(date);
+    }
+  }, [date]);
+
+  // 计算属性（别名）
+  const todayMinutes = todayDuration;
+  const todayCaloriesBurned = todayCalories;
 
   const loadToday = useCallback(async () => {
     try {
@@ -221,6 +237,8 @@ export function useExerciseRecords(): UseExerciseRecordsReturn {
     todayRecords,
     todayDuration,
     todayCalories,
+    todayMinutes,
+    todayCaloriesBurned,
     isLoading,
     error,
 

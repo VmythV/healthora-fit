@@ -1,44 +1,149 @@
-import { View, Text, StyleSheet } from 'react-native';
+// app/(tabs)/index.tsx
+// 首页
+
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
+import { useDietRecords } from '@/hooks/useDietRecords';
+import { useExerciseRecords } from '@/hooks/useExerciseRecords';
+import { useWeightRecords } from '@/hooks/useWeightRecords';
+import { useGoals } from '@/hooks/useGoals';
+import { StatusCard, SummaryCards, QuickActions, TodayRecords } from '@/components/home';
 
 export default function HomeScreen() {
   const { t } = useI18n();
+  const [refreshing, setRefreshing] = useState(false);
+
+  // 获取数据
+  const { records: dietRecords, todayCalories, todayNutrition } = useDietRecords();
+  const { records: exerciseRecords, todayMinutes, todayCaloriesBurned } = useExerciseRecords();
+  const { latestWeight, yesterdayWeight } = useWeightRecords();
+  const { activeGoal } = useGoals();
+
+  // 计算今日状态评分
+  const calculateScore = useCallback(() => {
+    let score = 0;
+
+    // 饮食规律评分（30%）- 有记录就得分
+    if (dietRecords.length > 0) {
+      score += 30 * Math.min(1, dietRecords.length / 3);
+    }
+
+    // 营养均衡评分（20%）- 蛋白质占比合理
+    if (todayNutrition.calories > 0) {
+      const proteinRatio = (todayNutrition.protein * 4) / todayNutrition.calories;
+      if (proteinRatio >= 0.15 && proteinRatio <= 0.35) {
+        score += 20;
+      } else {
+        score += 10;
+      }
+    }
+
+    // 卡路里控制评分（20%）- 在目标范围内
+    if (activeGoal?.dailyCalories && todayCalories > 0) {
+      const ratio = todayCalories / activeGoal.dailyCalories;
+      if (ratio >= 0.8 && ratio <= 1.2) {
+        score += 20;
+      } else if (ratio >= 0.6 && ratio <= 1.4) {
+        score += 10;
+      }
+    } else if (todayCalories > 0) {
+      score += 15; // 没有目标但有记录
+    }
+
+    // 运动完成评分（20%）- 有运动记录
+    if (exerciseRecords.length > 0) {
+      score += 20 * Math.min(1, todayMinutes / 30);
+    }
+
+    // 体重趋势评分（10%）- 有记录
+    if (latestWeight) {
+      score += 10;
+    }
+
+    return Math.min(100, Math.round(score));
+  }, [dietRecords, exerciseRecords, todayCalories, todayNutrition, todayMinutes, latestWeight, activeGoal]);
+
+  // 计算体重变化
+  const weightChange = latestWeight && yesterdayWeight
+    ? latestWeight.weight - yesterdayWeight.weight
+    : undefined;
+
+  // 整理今日记录
+  const todayRecords = [
+    ...dietRecords.map(r => ({
+      id: r.id,
+      type: 'diet' as const,
+      time: r.timestamp,
+      title: r.mealType ? t(`mealType.${r.mealType}`) : t('record.diet.title'),
+      detail: `${r.totalCalories || 0} ${t('home.kcal')}`,
+    })),
+    ...exerciseRecords.map(r => ({
+      id: r.id,
+      type: 'exercise' as const,
+      time: r.timestamp,
+      title: t(`exerciseType.${r.exerciseType}`),
+      detail: `${r.durationMinutes} ${t('home.minutes')}`,
+    })),
+  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+
+  // 下拉刷新
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    // 数据会通过 hooks 自动刷新
+    setTimeout(() => setRefreshing(false), 500);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t('home.title')}</Text>
-        <Text style={styles.subtitle}>{t('home.subtitle')}</Text>
-      </View>
-
-      <View style={styles.content}>
-        <View style={styles.statusCard}>
-          <Text style={styles.statusTitle}>{t('home.todayStatus')}</Text>
-          <Text style={styles.statusStars}>⭐⭐⭐⭐☆</Text>
-          <Text style={styles.statusText}>{t('home.statusGood')}</Text>
+      <ScrollView
+        style={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.title}>{t('home.title')}</Text>
+          <Text style={styles.subtitle}>{t('home.subtitle')}</Text>
         </View>
 
-        <View style={styles.summaryRow}>
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryValue}>--</Text>
-            <Text style={styles.summaryLabel}>{t('home.weight')} ({t('home.kg')})</Text>
-          </View>
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryValue}>0</Text>
-            <Text style={styles.summaryLabel}>{t('home.meals')}</Text>
-          </View>
-          <View style={styles.summaryCard}>
-            <Text style={styles.summaryValue}>0</Text>
-            <Text style={styles.summaryLabel}>{t('home.exercise')} ({t('home.minutes')})</Text>
-          </View>
-        </View>
+        <View style={styles.content}>
+          {/* 今日状态 */}
+          <StatusCard score={calculateScore()} />
 
-        <View style={styles.placeholder}>
-          <Text style={styles.placeholderText}>{t('common.comingSoon')}</Text>
+          {/* 今日摘要 */}
+          <SummaryCards
+            weight={latestWeight?.weight}
+            weightChange={weightChange}
+            targetWeight={activeGoal?.targetWeight}
+            mealsCount={dietRecords.length}
+            totalCalories={todayCalories}
+            exerciseMinutes={todayMinutes}
+            caloriesBurned={todayCaloriesBurned}
+          />
+
+          {/* 快捷操作 */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('record.title')}</Text>
+            <QuickActions />
+          </View>
+
+          {/* 今日记录 */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>{t('common.today')}</Text>
+            <TodayRecords records={todayRecords} />
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -47,6 +152,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background.secondary,
+  },
+  scrollView: {
+    flex: 1,
   },
   header: {
     paddingHorizontal: theme.spacing.xl,
@@ -64,61 +172,15 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing.xs,
   },
   content: {
-    flex: 1,
     padding: theme.spacing.xl,
+    gap: theme.spacing.xl,
   },
-  statusCard: {
-    backgroundColor: theme.colors.background.primary,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.xl,
-    alignItems: 'center',
-    ...theme.shadow.md,
-  },
-  statusTitle: {
-    fontSize: theme.fontSize.body,
-    color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.sm,
-  },
-  statusStars: {
-    fontSize: 28,
-    letterSpacing: 4,
-  },
-  statusText: {
-    fontSize: theme.fontSize.bodyLg,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.primary.main,
-    marginTop: theme.spacing.sm,
-  },
-  summaryRow: {
-    flexDirection: 'row',
+  section: {
     gap: theme.spacing.md,
-    marginTop: theme.spacing.xl,
   },
-  summaryCard: {
-    flex: 1,
-    backgroundColor: theme.colors.background.primary,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.base,
-    alignItems: 'center',
-    ...theme.shadow.sm,
-  },
-  summaryValue: {
-    fontSize: theme.fontSize.h3,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text.primary,
-  },
-  summaryLabel: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.text.tertiary,
-    marginTop: theme.spacing.xs,
-  },
-  placeholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  placeholderText: {
+  sectionTitle: {
     fontSize: theme.fontSize.body,
-    color: theme.colors.text.tertiary,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.text.secondary,
   },
 });
