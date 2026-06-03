@@ -92,7 +92,9 @@
     "deleteFood": "删除食物",
     "foodName": "食物名称",
     "portion": "份量",
-    "per100g": "每100g"
+    "per100g": "每100g",
+    "noFood": "请添加食物",
+    "newFood": "新食物"
   },
   "exercise": {
     "title": "记录运动",

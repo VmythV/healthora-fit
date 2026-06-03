@@ -93,7 +93,9 @@
     "deleteFood": "Delete Food",
     "foodName": "Food Name",
     "portion": "Portion",
-    "per100g": "per 100g"
+    "per100g": "per 100g",
+    "noFood": "Please add food",
+    "newFood": "New Food"
   },
   "exercise": {
     "title": "Record Exercise",
