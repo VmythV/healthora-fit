@@ -94,41 +94,41 @@ healthora-fit/
 > **状态**：🔵 进行中
 
 ### 2.1 数据库 Schema
-- ⬜ 定义 diet_records 表
-- ⬜ 定义 exercise_records 表
-- ⬜ 定义 weight_records 表
-- ⬜ 定义 goals 表
-- ⬜ 定义 ai_config 表
-- ⬜ 创建索引
+- ✅ 定义 diet_records 表
+- ✅ 定义 exercise_records 表
+- ✅ 定义 weight_records 表
+- ✅ 定义 goals 表
+- ✅ 定义 ai_config 表
+- ✅ 创建索引
 
 ### 2.2 数据库初始化
-- ⬜ 创建数据库初始化函数
-- ⬜ 创建数据库迁移机制
-- ⬜ 实现数据库版本管理
+- ✅ 创建数据库初始化函数
+- ✅ 创建数据库迁移机制
+- ✅ 实现数据库版本管理
 
 ### 2.3 CRUD 操作
-- ⬜ 饮食记录 CRUD
+- ✅ 饮食记录 CRUD
   - createDietRecord
   - getDietRecordById
   - getDietRecordsByDate
   - updateDietRecord
   - deleteDietRecord
-- ⬜ 运动记录 CRUD
+- ✅ 运动记录 CRUD
   - createExerciseRecord
   - getExerciseRecordById
   - getExerciseRecordsByDate
   - updateExerciseRecord
   - deleteExerciseRecord
-- ⬜ 体重记录 CRUD
+- ✅ 体重记录 CRUD
   - createWeightRecord
   - getWeightRecordsByDateRange
   - getLatestWeight
   - deleteWeightRecord
-- ⬜ 目标设置 CRUD
+- ✅ 目标设置 CRUD
   - getActiveGoal
   - setGoal
   - updateGoal
-- ⬜ AI 配置 CRUD
+- ✅ AI 配置 CRUD
   - getAiConfig
   - saveAiConfig
   - testAiConnection
