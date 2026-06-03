@@ -21,7 +21,7 @@
 
 > **目标**：搭建项目骨架，完成基础框架
 > **预计时间**：3-5 天
-> **状态**：🔵 进行中
+> **状态**：✅ 已完成（2026-06-03）
 
 ### 1.0 环境配置（已完成）
 - ✅ 安装 Node.js 20
@@ -31,70 +31,58 @@
 - ✅ 安装 VS Code 及插件
 
 ### 1.1 项目初始化
-- ⬜ 使用 Expo 创建 React Native 项目
-- ⬜ 配置 TypeScript
+- ✅ 使用 Expo 创建 React Native 项目
+- ✅ 配置 TypeScript
 - ⬜ 配置 ESLint + Prettier
-- ⬜ 配置 Git 仓库
-- ⬜ 创建项目目录结构
+- ✅ 配置 Git 仓库（Expo 自动创建）
+- ✅ 创建项目目录结构
 
 ### 1.2 依赖安装
-- ⬜ 安装核心依赖
+- ✅ 安装核心依赖
   - expo-router（导航）
   - expo-sqlite（数据库）
   - zustand（状态管理）
   - expo-camera / expo-image-picker（相机）
   - expo-file-system（文件操作）
-- ⬜ 安装 UI 相关依赖
+- ✅ 安装 UI 相关依赖
   - react-native-reanimated（动画）
   - expo-linear-gradient（渐变）
-  - @expo/vector-icons（备用图标）
-- ⬜ 安装开发依赖
+- ✅ 安装开发依赖
   - TypeScript 类型定义
 
 ### 1.3 基础配置
-- ⬜ 配置 app.json / app.config.ts
+- ✅ 配置 app.json / app.config.ts
   - 应用名称：Healthora Fit
   - Bundle ID / Package Name
   - 权限声明
-- ⬜ 配置 Expo Router
-- ⬜ 配置主题系统（颜色、字体、间距）
+- ✅ 配置 Expo Router
+- ✅ 配置主题系统（颜色、字体、间距）
 - ⬜ 配置全局样式
 
 ### 1.4 项目目录结构
 ```
 healthora-fit/
-├── app/                    # Expo Router 页面
+├── app/                    # Expo Router 页面 ✅
 │   ├── (tabs)/            # 底部导航页面
-│   │   ├── index.tsx      # 首页
-│   │   ├── calendar.tsx   # 日历
-│   │   ├── record.tsx     # 快记
-│   │   ├── analysis.tsx   # 分析
-│   │   └── settings.tsx   # 设置
-│   ├── _layout.tsx        # 根布局
-│   └── modal/             # 弹窗页面
-├── components/            # 可复用组件
-│   ├── ui/               # 基础 UI 组件
-│   ├── diet/             # 饮食相关组件
-│   ├── exercise/         # 运动相关组件
-│   └── weight/           # 体重相关组件
-├── constants/            # 常量定义
-├── database/             # 数据库相关
-│   ├── schema.ts         # 数据库 Schema
-│   ├── migrations.ts     # 数据库迁移
-│   └── queries.ts        # 查询函数
-├── hooks/                # 自定义 Hooks
-├── services/             # 服务层
-│   ├── ai.ts            # AI 服务
-│   ├── health.ts        # Health Connect/Kit 服务
-│   └── export.ts        # 导入导出服务
-├── stores/               # Zustand 状态
-├── types/                # TypeScript 类型定义
-├── utils/                # 工具函数
-├── assets/               # 静态资源
-│   ├── icons/           # 自定义图标
-│   ├── images/          # 图片
-│   └── fonts/           # 字体
-└── docs/                 # 文档
+│   │   ├── index.tsx      # 首页 ✅
+│   │   ├── calendar.tsx   # 日历 ✅
+│   │   ├── record.tsx     # 快记 ✅
+│   │   ├── analysis.tsx   # 分析 ✅
+│   │   └── settings.tsx   # 设置 ✅
+│   ├── _layout.tsx        # 根布局 ✅
+│   ├── diet/record.tsx    # 饮食记录页 ✅
+│   ├── exercise/record.tsx # 运动记录页 ✅
+│   ├── weight/record.tsx  # 体重记录页 ✅
+│   └── settings/ai-config.tsx # AI 配置页 ✅
+├── components/            # 可复用组件 ⬜ 待开发
+├── constants/            # 常量定义 ✅
+├── database/             # 数据库相关 ⬜ 待开发
+├── hooks/                # 自定义 Hooks ✅
+├── services/             # 服务层 ⬜ 待开发
+├── stores/               # Zustand 状态 ⬜ 待开发
+├── types/                # TypeScript 类型定义 ✅
+├── utils/                # 工具函数 ⬜ 待开发
+└── assets/               # 静态资源 ✅
 ```
 
 ---
@@ -103,6 +91,7 @@ healthora-fit/
 
 > **目标**：完成 SQLite 数据库设计和基础操作
 > **预计时间**：2-3 天
+> **状态**：🔵 进行中
 
 ### 2.1 数据库 Schema
 - ⬜ 定义 diet_records 表
@@ -777,8 +766,8 @@ healthora-fit/
 
 | Phase | 名称 | 状态 | 预计天数 | 实际天数 |
 |-------|------|------|---------|---------|
-| 1 | 项目初始化与基础框架 | 🔵 | 3-5 | - |
-| 2 | 数据库层 | ⬜ | 2-3 | - |
+| 1 | 项目初始化与基础框架 | ✅ | 3-5 | 1 |
+| 2 | 数据库层 | 🔵 | 2-3 | - |
 | 3 | 状态管理 | ⬜ | 1-2 | - |
 | 4 | 基础 UI 组件 | ⬜ | 3-5 | - |
 | 5 | 底部导航与页面框架 | ⬜ | 2-3 | - |

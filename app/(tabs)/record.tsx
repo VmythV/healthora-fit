@@ -1,0 +1,111 @@
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { theme } from '@/constants/theme';
+
+export default function RecordScreen() {
+  const router = useRouter();
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>快速记录</Text>
+        <Text style={styles.subtitle}>选择要记录的类型</Text>
+      </View>
+
+      <View style={styles.content}>
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => router.push('/diet/record')}
+        >
+          <Text style={styles.cardIcon}>🍚</Text>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardTitle}>记录饮食</Text>
+            <Text style={styles.cardDesc}>拍照识别食物，自动计算卡路里</Text>
+          </View>
+          <Text style={styles.cardArrow}>→</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => router.push('/exercise/record')}
+        >
+          <Text style={styles.cardIcon}>🏃</Text>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardTitle}>记录运动</Text>
+            <Text style={styles.cardDesc}>手动输入或截图识别运动数据</Text>
+          </View>
+          <Text style={styles.cardArrow}>→</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() => router.push('/weight/record')}
+        >
+          <Text style={styles.cardIcon}>⚖️</Text>
+          <View style={styles.cardInfo}>
+            <Text style={styles.cardTitle}>记录体重</Text>
+            <Text style={styles.cardDesc}>记录当前体重，追踪目标进度</Text>
+          </View>
+          <Text style={styles.cardArrow}>→</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background.secondary,
+  },
+  header: {
+    paddingHorizontal: theme.spacing.xl,
+    paddingVertical: theme.spacing.base,
+    backgroundColor: theme.colors.background.primary,
+  },
+  title: {
+    fontSize: theme.fontSize.h2,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.text.primary,
+  },
+  subtitle: {
+    fontSize: theme.fontSize.body,
+    color: theme.colors.text.tertiary,
+    marginTop: theme.spacing.xs,
+  },
+  content: {
+    flex: 1,
+    padding: theme.spacing.xl,
+    gap: theme.spacing.md,
+  },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background.primary,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.xl,
+    ...theme.shadow.md,
+  },
+  cardIcon: {
+    fontSize: 36,
+    marginRight: theme.spacing.base,
+  },
+  cardInfo: {
+    flex: 1,
+  },
+  cardTitle: {
+    fontSize: theme.fontSize.bodyLg,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.text.primary,
+  },
+  cardDesc: {
+    fontSize: theme.fontSize.bodySm,
+    color: theme.colors.text.tertiary,
+    marginTop: theme.spacing.xs,
+  },
+  cardArrow: {
+    fontSize: theme.fontSize.h3,
+    color: theme.colors.text.tertiary,
+  },
+});

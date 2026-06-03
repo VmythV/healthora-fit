@@ -1,0 +1,19 @@
+import { useEffect, useState } from 'react';
+
+declare global {
+  interface Window {
+    frameworkReady?: () => void;
+  }
+}
+
+export function useFrameworkReady() {
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    // 框架准备完成
+    setIsReady(true);
+    window.frameworkReady?.();
+  }, []);
+
+  return isReady;
+}
