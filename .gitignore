@@ -35,3 +35,39 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Android - 忽略构建产物，保留项目配置
+android/app/build/
+android/build/
+android/.gradle/
+android/gradle/wrapper/gradle-wrapper.jar
+android/app/debug.keystore
+android/app/release.keystore
+android/.cxx/
+
+# iOS - 忽略构建产物，保留项目配置
+ios/Pods/
+ios/build/
+ios/*.xcworkspace
+ios/*.xcodeproj
+ios/.xcode.env.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/

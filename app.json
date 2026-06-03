@@ -30,13 +30,15 @@
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "READ_MEDIA_IMAGES",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_IMAGES",
         "android.permission.health.READ_WEIGHT",
         "android.permission.health.READ_EXERCISE",
-        "android.permission.health.READ_STEPS"
+        "android.permission.health.READ_STEPS",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
       ]
     },
     "web": {
@@ -59,6 +61,12 @@
       ],
       "expo-localization"
     ],
-    "scheme": "healthora-fit"
+    "scheme": "healthora-fit",
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d3c28883-fa75-445f-96ae-17394c5fce7f"
+      }
+    }
   }
 }
