@@ -6,91 +6,58 @@
 
 ## 📋 打包方式总览
 
-| 方式 | 用途 | 输出格式 | 说明 |
-|------|------|---------|------|
-| EAS Build (preview) | 测试分发 | APK | 云端构建，推荐 |
-| EAS Build (production) | 上架 Google Play | AAB | 云端构建 |
-| 本地构建 | 离线构建 | APK | 需要 Android Studio |
+| 方式 | 用途 | 输出格式 | 状态 | 说明 |
+|------|------|---------|------|------|
+| 本地构建 | 测试分发 | APK | ✅ 可用 | 推荐使用 |
+| 本地构建 | 上架 Google Play | AAB | ✅ 可用 | 需要 Android Studio |
+| EAS Build | 云端构建 | APK/AAB | ⚠️ 有问题 | 暂时不可用 |
 
 ---
 
-## 🚀 方式 1：EAS Build（推荐）
+## ⚠️ 已知问题
 
-### 1.1 前置准备
+### EAS Build 问题
 
-#### 安装 EAS CLI
+**状态**：暂时不可用
 
-```bash
-npm install -g eas-cli
+**问题描述**：
+- `package-lock.json` 与 `package.json` 不同步
+- 依赖版本冲突导致构建失败
+- `react-native-worklets` 版本兼容性问题
+
+**错误信息**：
+```
+npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync.
 ```
 
-#### 登录 Expo 账号
+**临时解决方案**：使用本地构建
 
-```bash
-eas login
-```
-
-如果没有账号，先注册：
-
-```bash
-eas register
-```
-
-#### 配置项目
-
-```bash
-eas build:configure
-```
-
-### 1.2 构建 APK（测试用）
-
-```bash
-# 构建 preview 版本（APK）
-eas build --platform android --profile preview
-```
-
-构建完成后，会提供下载链接。
-
-### 1.3 构建 AAB（上架用）
-
-```bash
-# 构建 production 版本（AAB）
-eas build --platform android --profile production
-```
-
-### 1.4 查看构建历史
-
-```bash
-eas build:list
-```
-
-### 1.5 下载构建产物
-
-```bash
-# 下载最新的 preview 构建
-eas build:list --platform android --limit 1 --json | jq -r '.[0].artifacts.buildUrl'
-```
+**待修复**：
+- [ ] 解决依赖版本冲突
+- [ ] 更新 package-lock.json
+- [ ] 测试 EAS Build 兼容性
 
 ---
 
-## 🔧 方式 2：本地构建
+## ✅ 推荐方式：本地构建
 
-### 2.1 前置准备
+### 前置准备
 
 确保已安装：
+- Node.js 18+
 - Android Studio
 - JDK 17
 - Android SDK
 
-### 2.2 生成原生项目
+### 构建步骤
+
+#### 1. 生成原生项目
 
 ```bash
 npx expo prebuild --platform android
 ```
 
-这会生成 `android/` 目录。
-
-### 2.3 构建 Debug APK
+#### 2. 构建 Debug APK（调试用）
 
 ```bash
 cd android
@@ -99,7 +66,7 @@ cd android
 
 输出位置：`android/app/build/outputs/apk/debug/app-debug.apk`
 
-### 2.4 构建 Release APK
+#### 3. 构建 Release APK（正式版）
 
 ```bash
 cd android
@@ -108,7 +75,7 @@ cd android
 
 输出位置：`android/app/build/outputs/apk/release/app-release.apk`
 
-### 2.5 构建 AAB（用于上架）
+#### 4. 构建 AAB（上架 Google Play）
 
 ```bash
 cd android
@@ -116,6 +83,26 @@ cd android
 ```
 
 输出位置：`android/app/build/outputs/bundle/release/app-release.aab`
+
+---
+
+## 📱 安装 APK
+
+### 方式 1：使用 ADB 安装
+
+```bash
+# 连接设备
+adb devices
+
+# 安装 APK
+adb install app-release.apk
+```
+
+### 方式 2：直接传输
+
+将 APK 文件传输到手机，点击安装。
+
+**注意**：需要开启「允许安装未知来源应用」
 
 ---
 
@@ -127,7 +114,7 @@ cd android
 keytool -genkeypair -v -storetype PKCS12 -keystore healthora-fit.keystore -alias healthora-fit -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-### 配置签名（本地构建）
+### 配置签名
 
 编辑 `android/app/build.gradle`：
 
@@ -149,32 +136,6 @@ android {
 }
 ```
 
-### 配置签名（EAS Build）
-
-```bash
-eas credentials
-```
-
-按照提示配置 Android Keystore。
-
----
-
-## 📱 安装 APK
-
-### 使用 ADB 安装
-
-```bash
-# 连接设备
-adb devices
-
-# 安装 APK
-adb install app-release.apk
-```
-
-### 直接传输
-
-将 APK 文件传输到手机，点击安装。
-
 ---
 
 ## 🏪 上架 Google Play
@@ -193,12 +154,7 @@ adb install app-release.apk
 
 ### 3. 上传 AAB
 
-```bash
-# 使用 EAS Submit
-eas submit --platform android --profile production
-```
-
-或手动上传到 Google Play Console。
+将 `app-release.aab` 上传到 Google Play Console。
 
 ### 4. 填写应用信息
 
@@ -212,55 +168,9 @@ eas submit --platform android --profile production
 
 ---
 
-## ⚙️ eas.json 配置说明
+## 🔧 常见问题
 
-```json
-{
-  "build": {
-    // 开发版本（用于调试）
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      }
-    },
-    // 预览版本（用于测试分发）
-    "preview": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      }
-    },
-    // 生产版本（用于上架）
-    "production": {
-      "android": {
-        "buildType": "app-bundle"
-      }
-    }
-  }
-}
-```
-
-### buildType 选项
-
-| 选项 | 说明 | 用途 |
-|------|------|------|
-| `apk` | Android Package | 测试分发、直接安装 |
-| `app-bundle` | Android App Bundle | 上架 Google Play |
-
----
-
-## 🔍 常见问题
-
-### Q1: EAS Build 失败
-
-```bash
-# 查看构建日志
-eas build:view
-```
-
-### Q2: 本地构建失败
+### Q1: 构建失败
 
 ```bash
 # 清理构建缓存
@@ -271,27 +181,35 @@ cd android
 ./gradlew assembleRelease
 ```
 
-### Q3: APK 安装失败
+### Q2: APK 安装失败
 
 - 检查设备是否开启「允许安装未知来源应用」
 - 检查 APK 是否与设备架构兼容
 
-### Q4: 签名错误
+### Q3: 签名错误
 
 ```bash
 # 重新生成签名密钥
 keytool -genkeypair -v -storetype PKCS12 -keystore healthora-fit.keystore -alias healthora-fit -keyalg RSA -keysize 2048 -validity 10000
 ```
 
+### Q4: react-native-worklets 版本错误
+
+```bash
+# 降级到兼容版本
+npm install react-native-worklets@0.8.0 --legacy-peer-deps
+```
+
 ---
 
 ## 📚 参考文档
 
-- [Expo Build 文档](https://docs.expo.dev/build/introduction/)
-- [EAS Submit 文档](https://docs.expo.dev/submit/introduction/)
+- [Expo 本地构建文档](https://docs.expo.dev/guides/local-app-development/)
+- [Android Studio 下载](https://developer.android.com/studio)
 - [Google Play Console](https://play.google.com/console)
 
 ---
 
-*文档版本：v1.0*
+*文档版本：v1.1*
 *最后更新：2026-06-03*
+*状态：EAS Build 暂时不可用，推荐使用本地构建*
