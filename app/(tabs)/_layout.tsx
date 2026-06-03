@@ -40,9 +40,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="record"
         options={{
-          title: '快记',
+          title: '',
           tabBarIcon: ({ color }) => <AddButton color={color} />,
-          tabBarShowLabel: false,
         }}
       />
       <Tabs.Screen
