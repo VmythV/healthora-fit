@@ -17,6 +17,9 @@ import { useExerciseRecords } from '@/hooks/useExerciseRecords';
 import { useWeightRecords } from '@/hooks/useWeightRecords';
 import { useGoals } from '@/hooks/useGoals';
 import { StatusCard, SummaryCards, QuickActions, TodayRecords } from '@/components/home';
+import { AnimatedCard } from '@/components/AnimatedCard';
+import { AnimatedNumber } from '@/components/AnimatedNumber';
+import { EmptyState } from '@/components/EmptyState';
 
 export default function HomeScreen() {
   const { t } = useI18n();
@@ -118,30 +121,48 @@ export default function HomeScreen() {
 
         <View style={styles.content}>
           {/* 今日状态 */}
-          <StatusCard score={calculateScore()} />
+          <AnimatedCard animationType="fadeIn" delay={0}>
+            <StatusCard score={calculateScore()} />
+          </AnimatedCard>
 
           {/* 今日摘要 */}
-          <SummaryCards
-            weight={latestWeight?.weight}
-            weightChange={weightChange}
-            targetWeight={activeGoal?.targetWeight}
-            mealsCount={dietRecords.length}
-            totalCalories={todayCalories}
-            exerciseMinutes={todayMinutes}
-            caloriesBurned={todayCaloriesBurned}
-          />
+          <AnimatedCard animationType="slideUp" delay={100}>
+            <SummaryCards
+              weight={latestWeight?.weight}
+              weightChange={weightChange}
+              targetWeight={activeGoal?.targetWeight}
+              mealsCount={dietRecords.length}
+              totalCalories={todayCalories}
+              exerciseMinutes={todayMinutes}
+              caloriesBurned={todayCaloriesBurned}
+            />
+          </AnimatedCard>
 
           {/* 快捷操作 */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('record.title')}</Text>
-            <QuickActions />
-          </View>
+          <AnimatedCard animationType="slideUp" delay={200}>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('record.title')}</Text>
+              <QuickActions />
+            </View>
+          </AnimatedCard>
 
           {/* 今日记录 */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('common.today')}</Text>
-            <TodayRecords records={todayRecords} />
-          </View>
+          <AnimatedCard animationType="slideUp" delay={300}>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('common.today')}</Text>
+              {todayRecords.length > 0 ? (
+                <TodayRecords records={todayRecords} />
+              ) : (
+                <EmptyState
+                  icon="📝"
+                  title={t('home.noRecords')}
+                  message={t('home.noRecordsMessage')}
+                  actionTitle={t('record.title')}
+                  onAction={() => {}}
+                />
+              )}
+            </View>
+          </AnimatedCard>
         </View>
       </ScrollView>
     </SafeAreaView>

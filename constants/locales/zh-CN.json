@@ -38,7 +38,10 @@
     "exercise": "运动",
     "minutes": "分钟",
     "kg": "kg",
-    "kcal": "大卡"
+    "kcal": "大卡",
+    "targetWeight": "目标体重",
+    "noRecords": "暂无记录",
+    "noRecordsMessage": "点击下方按钮开始记录您的健康数据"
   },
   "calendar": {
     "title": "日历",

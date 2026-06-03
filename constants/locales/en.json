@@ -39,7 +39,10 @@
     "minutes": "min",
     "weight": "Weight",
     "kg": "kg",
-    "kcal": "kcal"
+    "kcal": "kcal",
+    "targetWeight": "Target Weight",
+    "noRecords": "No Records",
+    "noRecordsMessage": "Tap the button below to start tracking your health data"
   },
   "calendar": {
     "title": "Calendar",
