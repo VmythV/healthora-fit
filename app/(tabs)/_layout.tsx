@@ -1,9 +1,12 @@
 import { Tabs } from 'expo-router';
 import { Platform, View, StyleSheet } from 'react-native';
 import { theme } from '@/constants/theme';
-import { Icon, IconName } from '@/components/icons';
+import { Icon } from '@/components/icons';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function TabLayout() {
+  const { t } = useI18n();
+
   return (
     <Tabs
       screenOptions={{
@@ -26,14 +29,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: '首页',
+          title: t('tabs.home'),
           tabBarIcon: ({ color }) => <Icon name="home" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="calendar"
         options={{
-          title: '日历',
+          title: t('tabs.calendar'),
           tabBarIcon: ({ color }) => <Icon name="calendar" size={24} color={color} />,
         }}
       />
@@ -47,14 +50,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="analysis"
         options={{
-          title: '分析',
+          title: t('tabs.analysis'),
           tabBarIcon: ({ color }) => <Icon name="chart" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: '设置',
+          title: t('tabs.settings'),
           tabBarIcon: ({ color }) => <Icon name="settings" size={24} color={color} />,
         }}
       />
