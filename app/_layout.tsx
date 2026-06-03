@@ -41,6 +41,13 @@ export default function RootLayout() {
             headerTitle: 'AI 配置',
           }}
         />
+        <Stack.Screen
+          name="icons-preview"
+          options={{
+            headerShown: true,
+            headerTitle: '图标预览',
+          }}
+        />
       </Stack>
       <StatusBar style="auto" />
     </>

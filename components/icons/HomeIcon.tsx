@@ -1,9 +1,9 @@
 // components/icons/HomeIcon.tsx
 // 首页图标
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import Svg, { Path } from "react-native-svg";
 
 interface HomeIconProps {
   size?: number;
@@ -11,21 +11,21 @@ interface HomeIconProps {
 }
 
 /**
- * 首页图标（房子）
+ * 极简首页图标（纯线条、零冗余元素）
  *
  * @example
  * ```tsx
  * <HomeIcon size={24} color="#10B981" />
  * ```
  */
-export function HomeIcon({ size = 24, color = '#000000' }: HomeIconProps) {
+export function HomeIcon({ size = 24, color = "#000000" }: HomeIconProps) {
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
         <Path
-          d="M3 12L5 10M5 10L12 3L19 10M5 10V20C5 20.5523 5.44772 21 6 21H9M19 10L21 12M19 10V20C19 20.5523 18.5523 21 18 21H15M9 21C9.55228 21 10 20.5523 10 20V16C10 15.4477 10.4477 15 11 15H13C13.5523 15 14 15.4477 14 16V20C14 20.5523 14.4477 21 15 21M9 21H15"
+          d="M4 21V10.75L12 4L20 10.75V21H14V15H10V21H4Z"
           stroke={color}
-          strokeWidth={1.5}
+          strokeWidth={1.8}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -36,7 +36,7 @@ export function HomeIcon({ size = 24, color = '#000000' }: HomeIconProps) {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
