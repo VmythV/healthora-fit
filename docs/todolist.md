@@ -200,11 +200,13 @@ healthora-fit/
   - Number Input
   - Search Input
 - ✅ Card 卡片组件
-- ⬜ Modal 弹窗组件
+- ✅ Modal 弹窗组件
+  - 确认弹窗
+  - 底部弹窗
 - ✅ Toast 提示组件
 - ✅ Loading 加载组件
 - ✅ Empty 空状态组件
-- ⬜ Error 错误状态组件
+- ✅ Error 错误状态组件
 
 ### 4.3 图标系统
 - ⬜ 设计自定义图标（线条极简风）
