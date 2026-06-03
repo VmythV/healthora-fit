@@ -71,6 +71,8 @@ services/               # AI, Health Connect, export (pending)
 
 4. **Type Safety**: All data models defined in `types/` directory. Database queries return typed results.
 
+5. **Internationalization (i18n)**: All user-facing text must use i18n. See [Internationalization Guidelines](#internationalization-guidelines).
+
 ### Database Tables
 - `diet_records` - Food intake with nutrition data (JSON foods field)
 - `exercise_records` - Exercise with type, duration, calories
@@ -91,6 +93,57 @@ Use `/iterate` skill for structured development cycles:
 ## Important Notes
 
 - **Expo SDK 54**: Do not upgrade without checking Expo Go compatibility
-- **Chinese UI**: App interface is in Chinese
 - **No backend**: All data stored locally in SQLite
 - **AI Config**: Users configure their own OpenAI-compatible API endpoint/key
+
+## Internationalization Guidelines
+
+### Principles
+
+1. **All user-facing text must be internationalized**
+   - No hardcoded strings in components
+   - Use `t('key')` function for all text
+   - Keep translations in `constants/locales/` directory
+
+2. **Translation file structure**
+   ```
+   constants/
+   ├── i18n.ts           # i18n configuration
+   └── locales/
+       ├── zh-CN.json    # Chinese translations
+       └── en.json       # English translations
+   ```
+
+3. **How to use i18n in components**
+   ```typescript
+   import { useI18n } from '@/hooks/useI18n';
+
+   export default function MyComponent() {
+     const { t, locale, setLocale } = useI18n();
+
+     return (
+       <View>
+         <Text>{t('home.title')}</Text>
+         <Button onPress={() => setLocale('en')}>English</Button>
+       </View>
+     );
+   }
+   ```
+
+4. **Translation key naming convention**
+   - Use dot notation for hierarchy: `settings.ai.title`
+   - Group by feature: `diet.*`, `exercise.*`, `weight.*`
+   - Common strings: `common.ok`, `common.cancel`
+
+5. **Adding new text**
+   - Add key to both `zh-CN.json` and `en.json`
+   - Use descriptive keys that indicate context
+   - Keep translations in sync
+
+6. **Supported languages**
+   - `zh-CN` - Simplified Chinese (default)
+   - `en` - English
+
+7. **Language persistence**
+   - User's language choice is saved in AsyncStorage
+   - Default language follows device locale

@@ -1,0 +1,245 @@
+{
+  "common": {
+    "ok": "确定",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "back": "返回",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "confirm": "确认",
+    "yes": "是",
+    "no": "否",
+    "today": "今天",
+    "yesterday": "昨天",
+    "tomorrow": "明天",
+    "noData": "暂无数据",
+    "comingSoon": "功能开发中..."
+  },
+  "tabs": {
+    "home": "首页",
+    "calendar": "日历",
+    "record": "快记",
+    "analysis": "分析",
+    "settings": "设置"
+  },
+  "home": {
+    "title": "Healthora Fit",
+    "subtitle": "健康光环",
+    "todayStatus": "今日状态",
+    "statusExcellent": "太棒了！继续保持",
+    "statusGood": "做得不错",
+    "statusAverage": "还行，可以更好",
+    "statusPoor": "今天需要加油哦",
+    "weight": "体重",
+    "meals": "餐记录",
+    "exercise": "运动",
+    "minutes": "分钟",
+    "kg": "kg",
+    "kcal": "大卡"
+  },
+  "calendar": {
+    "title": "日历",
+    "monthView": "月视图",
+    "dayView": "日视图",
+    "summary": "摘要",
+    "diet": "饮食",
+    "exercise": "运动",
+    "weight": "体重",
+    "status": "状态",
+    "viewDetails": "查看详细"
+  },
+  "record": {
+    "title": "快速记录",
+    "subtitle": "选择要记录的类型",
+    "diet": {
+      "title": "记录饮食",
+      "desc": "拍照识别食物，自动计算卡路里"
+    },
+    "exercise": {
+      "title": "记录运动",
+      "desc": "手动输入或截图识别运动数据"
+    },
+    "weight": {
+      "title": "记录体重",
+      "desc": "记录当前体重，追踪目标进度"
+    }
+  },
+  "diet": {
+    "title": "记录饮食",
+    "takePhoto": "拍照",
+    "fromGallery": "相册",
+    "analyzing": "AI 分析中...",
+    "analysisFailed": "AI 识别失败，请重试或手动输入",
+    "mealType": "餐次",
+    "breakfast": "早餐",
+    "lunch": "午餐",
+    "dinner": "晚餐",
+    "snack": "加餐",
+    "foodList": "食物列表",
+    "addFood": "添加食物",
+    "total": "合计",
+    "calories": "卡路里",
+    "protein": "蛋白质",
+    "carbs": "碳水",
+    "fat": "脂肪",
+    "note": "备注",
+    "notePlaceholder": "添加备注...",
+    "saveRecord": "保存记录",
+    "editFood": "编辑食物",
+    "deleteFood": "删除食物",
+    "foodName": "食物名称",
+    "portion": "份量",
+    "per100g": "每100g"
+  },
+  "exercise": {
+    "title": "记录运动",
+    "manual": "手动输入",
+    "screenshot": "截图识别",
+    "sync": "自动同步",
+    "exerciseType": "运动类型",
+    "duration": "运动时长",
+    "minutes": "分钟",
+    "caloriesBurned": "消耗卡路里",
+    "distance": "距离",
+    "km": "公里",
+    "heartRate": "心率",
+    "bpm": "次/分钟",
+    "note": "备注",
+    "saveRecord": "保存记录",
+    "selectType": "选择运动类型",
+    "running": "跑步",
+    "walking": "步行",
+    "cycling": "骑行",
+    "swimming": "游泳",
+    "strength": "力量训练",
+    "yoga": "瑜伽",
+    "hiit": "HIIT",
+    "other": "其他"
+  },
+  "weight": {
+    "title": "记录体重",
+    "currentWeight": "当前体重",
+    "lastRecord": "上次记录",
+    "targetWeight": "目标体重",
+    "toTarget": "距离目标",
+    "kg": "kg",
+    "saveRecord": "保存记录",
+    "noRecord": "暂无记录"
+  },
+  "analysis": {
+    "title": "分析",
+    "week": "周",
+    "month": "月",
+    "year": "年",
+    "custom": "自定义",
+    "weightTrend": "体重趋势",
+    "dietTrend": "饮食趋势",
+    "exerciseTrend": "运动趋势",
+    "caloriesIntake": "卡路里摄入",
+    "nutritionBreakdown": "营养成分比例",
+    "exerciseDuration": "运动时长",
+    "caloriesBurned": "消耗卡路里",
+    "exerciseTypeDistribution": "运动类型分布",
+    "avg": "平均",
+    "min": "最低",
+    "max": "最高",
+    "change": "变化",
+    "trend": "趋势",
+    "rising": "上升",
+    "falling": "下降",
+    "stable": "稳定",
+    "total": "总计",
+    "times": "次"
+  },
+  "settings": {
+    "title": "设置",
+    "goals": {
+      "title": "🎯 目标设置",
+      "targetWeight": "目标体重",
+      "notSet": "未设置"
+    },
+    "ai": {
+      "title": "🤖 AI 配置",
+      "config": "AI 服务配置",
+      "endpoint": "API 地址",
+      "apiKey": "API Key",
+      "model": "模型名称",
+      "testConnection": "测试连接",
+      "testing": "测试中...",
+      "success": "连接成功",
+      "failed": "连接失败",
+      "notConfigured": "未配置"
+    },
+    "health": {
+      "title": "📱 健康数据连接",
+      "healthConnect": "Health Connect",
+      "connected": "已连接",
+      "notConnected": "未连接",
+      "authorize": "授权管理"
+    },
+    "data": {
+      "title": "📦 数据管理",
+      "export": "导出数据",
+      "import": "导入数据",
+      "exportDesc": "导出为 JSON 文件",
+      "importDesc": "从 JSON 文件恢复",
+      "exporting": "导出中...",
+      "importing": "导入中...",
+      "exportSuccess": "导出成功",
+      "importSuccess": "导入成功",
+      "importResult": "导入结果"
+    },
+    "language": {
+      "title": "🌐 语言",
+      "current": "当前语言",
+      "zh-CN": "简体中文",
+      "en": "English"
+    },
+    "about": {
+      "title": "ℹ️ 关于",
+      "version": "版本"
+    }
+  },
+  "status": {
+    "excellent": "优秀",
+    "good": "良好",
+    "average": "一般",
+    "poor": "较差"
+  },
+  "mealType": {
+    "breakfast": "早餐",
+    "lunch": "午餐",
+    "dinner": "晚餐",
+    "snack": "加餐"
+  },
+  "exerciseType": {
+    "running": "跑步",
+    "walking": "步行",
+    "cycling": "骑行",
+    "swimming": "游泳",
+    "strength": "力量训练",
+    "yoga": "瑜伽",
+    "hiit": "HIIT",
+    "other": "其他"
+  },
+  "error": {
+    "network": "网络连接失败，请检查网络设置",
+    "aiFailed": "AI 识别失败，请重试或手动输入",
+    "saveFailed": "保存失败，请重试",
+    "loadFailed": "加载失败，请下拉刷新",
+    "permission": "需要权限才能使用此功能"
+  },
+  "confirm": {
+    "delete": {
+      "title": "确认删除",
+      "message": "删除后无法恢复，确定要删除吗？"
+    },
+    "discard": {
+      "title": "放弃编辑",
+      "message": "当前编辑的内容将不会保存"
+    }
+  }
+}

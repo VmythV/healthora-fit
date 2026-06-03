@@ -6,3 +6,4 @@ export { useDietRecords } from './useDietRecords';
 export { useExerciseRecords } from './useExerciseRecords';
 export { useWeightRecords } from './useWeightRecords';
 export { useGoals } from './useGoals';
+export { useI18n } from './useI18n';

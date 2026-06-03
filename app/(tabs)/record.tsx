@@ -2,15 +2,17 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function RecordScreen() {
   const router = useRouter();
+  const { t } = useI18n();
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>快速记录</Text>
-        <Text style={styles.subtitle}>选择要记录的类型</Text>
+        <Text style={styles.title}>{t('record.title')}</Text>
+        <Text style={styles.subtitle}>{t('record.subtitle')}</Text>
       </View>
 
       <View style={styles.content}>
@@ -20,8 +22,8 @@ export default function RecordScreen() {
         >
           <Text style={styles.cardIcon}>🍚</Text>
           <View style={styles.cardInfo}>
-            <Text style={styles.cardTitle}>记录饮食</Text>
-            <Text style={styles.cardDesc}>拍照识别食物，自动计算卡路里</Text>
+            <Text style={styles.cardTitle}>{t('record.diet.title')}</Text>
+            <Text style={styles.cardDesc}>{t('record.diet.desc')}</Text>
           </View>
           <Text style={styles.cardArrow}>→</Text>
         </TouchableOpacity>
@@ -32,8 +34,8 @@ export default function RecordScreen() {
         >
           <Text style={styles.cardIcon}>🏃</Text>
           <View style={styles.cardInfo}>
-            <Text style={styles.cardTitle}>记录运动</Text>
-            <Text style={styles.cardDesc}>手动输入或截图识别运动数据</Text>
+            <Text style={styles.cardTitle}>{t('record.exercise.title')}</Text>
+            <Text style={styles.cardDesc}>{t('record.exercise.desc')}</Text>
           </View>
           <Text style={styles.cardArrow}>→</Text>
         </TouchableOpacity>
@@ -44,8 +46,8 @@ export default function RecordScreen() {
         >
           <Text style={styles.cardIcon}>⚖️</Text>
           <View style={styles.cardInfo}>
-            <Text style={styles.cardTitle}>记录体重</Text>
-            <Text style={styles.cardDesc}>记录当前体重，追踪目标进度</Text>
+            <Text style={styles.cardTitle}>{t('record.weight.title')}</Text>
+            <Text style={styles.cardDesc}>{t('record.weight.desc')}</Text>
           </View>
           <Text style={styles.cardArrow}>→</Text>
         </TouchableOpacity>

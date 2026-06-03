@@ -1,39 +1,42 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '@/constants/theme';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function HomeScreen() {
+  const { t } = useI18n();
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Healthora Fit</Text>
-        <Text style={styles.subtitle}>健康光环</Text>
+        <Text style={styles.title}>{t('home.title')}</Text>
+        <Text style={styles.subtitle}>{t('home.subtitle')}</Text>
       </View>
 
       <View style={styles.content}>
         <View style={styles.statusCard}>
-          <Text style={styles.statusTitle}>今日状态</Text>
+          <Text style={styles.statusTitle}>{t('home.todayStatus')}</Text>
           <Text style={styles.statusStars}>⭐⭐⭐⭐☆</Text>
-          <Text style={styles.statusText}>做得不错</Text>
+          <Text style={styles.statusText}>{t('home.statusGood')}</Text>
         </View>
 
         <View style={styles.summaryRow}>
           <View style={styles.summaryCard}>
             <Text style={styles.summaryValue}>--</Text>
-            <Text style={styles.summaryLabel}>体重 (kg)</Text>
+            <Text style={styles.summaryLabel}>{t('home.weight')} ({t('home.kg')})</Text>
           </View>
           <View style={styles.summaryCard}>
             <Text style={styles.summaryValue}>0</Text>
-            <Text style={styles.summaryLabel}>餐记录</Text>
+            <Text style={styles.summaryLabel}>{t('home.meals')}</Text>
           </View>
           <View style={styles.summaryCard}>
             <Text style={styles.summaryValue}>0</Text>
-            <Text style={styles.summaryLabel}>运动 (min)</Text>
+            <Text style={styles.summaryLabel}>{t('home.exercise')} ({t('home.minutes')})</Text>
           </View>
         </View>
 
         <View style={styles.placeholder}>
-          <Text style={styles.placeholderText}>首页功能开发中...</Text>
+          <Text style={styles.placeholderText}>{t('common.comingSoon')}</Text>
         </View>
       </View>
     </SafeAreaView>

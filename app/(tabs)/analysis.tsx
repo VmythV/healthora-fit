@@ -1,19 +1,22 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '@/constants/theme';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function AnalysisScreen() {
+  const { t } = useI18n();
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>分析</Text>
+        <Text style={styles.title}>{t('analysis.title')}</Text>
       </View>
 
       <View style={styles.content}>
         <View style={styles.placeholder}>
           <Text style={styles.placeholderIcon}>📊</Text>
-          <Text style={styles.placeholderText}>分析功能开发中...</Text>
-          <Text style={styles.placeholderSubtext}>周 / 月 / 年趋势图表</Text>
+          <Text style={styles.placeholderText}>{t('common.comingSoon')}</Text>
+          <Text style={styles.placeholderSubtext}>{t('analysis.week')} / {t('analysis.month')} / {t('analysis.year')}</Text>
         </View>
       </View>
     </SafeAreaView>

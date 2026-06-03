@@ -56,7 +56,8 @@
         {
           "photosPermission": "需要访问相册选择食物照片或运动截图"
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "scheme": "healthora-fit"
   }

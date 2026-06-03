@@ -1,19 +1,22 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '@/constants/theme';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function CalendarScreen() {
+  const { t } = useI18n();
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>日历</Text>
+        <Text style={styles.title}>{t('calendar.title')}</Text>
       </View>
 
       <View style={styles.content}>
         <View style={styles.placeholder}>
           <Text style={styles.placeholderIcon}>📅</Text>
-          <Text style={styles.placeholderText}>日历功能开发中...</Text>
-          <Text style={styles.placeholderSubtext}>月视图 / 日视图</Text>
+          <Text style={styles.placeholderText}>{t('common.comingSoon')}</Text>
+          <Text style={styles.placeholderSubtext}>{t('calendar.monthView')} / {t('calendar.dayView')}</Text>
         </View>
       </View>
     </SafeAreaView>

@@ -1,66 +1,102 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
+import { useI18n } from '@/hooks/useI18n';
+import { Locale } from '@/constants/i18n';
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { t, locale, setLocale, supportedLocales } = useI18n();
+
+  const handleLanguageChange = (newLocale: Locale) => {
+    if (newLocale === locale) return;
+
+    Alert.alert(
+      t('settings.language.title'),
+      `${t('settings.language.current')}: ${supportedLocales.find(l => l.code === newLocale)?.nativeName}`,
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.confirm'),
+          onPress: () => setLocale(newLocale),
+        },
+      ]
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>设置</Text>
+        <Text style={styles.title}>{t('settings.title')}</Text>
       </View>
 
       <ScrollView style={styles.content}>
         {/* 目标设置 */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🎯 目标设置</Text>
+          <Text style={styles.sectionTitle}>{t('settings.goals.title')}</Text>
           <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuLabel}>目标体重</Text>
-            <Text style={styles.menuValue}>未设置</Text>
+            <Text style={styles.menuLabel}>{t('settings.goals.targetWeight')}</Text>
+            <Text style={styles.menuValue}>{t('settings.goals.notSet')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* AI 配置 */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🤖 AI 配置</Text>
+          <Text style={styles.sectionTitle}>{t('settings.ai.title')}</Text>
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => router.push('/settings/ai-config')}
           >
-            <Text style={styles.menuLabel}>AI 服务配置</Text>
+            <Text style={styles.menuLabel}>{t('settings.ai.config')}</Text>
             <Text style={styles.menuArrow}>→</Text>
           </TouchableOpacity>
         </View>
 
         {/* 健康数据 */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📱 健康数据连接</Text>
+          <Text style={styles.sectionTitle}>{t('settings.health.title')}</Text>
           <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuLabel}>Health Connect</Text>
-            <Text style={styles.menuValue}>未连接</Text>
+            <Text style={styles.menuLabel}>{t('settings.health.healthConnect')}</Text>
+            <Text style={styles.menuValue}>{t('settings.health.notConnected')}</Text>
           </TouchableOpacity>
+        </View>
+
+        {/* 语言设置 */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('settings.language.title')}</Text>
+          {supportedLocales.map((loc) => (
+            <TouchableOpacity
+              key={loc.code}
+              style={styles.menuItem}
+              onPress={() => handleLanguageChange(loc.code)}
+            >
+              <Text style={styles.menuLabel}>{loc.nativeName}</Text>
+              {locale === loc.code && (
+                <Text style={styles.checkmark}>✓</Text>
+              )}
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* 数据管理 */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>📦 数据管理</Text>
+          <Text style={styles.sectionTitle}>{t('settings.data.title')}</Text>
           <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuLabel}>导出数据</Text>
+            <Text style={styles.menuLabel}>{t('settings.data.export')}</Text>
             <Text style={styles.menuArrow}>→</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuLabel}>导入数据</Text>
+            <Text style={styles.menuLabel}>{t('settings.data.import')}</Text>
             <Text style={styles.menuArrow}>→</Text>
           </TouchableOpacity>
         </View>
 
         {/* 关于 */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>ℹ️ 关于</Text>
+          <Text style={styles.sectionTitle}>{t('settings.about.title')}</Text>
           <View style={styles.menuItem}>
-            <Text style={styles.menuLabel}>版本</Text>
+            <Text style={styles.menuLabel}>{t('settings.about.version')}</Text>
             <Text style={styles.menuValue}>1.0.0</Text>
           </View>
         </View>
@@ -118,5 +154,10 @@ const styles = StyleSheet.create({
   menuArrow: {
     fontSize: theme.fontSize.bodyLg,
     color: theme.colors.text.tertiary,
+  },
+  checkmark: {
+    fontSize: theme.fontSize.bodyLg,
+    color: theme.colors.primary.main,
+    fontWeight: theme.fontWeight.bold,
   },
 });

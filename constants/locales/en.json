@@ -1,0 +1,246 @@
+{
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "noData": "No data",
+    "comingSoon": "Coming soon..."
+  },
+  "tabs": {
+    "home": "Home",
+    "calendar": "Calendar",
+    "record": "Record",
+    "analysis": "Analysis",
+    "settings": "Settings"
+  },
+  "home": {
+    "title": "Healthora Fit",
+    "subtitle": "Healthy Aura",
+    "todayStatus": "Today's Status",
+    "statusExcellent": "Great job! Keep it up",
+    "statusGood": "Doing well",
+    "statusAverage": "Not bad, could be better",
+    "statusPoor": "Need to push harder today",
+    "weight": "Weight",
+    "meals": "Meals",
+    "exercise": "Exercise",
+    "minutes": "min",
+    "weight": "Weight",
+    "kg": "kg",
+    "kcal": "kcal"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "monthView": "Month View",
+    "dayView": "Day View",
+    "summary": "Summary",
+    "diet": "Diet",
+    "exercise": "Exercise",
+    "weight": "Weight",
+    "status": "Status",
+    "viewDetails": "View Details"
+  },
+  "record": {
+    "title": "Quick Record",
+    "subtitle": "Select record type",
+    "diet": {
+      "title": "Record Diet",
+      "desc": "Take a photo to identify food and calculate calories"
+    },
+    "exercise": {
+      "title": "Record Exercise",
+      "desc": "Manual input or screenshot to record exercise"
+    },
+    "weight": {
+      "title": "Record Weight",
+      "desc": "Record current weight and track progress"
+    }
+  },
+  "diet": {
+    "title": "Record Diet",
+    "takePhoto": "Take Photo",
+    "fromGallery": "Gallery",
+    "analyzing": "AI Analyzing...",
+    "analysisFailed": "AI recognition failed, please retry or input manually",
+    "mealType": "Meal Type",
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snack": "Snack",
+    "foodList": "Food List",
+    "addFood": "Add Food",
+    "total": "Total",
+    "calories": "Calories",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "note": "Note",
+    "notePlaceholder": "Add note...",
+    "saveRecord": "Save Record",
+    "editFood": "Edit Food",
+    "deleteFood": "Delete Food",
+    "foodName": "Food Name",
+    "portion": "Portion",
+    "per100g": "per 100g"
+  },
+  "exercise": {
+    "title": "Record Exercise",
+    "manual": "Manual Input",
+    "screenshot": "Screenshot",
+    "sync": "Auto Sync",
+    "exerciseType": "Exercise Type",
+    "duration": "Duration",
+    "minutes": "minutes",
+    "caloriesBurned": "Calories Burned",
+    "distance": "Distance",
+    "km": "km",
+    "heartRate": "Heart Rate",
+    "bpm": "bpm",
+    "note": "Note",
+    "saveRecord": "Save Record",
+    "selectType": "Select Exercise Type",
+    "running": "Running",
+    "walking": "Walking",
+    "cycling": "Cycling",
+    "swimming": "Swimming",
+    "strength": "Strength Training",
+    "yoga": "Yoga",
+    "hiit": "HIIT",
+    "other": "Other"
+  },
+  "weight": {
+    "title": "Record Weight",
+    "currentWeight": "Current Weight",
+    "lastRecord": "Last Record",
+    "targetWeight": "Target Weight",
+    "toTarget": "To Target",
+    "kg": "kg",
+    "saveRecord": "Save Record",
+    "noRecord": "No record"
+  },
+  "analysis": {
+    "title": "Analysis",
+    "week": "Week",
+    "month": "Month",
+    "year": "Year",
+    "custom": "Custom",
+    "weightTrend": "Weight Trend",
+    "dietTrend": "Diet Trend",
+    "exerciseTrend": "Exercise Trend",
+    "caloriesIntake": "Calories Intake",
+    "nutritionBreakdown": "Nutrition Breakdown",
+    "exerciseDuration": "Exercise Duration",
+    "caloriesBurned": "Calories Burned",
+    "exerciseTypeDistribution": "Exercise Type Distribution",
+    "avg": "Average",
+    "min": "Min",
+    "max": "Max",
+    "change": "Change",
+    "trend": "Trend",
+    "rising": "Rising",
+    "falling": "Falling",
+    "stable": "Stable",
+    "total": "Total",
+    "times": "times"
+  },
+  "settings": {
+    "title": "Settings",
+    "goals": {
+      "title": "🎯 Goals",
+      "targetWeight": "Target Weight",
+      "notSet": "Not Set"
+    },
+    "ai": {
+      "title": "🤖 AI Configuration",
+      "config": "AI Service Config",
+      "endpoint": "API Endpoint",
+      "apiKey": "API Key",
+      "model": "Model Name",
+      "testConnection": "Test Connection",
+      "testing": "Testing...",
+      "success": "Connection Success",
+      "failed": "Connection Failed",
+      "notConfigured": "Not Configured"
+    },
+    "health": {
+      "title": "📱 Health Data",
+      "healthConnect": "Health Connect",
+      "connected": "Connected",
+      "notConnected": "Not Connected",
+      "authorize": "Authorize"
+    },
+    "data": {
+      "title": "📦 Data Management",
+      "export": "Export Data",
+      "import": "Import Data",
+      "exportDesc": "Export as JSON file",
+      "importDesc": "Restore from JSON file",
+      "exporting": "Exporting...",
+      "importing": "Importing...",
+      "exportSuccess": "Export Success",
+      "importSuccess": "Import Success",
+      "importResult": "Import Result"
+    },
+    "language": {
+      "title": "🌐 Language",
+      "current": "Current Language",
+      "zh-CN": "简体中文",
+      "en": "English"
+    },
+    "about": {
+      "title": "ℹ️ About",
+      "version": "Version"
+    }
+  },
+  "status": {
+    "excellent": "Excellent",
+    "good": "Good",
+    "average": "Average",
+    "poor": "Poor"
+  },
+  "mealType": {
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snack": "Snack"
+  },
+  "exerciseType": {
+    "running": "Running",
+    "walking": "Walking",
+    "cycling": "Cycling",
+    "swimming": "Swimming",
+    "strength": "Strength Training",
+    "yoga": "Yoga",
+    "hiit": "HIIT",
+    "other": "Other"
+  },
+  "error": {
+    "network": "Network connection failed, please check your network settings",
+    "aiFailed": "AI recognition failed, please retry or input manually",
+    "saveFailed": "Save failed, please retry",
+    "loadFailed": "Load failed, please pull down to refresh",
+    "permission": "Permission required to use this feature"
+  },
+  "confirm": {
+    "delete": {
+      "title": "Confirm Delete",
+      "message": "Cannot be undone after deletion, are you sure?"
+    },
+    "discard": {
+      "title": "Discard Changes",
+      "message": "Current changes will not be saved"
+    }
+  }
+}
