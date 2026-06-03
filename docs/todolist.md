@@ -91,7 +91,7 @@ healthora-fit/
 
 > **目标**：完成 SQLite 数据库设计和基础操作
 > **预计时间**：2-3 天
-> **状态**：🔵 进行中
+> **状态**：✅ 已完成（2026-06-03）
 
 ### 2.1 数据库 Schema
 - ✅ 定义 diet_records 表
@@ -134,11 +134,11 @@ healthora-fit/
   - testAiConnection
 
 ### 2.4 数据库 Hooks
-- ⬜ useDatabase 初始化 Hook
-- ⬜ useDietRecords 饮食记录 Hook
-- ⬜ useExerciseRecords 运动记录 Hook
-- ⬜ useWeightRecords 体重记录 Hook
-- ⬜ useGoals 目标 Hook
+- ✅ useDatabase 初始化 Hook
+- ✅ useDietRecords 饮食记录 Hook
+- ✅ useExerciseRecords 运动记录 Hook
+- ✅ useWeightRecords 体重记录 Hook
+- ✅ useGoals 目标 Hook
 
 ---
 
@@ -767,7 +767,7 @@ healthora-fit/
 | Phase | 名称 | 状态 | 预计天数 | 实际天数 |
 |-------|------|------|---------|---------|
 | 1 | 项目初始化与基础框架 | ✅ | 3-5 | 1 |
-| 2 | 数据库层 | 🔵 | 2-3 | - |
+| 2 | 数据库层 | ✅ | 2-3 | 1 |
 | 3 | 状态管理 | ⬜ | 1-2 | - |
 | 4 | 基础 UI 组件 | ⬜ | 3-5 | - |
 | 5 | 底部导航与页面框架 | ⬜ | 2-3 | - |
