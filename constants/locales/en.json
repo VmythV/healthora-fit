@@ -133,7 +133,8 @@
     "toTarget": "To Target",
     "kg": "kg",
     "saveRecord": "Save Record",
-    "noRecord": "No record"
+    "noRecord": "No record",
+    "invalidWeight": "Please enter a valid weight (20-300 kg)"
   },
   "analysis": {
     "title": "Analysis",

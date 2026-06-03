@@ -1,23 +1,23 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '@/constants/theme';
+// app/weight/record.tsx
+// 体重记录页面
+
+import React from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
+import { WeightRecordForm } from '@/components/weight';
 
 export default function WeightRecordScreen() {
+  const params = useLocalSearchParams<{
+    recordId?: string;
+    weight?: string;
+  }>();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>体重记录页面 - 开发中</Text>
-    </View>
+    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+      <WeightRecordForm
+        recordId={params.recordId ? Number(params.recordId) : undefined}
+        initialWeight={params.weight ? Number(params.weight) : 70}
+      />
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.background.primary,
-  },
-  text: {
-    fontSize: theme.fontSize.body,
-    color: theme.colors.text.secondary,
-  },
-});

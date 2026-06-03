@@ -132,7 +132,8 @@
     "toTarget": "距离目标",
     "kg": "kg",
     "saveRecord": "保存记录",
-    "noRecord": "暂无记录"
+    "noRecord": "暂无记录",
+    "invalidWeight": "请输入有效的体重（20-300 kg）"
   },
   "analysis": {
     "title": "分析",
