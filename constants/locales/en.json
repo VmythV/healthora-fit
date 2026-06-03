@@ -174,19 +174,44 @@
     "goals": {
       "title": "🎯 Goals",
       "targetWeight": "Target Weight",
-      "notSet": "Not Set"
+      "notSet": "Not Set",
+      "setTarget": "Set Target Weight",
+      "saveSuccess": "Goal saved",
+      "saveFailed": "Save failed, please retry",
+      "achieved": "Achieved!",
+      "inProgress": "In Progress",
+      "tips": "Tips",
+      "tip1": "Set a realistic target weight, aim for 0.5-1 kg per week",
+      "tip2": "Keep diet and exercise records to help reach your goal",
+      "tip3": "Record weight regularly to track your progress"
     },
     "ai": {
       "title": "🤖 AI Configuration",
       "config": "AI Service Config",
       "endpoint": "API Endpoint",
+      "endpointHint": "OpenAI-compatible API endpoint",
       "apiKey": "API Key",
+      "apiKeyHint": "Your API key, stored securely on device",
       "model": "Model Name",
+      "modelHint": "e.g.: gpt-4o-mini, claude-3-haiku",
       "testConnection": "Test Connection",
       "testing": "Testing...",
       "success": "Connection Success",
       "failed": "Connection Failed",
-      "notConfigured": "Not Configured"
+      "notConfigured": "Not Configured",
+      "endpointRequired": "Please enter API endpoint",
+      "apiKeyRequired": "Please enter API Key",
+      "modelRequired": "Please enter model name",
+      "saveSuccess": "Config saved",
+      "saveFailed": "Save failed, please retry",
+      "testSuccess": "Connection test successful!",
+      "testFailed": "Connection test failed, please check config",
+      "help": "Configuration Guide",
+      "helpText1": "AI is used to recognize food photos and calculate nutrition",
+      "helpText2": "Supports OpenAI-compatible APIs, including local models",
+      "helpText3": "API Key is stored locally only, never uploaded to any server",
+      "exampleTitle": "Common API Endpoints",
+      "localModel": "Local Model"
     },
     "health": {
       "title": "📱 Health Data",
@@ -205,7 +230,11 @@
       "importing": "Importing...",
       "exportSuccess": "Export Success",
       "importSuccess": "Import Success",
-      "importResult": "Import Result"
+      "importResult": "Import Result",
+      "exportConfirm": "Export all diet, exercise, and weight records as JSON file",
+      "importConfirm": "Import data from JSON file, duplicate records will be skipped",
+      "exportFailed": "Export failed, please retry",
+      "importFailed": "Import failed, please check file format"
     },
     "language": {
       "title": "🌐 Language",
@@ -215,7 +244,22 @@
     },
     "about": {
       "title": "ℹ️ About",
-      "version": "Version"
+      "version": "Version",
+      "description": "Your personal health tracking assistant for diet, exercise, and weight management",
+      "versionInfo": "Version Info",
+      "buildNumber": "Build Number",
+      "developer": "Developer",
+      "team": "Team",
+      "contact": "Contact Us",
+      "website": "Website",
+      "email": "Email",
+      "features": "Features",
+      "feature1": "Smart food recognition & nutrition analysis",
+      "feature2": "Exercise tracking & calorie calculation",
+      "feature3": "Weight tracking & goal management",
+      "feature4": "Data analysis & visualization charts",
+      "feature5": "AI-powered health insights",
+      "allRightsReserved": "All Rights Reserved"
     }
   },
   "status": {

@@ -173,19 +173,44 @@
     "goals": {
       "title": "🎯 目标设置",
       "targetWeight": "目标体重",
-      "notSet": "未设置"
+      "notSet": "未设置",
+      "setTarget": "设置目标体重",
+      "saveSuccess": "目标已保存",
+      "saveFailed": "保存失败，请重试",
+      "achieved": "已达成！",
+      "inProgress": "进行中",
+      "tips": "小贴士",
+      "tip1": "设定一个合理的目标体重，建议每周减重 0.5-1 kg",
+      "tip2": "保持饮食记录和运动习惯，有助于达成目标",
+      "tip3": "定期记录体重，可以看到自己的进步"
     },
     "ai": {
       "title": "🤖 AI 配置",
       "config": "AI 服务配置",
       "endpoint": "API 地址",
+      "endpointHint": "OpenAI 兼容的 API 地址",
       "apiKey": "API Key",
+      "apiKeyHint": "您的 API 密钥，将安全存储在本地",
       "model": "模型名称",
+      "modelHint": "例如: gpt-4o-mini, claude-3-haiku",
       "testConnection": "测试连接",
       "testing": "测试中...",
       "success": "连接成功",
       "failed": "连接失败",
-      "notConfigured": "未配置"
+      "notConfigured": "未配置",
+      "endpointRequired": "请输入 API 地址",
+      "apiKeyRequired": "请输入 API Key",
+      "modelRequired": "请输入模型名称",
+      "saveSuccess": "配置已保存",
+      "saveFailed": "保存失败，请重试",
+      "testSuccess": "连接测试成功！",
+      "testFailed": "连接测试失败，请检查配置",
+      "help": "配置说明",
+      "helpText1": "AI 功能用于识别食物照片，自动计算营养成分",
+      "helpText2": "支持 OpenAI 兼容的 API，包括本地部署的模型",
+      "helpText3": "API Key 仅存储在本地设备，不会上传到任何服务器",
+      "exampleTitle": "常见 API 地址",
+      "localModel": "本地模型"
     },
     "health": {
       "title": "📱 健康数据连接",
@@ -204,7 +229,11 @@
       "importing": "导入中...",
       "exportSuccess": "导出成功",
       "importSuccess": "导入成功",
-      "importResult": "导入结果"
+      "importResult": "导入结果",
+      "exportConfirm": "将导出所有饮食、运动、体重记录为 JSON 文件",
+      "importConfirm": "从 JSON 文件导入数据，相同记录不会重复导入",
+      "exportFailed": "导出失败，请重试",
+      "importFailed": "导入失败，请检查文件格式"
     },
     "language": {
       "title": "🌐 语言",
@@ -214,7 +243,22 @@
     },
     "about": {
       "title": "ℹ️ 关于",
-      "version": "版本"
+      "version": "版本",
+      "description": "您的私人健康追踪助手，帮助您记录饮食、运动和体重，实现健康目标",
+      "versionInfo": "版本信息",
+      "buildNumber": "构建号",
+      "developer": "开发者",
+      "team": "团队",
+      "contact": "联系我们",
+      "website": "官网",
+      "email": "邮箱",
+      "features": "功能特性",
+      "feature1": "智能饮食识别与营养分析",
+      "feature2": "运动记录与卡路里计算",
+      "feature3": "体重追踪与目标管理",
+      "feature4": "数据分析与可视化图表",
+      "feature5": "AI 驱动的健康洞察",
+      "allRightsReserved": "保留所有权利"
     }
   },
   "status": {
