@@ -123,6 +123,69 @@ export const dietQueries = {
   },
 
   /**
+   * 按日期分组的营养成分统计
+   */
+  async getDailyNutritionStats(
+    startDate: string,
+    endDate: string
+  ): Promise<{
+    date: string;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+  }[]> {
+    const db = database.getDatabase();
+    return db.getAllAsync(
+      `SELECT
+        date(timestamp) as date,
+        SUM(total_calories) as calories,
+        SUM(total_protein) as protein,
+        SUM(total_carbs) as carbs,
+        SUM(total_fat) as fat
+       FROM diet_records
+       WHERE date(timestamp) BETWEEN ? AND ?
+       GROUP BY date(timestamp)
+       ORDER BY date ASC`,
+      [startDate, endDate]
+    );
+  },
+
+  /**
+   * 获取时间段内的总营养成分
+   */
+  async getTotalNutrition(
+    startDate: string,
+    endDate: string
+  ): Promise<{
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    days: number;
+  }> {
+    const db = database.getDatabase();
+    const result = await db.getFirstAsync(
+      `SELECT
+        COALESCE(SUM(total_calories), 0) as calories,
+        COALESCE(SUM(total_protein), 0) as protein,
+        COALESCE(SUM(total_carbs), 0) as carbs,
+        COALESCE(SUM(total_fat), 0) as fat,
+        COUNT(DISTINCT date(timestamp)) as days
+       FROM diet_records
+       WHERE date(timestamp) BETWEEN ? AND ?`,
+      [startDate, endDate]
+    );
+    return {
+      calories: result?.calories || 0,
+      protein: result?.protein || 0,
+      carbs: result?.carbs || 0,
+      fat: result?.fat || 0,
+      days: result?.days || 0,
+    };
+  },
+
+  /**
    * 按餐次统计
    */
   async getMealTypeStats(

@@ -118,6 +118,61 @@ export const exerciseQueries = {
   },
 
   /**
+   * 按日期分组的卡路里消耗统计
+   */
+  async getDailyCaloriesStats(
+    startDate: string,
+    endDate: string
+  ): Promise<{ date: string; calories: number; duration: number }[]> {
+    const db = database.getDatabase();
+    return db.getAllAsync(
+      `SELECT
+        date(timestamp) as date,
+        SUM(calories_burned) as calories,
+        SUM(duration_minutes) as duration
+       FROM exercise_records
+       WHERE date(timestamp) BETWEEN ? AND ?
+       GROUP BY date(timestamp)
+       ORDER BY date ASC`,
+      [startDate, endDate]
+    );
+  },
+
+  /**
+   * 获取时间段内的总运动统计
+   */
+  async getTotalStats(
+    startDate: string,
+    endDate: string
+  ): Promise<{
+    totalDuration: number;
+    totalCalories: number;
+    totalDistance: number;
+    count: number;
+    days: number;
+  }> {
+    const db = database.getDatabase();
+    const result = await db.getFirstAsync(
+      `SELECT
+        COALESCE(SUM(duration_minutes), 0) as totalDuration,
+        COALESCE(SUM(calories_burned), 0) as totalCalories,
+        COALESCE(SUM(distance_km), 0) as totalDistance,
+        COUNT(*) as count,
+        COUNT(DISTINCT date(timestamp)) as days
+       FROM exercise_records
+       WHERE date(timestamp) BETWEEN ? AND ?`,
+      [startDate, endDate]
+    );
+    return {
+      totalDuration: result?.totalDuration || 0,
+      totalCalories: result?.totalCalories || 0,
+      totalDistance: result?.totalDistance || 0,
+      count: result?.count || 0,
+      days: result?.days || 0,
+    };
+  },
+
+  /**
    * 根据 ID 获取记录
    */
   async getById(id: number): Promise<ExerciseRecord | null> {
