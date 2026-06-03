@@ -146,36 +146,26 @@ healthora-fit/
 
 > **目标**：使用 Zustand 管理全局状态
 > **预计时间**：1-2 天
+> **状态**：✅ 已完成（2026-06-03）
 
 ### 3.1 Store 定义
-- ⬜ appStore - 应用全局状态
+- ✅ appStore - 应用全局状态
   - isLoading
   - currentTab
   - theme
-- ⬜ dietStore - 饮食记录状态
-  - records
-  - todayRecords
-  - loading
-- ⬜ exerciseStore - 运动记录状态
-  - records
-  - todayRecords
-  - loading
-- ⬜ weightStore - 体重记录状态
-  - records
-  - latestWeight
-  - targetWeight
-  - loading
-- ⬜ aiStore - AI 服务状态
+  - locale
+- ✅ aiStore - AI 服务状态
   - config
   - isAnalyzing
   - error
 
 ### 3.2 Store Actions
-- ⬜ 实现饮食记录 Actions
-- ⬜ 实现运动记录 Actions
-- ⬜ 实现体重记录 Actions
-- ⬜ 实现数据加载 Actions
-- ⬜ 实现数据同步 Actions
+- ✅ 应用状态 Actions（setLoading、setCurrentTab、setTheme、setLocale）
+- ✅ AI 服务 Actions（loadConfig、saveConfig、testConnection）
+
+### 说明
+- 饮食、运动、体重状态已通过 Hooks 实现（Phase 2.4）
+- 只创建必要的全局状态 Store
 
 ---
 
@@ -768,7 +758,7 @@ healthora-fit/
 |-------|------|------|---------|---------|
 | 1 | 项目初始化与基础框架 | ✅ | 3-5 | 1 |
 | 2 | 数据库层 | ✅ | 2-3 | 1 |
-| 3 | 状态管理 | ⬜ | 1-2 | - |
+| 3 | 状态管理 | ✅ | 1-2 | 0.5 |
 | 4 | 基础 UI 组件 | ⬜ | 3-5 | - |
 | 5 | 底部导航与页面框架 | ⬜ | 2-3 | - |
 | 6 | 饮食记录功能 | ⬜ | 5-7 | - |
