@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router';
-import { Platform } from 'react-native';
+import { Platform, View, StyleSheet } from 'react-native';
 import { theme } from '@/constants/theme';
+import { Icon, IconName } from '@/components/icons';
 
 export default function TabLayout() {
   return (
@@ -26,14 +27,14 @@ export default function TabLayout() {
         name="index"
         options={{
           title: '首页',
-          tabBarIcon: ({ color }) => <TabIcon name="home" color={color} />,
+          tabBarIcon: ({ color }) => <Icon name="home" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="calendar"
         options={{
           title: '日历',
-          tabBarIcon: ({ color }) => <TabIcon name="calendar" color={color} />,
+          tabBarIcon: ({ color }) => <Icon name="calendar" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -47,42 +48,42 @@ export default function TabLayout() {
         name="analysis"
         options={{
           title: '分析',
-          tabBarIcon: ({ color }) => <TabIcon name="chart" color={color} />,
+          tabBarIcon: ({ color }) => <Icon name="chart" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: '设置',
-          tabBarIcon: ({ color }) => <TabIcon name="settings" color={color} />,
+          tabBarIcon: ({ color }) => <Icon name="settings" size={24} color={color} />,
         }}
       />
     </Tabs>
   );
 }
 
-// 临时的 Tab 图标组件（后续会替换为自定义图标）
-import { Text } from 'react-native';
-
-function TabIcon({ name, color }: { name: string; color: string }) {
-  const icons: Record<string, string> = {
-    home: '🏠',
-    calendar: '📅',
-    chart: '📊',
-    settings: '⚙️',
-  };
-
-  return (
-    <Text style={{ fontSize: 20, color }}>
-      {icons[name] || '📱'}
-    </Text>
-  );
-}
-
+// 添加按钮（特殊样式）
 function AddButton({ color }: { color: string }) {
   return (
-    <Text style={{ fontSize: 28, color, fontWeight: '300' }}>
-      ➕
-    </Text>
+    <View style={styles.addButtonContainer}>
+      <View style={[styles.addButton, { backgroundColor: theme.colors.primary.main }]}>
+        <Icon name="add" size={28} color="#FFFFFF" />
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  addButtonContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...theme.shadow.md,
+  },
+});
