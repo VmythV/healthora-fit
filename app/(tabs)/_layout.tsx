@@ -42,6 +42,7 @@ export default function TabLayout() {
         options={{
           title: '快记',
           tabBarIcon: ({ color }) => <AddButton color={color} />,
+          tabBarShowLabel: false,
         }}
       />
       <Tabs.Screen
