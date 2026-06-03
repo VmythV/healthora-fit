@@ -18,8 +18,8 @@ const i18n = new I18n({
 i18n.defaultLocale = 'zh-CN';
 i18n.enableFallback = true;
 
-// 获取设备语言
-const deviceLocale = Localization.locale;
+// 获取设备语言（可能为 undefined，需要空值检查）
+const deviceLocale = Localization.locale ?? 'zh-CN';
 
 // 设置当前语言（从设备语言推断）
 if (deviceLocale.startsWith('zh')) {
