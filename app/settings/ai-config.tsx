@@ -87,10 +87,10 @@ export default function AIConfigScreen() {
     try {
       setIsTesting(true);
       const result = await aiConfigQueries.testConnection();
-      if (result) {
+      if (result.success) {
         Alert.alert(t('common.success'), t('settings.ai.testSuccess'));
       } else {
-        Alert.alert(t('common.error'), t('settings.ai.testFailed'));
+        Alert.alert(t('common.error'), result.error || t('settings.ai.testFailed'));
       }
     } catch (error) {
       Alert.alert(t('common.error'), t('settings.ai.testFailed'));
@@ -214,6 +214,10 @@ export default function AIConfigScreen() {
             <View style={styles.exampleItem}>
               <Text style={styles.exampleLabel}>Claude:</Text>
               <Text style={styles.exampleValue}>https://api.anthropic.com/v1</Text>
+            </View>
+            <View style={styles.exampleItem}>
+              <Text style={styles.exampleLabel}>{t('settings.ai.volcengine')}:</Text>
+              <Text style={styles.exampleValue}>https://ark.cn-beijing.volces.com/api/v3</Text>
             </View>
             <View style={styles.exampleItem}>
               <Text style={styles.exampleLabel}>{t('settings.ai.localModel')}:</Text>

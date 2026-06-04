@@ -96,22 +96,72 @@ export const aiConfigQueries = {
 
   /**
    * 测试连接
+   *
+   * 支持多种 API 提供商：
+   * - OpenAI 兼容 API（使用 /models 端点）
+   * - 火山引擎等（使用简单聊天请求测试）
    */
-  async testConnection(): Promise<boolean> {
+  async testConnection(): Promise<{ success: boolean; error?: string }> {
     const config = await this.getActive();
     if (!config) {
-      return false;
+      return { success: false, error: 'AI 服务未配置' };
     }
 
     try {
-      const response = await fetch(`${config.apiEndpoint}/models`, {
+      // 首先尝试 /models 端点（适用于 OpenAI 兼容 API）
+      try {
+        const modelsResponse = await fetch(`${config.apiEndpoint}/models`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${config.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (modelsResponse.ok) {
+          return { success: true };
+        }
+      } catch (e) {
+        // /models 端点不可用，继续尝试其他方式
+      }
+
+      // 如果 /models 不可用，发送一个简单的聊天请求测试
+      const chatResponse = await fetch(`${config.apiEndpoint}/chat/completions`, {
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${config.apiKey}`,
+          'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          model: config.modelName,
+          messages: [
+            {
+              role: 'user',
+              content: 'Hi',
+            },
+          ],
+          max_tokens: 5,
+        }),
       });
-      return response.ok;
+
+      if (chatResponse.ok) {
+        return { success: true };
+      }
+
+      // 解析错误信息
+      let errorMessage = '连接失败';
+      try {
+        const errorData = await chatResponse.json();
+        errorMessage = errorData.error?.message || errorData.message || `HTTP ${chatResponse.status}`;
+      } catch {
+        errorMessage = `HTTP ${chatResponse.status}`;
+      }
+
+      return { success: false, error: errorMessage };
     } catch (error) {
-      return false;
+      console.error('测试连接失败:', error);
+      const message = error instanceof Error ? error.message : '网络连接失败';
+      return { success: false, error: message };
     }
   },
 };
