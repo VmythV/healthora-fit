@@ -70,31 +70,19 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="settings/ai-config"
-                options={{
-                  headerShown: true,
-                  headerTitle: 'AI 配置',
-                }}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="settings/goals"
-                options={{
-                  headerShown: true,
-                  headerTitle: '目标设置',
-                }}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="settings/about"
-                options={{
-                  headerShown: true,
-                  headerTitle: '关于',
-                }}
+                options={{ headerShown: false }}
               />
               <Stack.Screen
                 name="settings/health-connect"
-                options={{
-                  headerShown: true,
-                  headerTitle: '健康数据连接',
-                }}
+                options={{ headerShown: false }}
               />
             </Stack>
             <StatusBar style="auto" />
