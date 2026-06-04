@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, {
-  useAnimatedScrollHandler,
   useSharedValue,
   useAnimatedStyle,
   interpolate,
@@ -84,11 +83,9 @@ export default function CalendarScreen() {
   // 时间线的滚动驱动日历折叠
   const timelineScrollY = useSharedValue(0);
 
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      timelineScrollY.value = event.contentOffset.y;
-    },
-  });
+  const handleTimelineScroll = useCallback((event: any) => {
+    timelineScrollY.value = event.nativeEvent.contentOffset.y;
+  }, [timelineScrollY]);
 
   // 日历容器：高度随 timeline 滚动缩小
   const calAnimatedStyle = useAnimatedStyle(() => {
@@ -136,7 +133,7 @@ export default function CalendarScreen() {
       </Animated.View>
 
       {/* ===== 第2部分：概括 + 可滚动时间线 ===== */}
-      <DayDetail date={selectedDate} maxDate={todayStr} onScroll={scrollHandler} />
+      <DayDetail date={selectedDate} maxDate={todayStr} onScroll={handleTimelineScroll} />
     </SafeAreaView>
   );
 }
