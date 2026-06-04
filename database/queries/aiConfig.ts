@@ -10,9 +10,12 @@ export const aiConfigQueries = {
    */
   async getActive(): Promise<AIConfig | null> {
     const db = database.getDatabase();
-    return db.getFirstAsync<AIConfig>(
-      `SELECT * FROM ai_config WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1`
+    const result = await db.getFirstAsync<any>(
+      `SELECT id, api_endpoint as apiEndpoint, api_key as apiKey, model_name as modelName,
+              is_active as isActive, created_at as createdAt, updated_at as updatedAt
+       FROM ai_config WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1`
     );
+    return result as AIConfig | null;
   },
 
   /**
@@ -20,9 +23,12 @@ export const aiConfigQueries = {
    */
   async getAll(): Promise<AIConfig[]> {
     const db = database.getDatabase();
-    return db.getAllAsync<AIConfig>(
-      `SELECT * FROM ai_config ORDER BY created_at DESC`
+    const results = await db.getAllAsync<any>(
+      `SELECT id, api_endpoint as apiEndpoint, api_key as apiKey, model_name as modelName,
+              is_active as isActive, created_at as createdAt, updated_at as updatedAt
+       FROM ai_config ORDER BY created_at DESC`
     );
+    return results as AIConfig[];
   },
 
   /**

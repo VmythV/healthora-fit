@@ -67,6 +67,11 @@ export default function AIConfigScreen() {
 
   // 加载配置到表单
   const loadConfigToForm = (config: AIConfig) => {
+    console.log('[AI Config] Loading config to form:', config);
+    console.log('[AI Config] apiEndpoint:', config.apiEndpoint);
+    console.log('[AI Config] apiKey:', config.apiKey);
+    console.log('[AI Config] modelName:', config.modelName);
+
     setApiEndpoint(config.apiEndpoint || '');
     setApiKey(config.apiKey || '');
     setModelName(config.modelName || '');
@@ -79,10 +84,13 @@ export default function AIConfigScreen() {
     } else {
       setApiType('auto');
     }
+
+    console.log('[AI Config] Form loaded successfully');
   };
 
   // 点击配置项
   const handleConfigPress = (config: AIConfig) => {
+    console.log('[AI Config] Config pressed:', config);
     setEditingConfig(config);
     loadConfigToForm(config);
     setIsEditing(true);
