@@ -5,9 +5,11 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '@/constants/theme';
 import { Button } from './Button';
+import { Icon } from '@/components/icons';
+import { IconName } from '@/components/icons/Icon';
 
 interface EmptyProps {
-  icon?: string;
+  icon?: IconName;
   title: string;
   description?: string;
   actionTitle?: string;
@@ -20,7 +22,7 @@ interface EmptyProps {
  * @example
  * ```tsx
  * <Empty
- *   icon="🍽️"
+ *   icon="plate"
  *   title="还没有饮食记录"
  *   description="点击下方按钮开始记录你的第一餐"
  *   actionTitle="记录饮食"
@@ -37,7 +39,11 @@ export function Empty({
 }: EmptyProps) {
   return (
     <View style={styles.container}>
-      {icon && <Text style={styles.icon}>{icon}</Text>}
+      {icon && (
+        <View style={styles.iconContainer}>
+          <Icon name={icon} size={64} color={theme.colors.text.tertiary} />
+        </View>
+      )}
 
       <Text style={styles.title}>{title}</Text>
 
@@ -65,8 +71,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: theme.spacing['2xl'],
   },
-  icon: {
-    fontSize: 64,
+  iconContainer: {
     marginBottom: theme.spacing.xl,
   },
   title: {

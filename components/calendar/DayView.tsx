@@ -16,6 +16,8 @@ import { useDietRecords } from '@/hooks/useDietRecords';
 import { useExerciseRecords } from '@/hooks/useExerciseRecords';
 import { useWeightRecords } from '@/hooks/useWeightRecords';
 import { Card, Empty } from '@/components/ui';
+import { Icon } from '@/components/icons';
+import { IconName } from '@/components/icons/Icon';
 
 interface DayViewProps {
   date: string; // YYYY-MM-DD
@@ -23,10 +25,10 @@ interface DayViewProps {
 }
 
 // 记录类型图标
-const RECORD_ICONS: Record<string, string> = {
-  diet: '🍚',
-  exercise: '🏃',
-  weight: '⚖️',
+const RECORD_ICONS: Record<string, IconName> = {
+  diet: 'bowl',
+  exercise: 'running',
+  weight: 'weight',
 };
 
 /**
@@ -140,7 +142,7 @@ export function DayView({ date, onDateChange }: DayViewProps) {
       <ScrollView style={styles.recordList}>
         {allRecords.length === 0 ? (
           <Empty
-            icon="📝"
+            icon="note"
             title={t('common.noData')}
             description={t('common.comingSoon')}
           />
@@ -153,9 +155,9 @@ export function DayView({ date, onDateChange }: DayViewProps) {
             >
               <Card style={styles.recordCard}>
                 <View style={styles.recordRow}>
-                  <Text style={styles.recordIcon}>
-                    {RECORD_ICONS[record.type]}
-                  </Text>
+                  <View style={styles.recordIconContainer}>
+                    <Icon name={RECORD_ICONS[record.type]} size={24} color={theme.colors.primary.main} />
+                  </View>
                   <View style={styles.recordInfo}>
                     <Text style={styles.recordTitle}>{record.title}</Text>
                     <Text style={styles.recordDetail}>{record.detail}</Text>
@@ -231,8 +233,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.md,
   },
-  recordIcon: {
-    fontSize: 24,
+  recordIconContainer: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   recordInfo: {
     flex: 1,

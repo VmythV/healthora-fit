@@ -17,6 +17,7 @@ import { useExerciseRecords } from '@/hooks/useExerciseRecords';
 import { ExerciseRecord } from '@/types/exercise';
 import { Card } from '@/components/ui';
 import { Icon } from '@/components/icons';
+import { IconName } from '@/components/icons/Icon';
 
 interface ExerciseRecordDetailProps {
   record: ExerciseRecord;
@@ -24,15 +25,15 @@ interface ExerciseRecordDetailProps {
 }
 
 // 运动类型图标
-const EXERCISE_ICONS: Record<string, string> = {
-  running: '🏃',
-  walking: '🚶',
-  cycling: '🚴',
-  swimming: '🏊',
-  strength: '💪',
-  yoga: '🧘',
-  hiit: '⚡',
-  other: '🎯',
+const EXERCISE_ICONS: Record<string, IconName> = {
+  running: 'running',
+  walking: 'walking',
+  cycling: 'cycling',
+  swimming: 'swimming',
+  strength: 'strength',
+  yoga: 'yoga',
+  hiit: 'hiit',
+  other: 'other-exercise',
 };
 
 /**
@@ -106,9 +107,9 @@ export function ExerciseRecordDetail({ record, onDelete }: ExerciseRecordDetailP
       <Card style={styles.headerCard}>
         <View style={styles.headerRow}>
           <View style={styles.typeContainer}>
-            <Text style={styles.typeIcon}>
-              {EXERCISE_ICONS[record.exerciseType] || '🎯'}
-            </Text>
+            <View style={styles.typeIconContainer}>
+              <Icon name={EXERCISE_ICONS[record.exerciseType] || 'other-exercise'} size={36} color={theme.colors.primary.main} />
+            </View>
             <Text style={styles.typeName}>
               {t(`exerciseType.${record.exerciseType}`)}
             </Text>
@@ -218,8 +219,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.md,
   },
-  typeIcon: {
-    fontSize: 36,
+  typeIconContainer: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   typeName: {
     fontSize: theme.fontSize.h3,

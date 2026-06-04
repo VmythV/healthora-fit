@@ -17,6 +17,7 @@ import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { useHealthData } from '@/hooks/useHealthData';
 import { HealthConnectionStatus } from '@/services/health';
+import { Icon } from '@/components/icons';
 
 export default function HealthConnectScreen() {
   const { t } = useI18n();
@@ -140,9 +141,13 @@ export default function HealthConnectScreen() {
         {/* 连接状态卡片 */}
         <View style={styles.statusCard}>
           <View style={styles.statusHeader}>
-            <Text style={styles.statusIcon}>
-              {connectionStatus?.isConnected ? '🟢' : '⚪'}
-            </Text>
+            <View style={styles.statusIconContainer}>
+              <Icon
+                name={connectionStatus?.isConnected ? 'connected' : 'disconnected'}
+                size={24}
+                color={connectionStatus?.isConnected ? theme.colors.success : theme.colors.text.tertiary}
+              />
+            </View>
             <Text style={styles.statusTitle}>
               {getStatusText(connectionStatus)}
             </Text>
@@ -241,7 +246,10 @@ export default function HealthConnectScreen() {
 
         {/* 帮助信息 */}
         <View style={styles.helpCard}>
-          <Text style={styles.helpTitle}>📖 {t('settings.health.help')}</Text>
+          <View style={styles.helpTitleRow}>
+            <Icon name="help" size={18} color={theme.colors.text.primary} />
+            <Text style={styles.helpTitle}>{t('settings.health.help')}</Text>
+          </View>
           <Text style={styles.helpText}>{t('settings.health.helpText1')}</Text>
           <Text style={styles.helpText}>{t('settings.health.helpText2')}</Text>
           <Text style={styles.helpText}>{t('settings.health.helpText3')}</Text>
@@ -297,8 +305,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: theme.spacing.base,
   },
-  statusIcon: {
-    fontSize: 24,
+  statusIconContainer: {
     marginRight: theme.spacing.base,
   },
   statusTitle: {
@@ -387,11 +394,16 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.lg,
     padding: theme.spacing.xl,
   },
+  helpTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.base,
+  },
   helpTitle: {
     fontSize: theme.fontSize.body,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.text.primary,
-    marginBottom: theme.spacing.base,
   },
   helpText: {
     fontSize: theme.fontSize.bodySm,

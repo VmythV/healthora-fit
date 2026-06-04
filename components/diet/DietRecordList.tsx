@@ -17,6 +17,7 @@ import { useDietRecords } from '@/hooks/useDietRecords';
 import { DietRecord, FoodItem } from '@/types/diet';
 import { Card, Empty } from '@/components/ui';
 import { Icon } from '@/components/icons';
+import { IconName } from '@/components/icons/Icon';
 
 interface DietRecordListProps {
   date?: string; // 筛选日期，格式 YYYY-MM-DD
@@ -41,18 +42,18 @@ export function DietRecordList({ date, onRecordPress }: DietRecordListProps) {
   };
 
   // 获取餐次图标
-  const getMealIcon = (mealType?: string) => {
+  const getMealIcon = (mealType?: string): IconName => {
     switch (mealType) {
       case 'breakfast':
-        return '🌅';
+        return 'sunrise';
       case 'lunch':
-        return '☀️';
+        return 'plate';
       case 'dinner':
-        return '🌙';
+        return 'moon';
       case 'snack':
-        return '🍪';
+        return 'cookie';
       default:
-        return '🍽️';
+        return 'plate';
     }
   };
 
@@ -91,7 +92,9 @@ export function DietRecordList({ date, onRecordPress }: DietRecordListProps) {
         <View style={styles.recordHeader}>
           <View style={styles.recordInfo}>
             <View style={styles.mealRow}>
-              <Text style={styles.mealIcon}>{getMealIcon(item.mealType)}</Text>
+              <View style={styles.mealIconContainer}>
+                <Icon name={getMealIcon(item.mealType)} size={20} color={theme.colors.primary.main} />
+              </View>
               <Text style={styles.mealType}>
                 {item.mealType ? t(`mealType.${item.mealType}`) : ''}
               </Text>
@@ -135,7 +138,7 @@ export function DietRecordList({ date, onRecordPress }: DietRecordListProps) {
   if (!loading && records.length === 0) {
     return (
       <Empty
-        icon="🍽️"
+        icon="plate"
         title={t('diet.noFood')}
         description={t('common.comingSoon')}
       />
@@ -174,8 +177,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.sm,
   },
-  mealIcon: {
-    fontSize: 20,
+  mealIconContainer: {
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   mealType: {
     fontSize: theme.fontSize.body,

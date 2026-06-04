@@ -154,7 +154,7 @@ export default function HomeScreen() {
                 <TodayRecords records={todayRecords} />
               ) : (
                 <EmptyState
-                  icon="📝"
+                  icon="note"
                   title={t('home.noRecords')}
                   message={t('home.noRecordsMessage')}
                   actionTitle={t('record.title')}

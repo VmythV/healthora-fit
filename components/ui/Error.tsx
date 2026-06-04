@@ -5,9 +5,11 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '@/constants/theme';
 import { Button } from './Button';
+import { Icon } from '@/components/icons';
+import { IconName } from '@/components/icons/Icon';
 
 interface ErrorProps {
-  icon?: string;
+  icon?: IconName;
   title?: string;
   message: string;
   retryText?: string;
@@ -34,7 +36,7 @@ interface ErrorProps {
  * ```
  */
 export function Error({
-  icon = '⚠️',
+  icon = 'tips',
   title,
   message,
   retryText = '重试',
@@ -42,7 +44,9 @@ export function Error({
 }: ErrorProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>{icon}</Text>
+      <View style={styles.iconContainer}>
+        <Icon name={icon} size={64} color={theme.colors.text.tertiary} />
+      </View>
 
       {title && <Text style={styles.title}>{title}</Text>}
 
@@ -68,8 +72,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: theme.spacing['2xl'],
   },
-  icon: {
-    fontSize: 64,
+  iconContainer: {
     marginBottom: theme.spacing.xl,
   },
   title: {

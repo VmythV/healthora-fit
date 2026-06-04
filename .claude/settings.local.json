@@ -6,7 +6,8 @@
       "Bash(chmod +x *)",
       "Bash(npx eas-cli *)",
       "Bash(npx expo *)",
-      "Bash(awk -F\"'\" '{print $2}')"
+      "Bash(awk -F\"'\" '{print $2}')",
+      "Bash(npx tsc *)"
     ]
   }
 }

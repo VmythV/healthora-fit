@@ -5,21 +5,23 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
+import { Icon } from '@/components/icons';
+import { IconName } from '@/components/icons/Icon';
 
 interface ExerciseTypeSelectorProps {
   value: string;
   onChange: (type: string) => void;
 }
 
-const EXERCISE_TYPES = [
-  { key: 'running', icon: '🏃' },
-  { key: 'walking', icon: '🚶' },
-  { key: 'cycling', icon: '🚴' },
-  { key: 'swimming', icon: '🏊' },
-  { key: 'strength', icon: '💪' },
-  { key: 'yoga', icon: '🧘' },
-  { key: 'hiit', icon: '⚡' },
-  { key: 'other', icon: '🎯' },
+const EXERCISE_TYPES: { key: string; icon: IconName }[] = [
+  { key: 'running', icon: 'running' },
+  { key: 'walking', icon: 'walking' },
+  { key: 'cycling', icon: 'cycling' },
+  { key: 'swimming', icon: 'swimming' },
+  { key: 'strength', icon: 'strength' },
+  { key: 'yoga', icon: 'yoga' },
+  { key: 'hiit', icon: 'hiit' },
+  { key: 'other', icon: 'other-exercise' },
 ];
 
 /**
@@ -43,7 +45,9 @@ export function ExerciseTypeSelector({ value, onChange }: ExerciseTypeSelectorPr
           ]}
           onPress={() => onChange(type.key)}
         >
-          <Text style={styles.icon}>{type.icon}</Text>
+          <View style={styles.iconContainer}>
+            <Icon name={type.icon} size={28} color={value === type.key ? theme.colors.primary.main : theme.colors.text.secondary} />
+          </View>
           <Text
             style={[
               styles.label,
@@ -77,8 +81,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary.main,
     backgroundColor: theme.colors.primary.light,
   },
-  icon: {
-    fontSize: 28,
+  iconContainer: {
     marginBottom: theme.spacing.xs,
   },
   label: {

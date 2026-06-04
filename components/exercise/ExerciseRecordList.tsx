@@ -17,6 +17,7 @@ import { useExerciseRecords } from '@/hooks/useExerciseRecords';
 import { ExerciseRecord } from '@/types/exercise';
 import { Card, Empty } from '@/components/ui';
 import { Icon } from '@/components/icons';
+import { IconName } from '@/components/icons/Icon';
 
 interface ExerciseRecordListProps {
   date?: string;
@@ -24,15 +25,15 @@ interface ExerciseRecordListProps {
 }
 
 // 运动类型图标
-const EXERCISE_ICONS: Record<string, string> = {
-  running: '🏃',
-  walking: '🚶',
-  cycling: '🚴',
-  swimming: '🏊',
-  strength: '💪',
-  yoga: '🧘',
-  hiit: '⚡',
-  other: '🎯',
+const EXERCISE_ICONS: Record<string, IconName> = {
+  running: 'running',
+  walking: 'walking',
+  cycling: 'cycling',
+  swimming: 'swimming',
+  strength: 'strength',
+  yoga: 'yoga',
+  hiit: 'hiit',
+  other: 'other-exercise',
 };
 
 /**
@@ -78,9 +79,9 @@ export function ExerciseRecordList({ date, onRecordPress }: ExerciseRecordListPr
         <View style={styles.recordHeader}>
           <View style={styles.recordInfo}>
             <View style={styles.typeRow}>
-              <Text style={styles.typeIcon}>
-                {EXERCISE_ICONS[item.exerciseType] || '🎯'}
-              </Text>
+              <View style={styles.typeIconContainer}>
+                <Icon name={EXERCISE_ICONS[item.exerciseType] || 'other-exercise'} size={24} color={theme.colors.primary.main} />
+              </View>
               <Text style={styles.typeName}>
                 {t(`exerciseType.${item.exerciseType}`)}
               </Text>
@@ -95,13 +96,19 @@ export function ExerciseRecordList({ date, onRecordPress }: ExerciseRecordListPr
 
         {/* 详细数据 */}
         <View style={styles.detailRow}>
-          <Text style={styles.detailText}>
-            🔥 {item.caloriesBurned || 0} {t('home.kcal')}
-          </Text>
-          {item.distanceKm ? (
+          <View style={styles.detailItem}>
+            <Icon name="fire" size={14} color={theme.colors.text.secondary} />
             <Text style={styles.detailText}>
-              📏 {item.distanceKm} {t('exercise.km')}
+              {' '}{item.caloriesBurned || 0} {t('home.kcal')}
             </Text>
+          </View>
+          {item.distanceKm ? (
+            <View style={styles.detailItem}>
+              <Icon name="chart-bar" size={14} color={theme.colors.text.secondary} />
+              <Text style={styles.detailText}>
+                {' '}{item.distanceKm} {t('exercise.km')}
+              </Text>
+            </View>
           ) : null}
         </View>
 
@@ -120,7 +127,7 @@ export function ExerciseRecordList({ date, onRecordPress }: ExerciseRecordListPr
   if (!loading && records.length === 0) {
     return (
       <Empty
-        icon="🏃"
+        icon="running"
         title={t('exercise.noRecords')}
         description={t('common.comingSoon')}
       />
@@ -159,8 +166,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.sm,
   },
-  typeIcon: {
-    fontSize: 24,
+  typeIconContainer: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   typeName: {
     fontSize: theme.fontSize.body,
@@ -190,6 +200,10 @@ const styles = StyleSheet.create({
     paddingTop: theme.spacing.sm,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border.light,
+  },
+  detailItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   detailText: {
     fontSize: theme.fontSize.bodySm,

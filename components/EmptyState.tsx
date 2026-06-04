@@ -5,9 +5,11 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '@/constants/theme';
 import { AnimatedButton } from './AnimatedButton';
+import { Icon } from '@/components/icons';
+import { IconName } from '@/components/icons/Icon';
 
 interface EmptyStateProps {
-  icon: string;
+  icon: IconName;
   title: string;
   message?: string;
   actionTitle?: string;
@@ -23,7 +25,9 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>{icon}</Text>
+      <View style={styles.iconContainer}>
+        <Icon name={icon} size={64} color={theme.colors.text.tertiary} />
+      </View>
       <Text style={styles.title}>{title}</Text>
       {message && <Text style={styles.message}>{message}</Text>}
       {actionTitle && onAction && (
@@ -46,8 +50,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: theme.spacing.xl,
   },
-  icon: {
-    fontSize: 64,
+  iconContainer: {
     marginBottom: theme.spacing.xl,
   },
   title: {

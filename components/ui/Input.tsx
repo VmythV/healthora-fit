@@ -12,6 +12,7 @@ import {
   KeyboardTypeOptions,
 } from 'react-native';
 import { theme } from '@/constants/theme';
+import { Icon } from '@/components/icons';
 
 type InputVariant = 'text' | 'number' | 'search';
 
@@ -102,7 +103,7 @@ export function Input({
         ]}
       >
         {variant === 'search' && (
-          <Text style={styles.searchIcon}>🔍</Text>
+          <Icon name="search" size={16} color={theme.colors.text.tertiary} />
         )}
 
         <TextInput
@@ -174,9 +175,6 @@ const styles = StyleSheet.create({
   },
   inputWithSuffix: {
     marginRight: theme.spacing.sm,
-  },
-  searchIcon: {
-    fontSize: 16,
   },
   suffix: {
     fontSize: theme.fontSize.body,

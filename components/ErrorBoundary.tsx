@@ -4,6 +4,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { theme } from '@/constants/theme';
+import { Icon } from '@/components/icons';
 
 interface Props {
   children: ReactNode;
@@ -59,7 +60,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
       return (
         <View style={styles.container}>
-          <Text style={styles.icon}>⚠️</Text>
+          <View style={styles.iconContainer}>
+            <Icon name="tips" size={64} color={theme.colors.text.tertiary} />
+          </View>
           <Text style={styles.title}>应用发生错误</Text>
           <Text style={styles.message}>
             {this.state.error?.message || '发生未知错误'}
@@ -93,8 +96,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.xl,
     backgroundColor: theme.colors.background.primary,
   },
-  icon: {
-    fontSize: 64,
+  iconContainer: {
     marginBottom: theme.spacing.xl,
   },
   title: {

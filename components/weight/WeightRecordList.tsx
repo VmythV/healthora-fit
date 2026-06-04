@@ -112,9 +112,12 @@ export function WeightRecordList({ onRecordPress }: WeightRecordListProps) {
               </Text>
             )}
             {item.note && (
-              <Text style={styles.noteText} numberOfLines={1}>
-                📝 {item.note}
-              </Text>
+              <View style={styles.noteContainer}>
+                <Icon name="note" size={14} color={theme.colors.text.tertiary} />
+                <Text style={styles.noteText} numberOfLines={1}>
+                  {' '}{item.note}
+                </Text>
+              </View>
             )}
           </View>
 
@@ -134,7 +137,7 @@ export function WeightRecordList({ onRecordPress }: WeightRecordListProps) {
   if (!loading && records.length === 0) {
     return (
       <Empty
-        icon="⚖️"
+        icon="weight"
         title={t('weight.noRecord')}
         description={t('common.comingSoon')}
       />
@@ -205,11 +208,15 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.bodySm,
     fontWeight: theme.fontWeight.medium,
   },
+  noteContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
   noteText: {
     fontSize: theme.fontSize.caption,
     color: theme.colors.text.tertiary,
-    flex: 1,
-    textAlign: 'right',
   },
   deleteButton: {
     position: 'absolute',

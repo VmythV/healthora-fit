@@ -6,6 +6,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { MealType } from '@/types/diet';
+import { Icon } from '@/components/icons';
+import { IconName } from '@/components/icons/Icon';
 
 interface MealTypeSelectorProps {
   value: MealType;
@@ -14,11 +16,11 @@ interface MealTypeSelectorProps {
 
 const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
 
-const MEAL_ICONS: Record<MealType, string> = {
-  breakfast: '🌅',
-  lunch: '☀️',
-  dinner: '🌙',
-  snack: '🍪',
+const MEAL_ICONS: Record<MealType, IconName> = {
+  breakfast: 'sunrise',
+  lunch: 'plate',
+  dinner: 'moon',
+  snack: 'cookie',
 };
 
 /**
@@ -38,7 +40,9 @@ export function MealTypeSelector({ value, onChange }: MealTypeSelectorProps) {
           ]}
           onPress={() => onChange(type)}
         >
-          <Text style={styles.icon}>{MEAL_ICONS[type]}</Text>
+          <View style={styles.iconContainer}>
+            <Icon name={MEAL_ICONS[type]} size={24} color={value === type ? theme.colors.primary.main : theme.colors.text.secondary} />
+          </View>
           <Text
             style={[
               styles.label,
@@ -71,8 +75,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary.main,
     backgroundColor: theme.colors.primary.light,
   },
-  icon: {
-    fontSize: 24,
+  iconContainer: {
     marginBottom: theme.spacing.xs,
   },
   label: {

@@ -18,6 +18,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { useGoals } from '@/hooks/useGoals';
 import { useWeightRecords } from '@/hooks/useWeightRecords';
 import { ProgressRing } from '@/components/charts/ProgressRing';
+import { Icon } from '@/components/icons';
 
 export default function GoalsScreen() {
   const { t } = useI18n();
@@ -177,7 +178,10 @@ export default function GoalsScreen() {
 
         {/* 提示信息 */}
         <View style={styles.tipsCard}>
-          <Text style={styles.tipsTitle}>💡 {t('settings.goals.tips')}</Text>
+          <View style={styles.tipsTitleRow}>
+            <Icon name="tips" size={18} color={theme.colors.text.primary} />
+            <Text style={styles.tipsTitle}>{t('settings.goals.tips')}</Text>
+          </View>
           <Text style={styles.tipsText}>{t('settings.goals.tip1')}</Text>
           <Text style={styles.tipsText}>{t('settings.goals.tip2')}</Text>
           <Text style={styles.tipsText}>{t('settings.goals.tip3')}</Text>
@@ -339,11 +343,16 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.lg,
     padding: theme.spacing.xl,
   },
+  tipsTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.base,
+  },
   tipsTitle: {
     fontSize: theme.fontSize.body,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.text.primary,
-    marginBottom: theme.spacing.base,
   },
   tipsText: {
     fontSize: theme.fontSize.bodySm,

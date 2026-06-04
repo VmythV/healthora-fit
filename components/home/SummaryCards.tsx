@@ -6,6 +6,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { Card } from '@/components/ui';
+import { Icon } from '@/components/icons';
 
 interface SummaryCardsProps {
   weight?: number;
@@ -35,7 +36,9 @@ export function SummaryCards({
     <View style={styles.container}>
       {/* 体重卡片 */}
       <Card style={styles.weightCard}>
-        <Text style={styles.cardIcon}>⚖️</Text>
+        <View style={styles.cardIcon}>
+          <Icon name="weight" size={24} color={theme.colors.primary.main} />
+        </View>
         <Text style={styles.cardTitle}>{t('home.weight')}</Text>
         <Text style={styles.cardValue}>
           {weight ? weight.toFixed(1) : '--'}
@@ -55,7 +58,9 @@ export function SummaryCards({
 
       {/* 饮食卡片 */}
       <Card style={styles.dietCard}>
-        <Text style={styles.cardIcon}>🍚</Text>
+        <View style={styles.cardIcon}>
+          <Icon name="bowl" size={24} color={theme.colors.primary.main} />
+        </View>
         <Text style={styles.cardTitle}>{t('home.meals')}</Text>
         <Text style={styles.cardValue}>{mealsCount}</Text>
         <Text style={styles.cardUnit}>{t('diet.calories')}</Text>
@@ -64,11 +69,16 @@ export function SummaryCards({
 
       {/* 运动卡片 */}
       <Card style={styles.exerciseCard}>
-        <Text style={styles.cardIcon}>🏃</Text>
+        <View style={styles.cardIcon}>
+          <Icon name="exercise" size={24} color={theme.colors.primary.main} />
+        </View>
         <Text style={styles.cardTitle}>{t('home.exercise')}</Text>
         <Text style={styles.cardValue}>{exerciseMinutes}</Text>
         <Text style={styles.cardUnit}>{t('home.minutes')}</Text>
-        <Text style={styles.cardExtra}>🔥 {caloriesBurned} {t('home.kcal')}</Text>
+        <View style={styles.cardExtraContainer}>
+          <Icon name="fire" size={14} color={theme.colors.primary.main} />
+          <Text style={styles.cardExtra}>{caloriesBurned} {t('home.kcal')}</Text>
+        </View>
       </Card>
     </View>
   );
@@ -95,7 +105,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardIcon: {
-    fontSize: 24,
     marginBottom: theme.spacing.xs,
   },
   cardTitle: {
@@ -112,10 +121,15 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.caption,
     color: theme.colors.text.tertiary,
   },
+  cardExtraContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: theme.spacing.xs,
+  },
   cardExtra: {
     fontSize: theme.fontSize.caption,
     color: theme.colors.primary.main,
-    marginTop: theme.spacing.xs,
+    marginLeft: theme.spacing.xs,
   },
   changeText: {
     fontSize: theme.fontSize.bodySm,

@@ -18,6 +18,7 @@ import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { aiConfigQueries } from '@/database/queries/aiConfig';
 import { AIConfig } from '@/types/ai';
+import { Icon } from '@/components/icons';
 
 export default function AIConfigScreen() {
   const { t } = useI18n();
@@ -194,7 +195,10 @@ export default function AIConfigScreen() {
 
         {/* 帮助信息 */}
         <View style={styles.helpCard}>
-          <Text style={styles.helpTitle}>📖 {t('settings.ai.help')}</Text>
+          <View style={styles.helpTitleRow}>
+            <Icon name="help" size={18} color={theme.colors.text.primary} />
+            <Text style={styles.helpTitle}>{t('settings.ai.help')}</Text>
+          </View>
           <Text style={styles.helpText}>{t('settings.ai.helpText1')}</Text>
           <Text style={styles.helpText}>{t('settings.ai.helpText2')}</Text>
           <Text style={styles.helpText}>{t('settings.ai.helpText3')}</Text>
@@ -342,11 +346,16 @@ const styles = StyleSheet.create({
     borderRadius: theme.borderRadius.lg,
     padding: theme.spacing.xl,
   },
+  helpTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.base,
+  },
   helpTitle: {
     fontSize: theme.fontSize.body,
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.text.primary,
-    marginBottom: theme.spacing.base,
   },
   helpText: {
     fontSize: theme.fontSize.bodySm,

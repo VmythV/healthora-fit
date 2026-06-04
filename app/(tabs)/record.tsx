@@ -3,6 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
+import { Icon } from '@/components/icons';
 
 export default function RecordScreen() {
   const router = useRouter();
@@ -20,7 +21,9 @@ export default function RecordScreen() {
           style={styles.card}
           onPress={() => router.push('/diet/record')}
         >
-          <Text style={styles.cardIcon}>🍚</Text>
+          <View style={styles.cardIconContainer}>
+            <Icon name="bowl" size={36} color={theme.colors.primary.main} />
+          </View>
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>{t('record.diet.title')}</Text>
             <Text style={styles.cardDesc}>{t('record.diet.desc')}</Text>
@@ -32,7 +35,9 @@ export default function RecordScreen() {
           style={styles.card}
           onPress={() => router.push('/exercise/record')}
         >
-          <Text style={styles.cardIcon}>🏃</Text>
+          <View style={styles.cardIconContainer}>
+            <Icon name="running" size={36} color={theme.colors.primary.main} />
+          </View>
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>{t('record.exercise.title')}</Text>
             <Text style={styles.cardDesc}>{t('record.exercise.desc')}</Text>
@@ -44,7 +49,9 @@ export default function RecordScreen() {
           style={styles.card}
           onPress={() => router.push('/weight/record')}
         >
-          <Text style={styles.cardIcon}>⚖️</Text>
+          <View style={styles.cardIconContainer}>
+            <Icon name="weight" size={36} color={theme.colors.primary.main} />
+          </View>
           <View style={styles.cardInfo}>
             <Text style={styles.cardTitle}>{t('record.weight.title')}</Text>
             <Text style={styles.cardDesc}>{t('record.weight.desc')}</Text>
@@ -89,8 +96,7 @@ const styles = StyleSheet.create({
     padding: theme.spacing.xl,
     ...theme.shadow.md,
   },
-  cardIcon: {
-    fontSize: 36,
+  cardIconContainer: {
     marginRight: theme.spacing.base,
   },
   cardInfo: {

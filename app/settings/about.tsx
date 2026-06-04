@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
+import { Icon } from '@/components/icons';
 
 export default function AboutScreen() {
   const { t } = useI18n();
@@ -48,7 +49,9 @@ export default function AboutScreen() {
       <ScrollView style={styles.content}>
         {/* App Logo 和名称 */}
         <View style={styles.logoSection}>
-          <Text style={styles.logo}>🏃‍♂️</Text>
+          <View style={styles.logoContainer}>
+            <Icon name="exercise" size={64} color={theme.colors.primary.main} />
+          </View>
           <Text style={styles.appName}>{appInfo.name}</Text>
           <Text style={styles.appDescription}>{appInfo.description}</Text>
         </View>
@@ -98,23 +101,33 @@ export default function AboutScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('settings.about.features')}</Text>
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>🍚</Text>
+            <View style={styles.featureIconContainer}>
+              <Icon name="bowl" size={20} color={theme.colors.primary.main} />
+            </View>
             <Text style={styles.featureText}>{t('settings.about.feature1')}</Text>
           </View>
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>🏃</Text>
+            <View style={styles.featureIconContainer}>
+              <Icon name="running" size={20} color={theme.colors.primary.main} />
+            </View>
             <Text style={styles.featureText}>{t('settings.about.feature2')}</Text>
           </View>
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>⚖️</Text>
+            <View style={styles.featureIconContainer}>
+              <Icon name="weight" size={20} color={theme.colors.primary.main} />
+            </View>
             <Text style={styles.featureText}>{t('settings.about.feature3')}</Text>
           </View>
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>📊</Text>
+            <View style={styles.featureIconContainer}>
+              <Icon name="chart-bar" size={20} color={theme.colors.primary.main} />
+            </View>
             <Text style={styles.featureText}>{t('settings.about.feature4')}</Text>
           </View>
           <View style={styles.featureItem}>
-            <Text style={styles.featureIcon}>🤖</Text>
+            <View style={styles.featureIconContainer}>
+              <Icon name="ai" size={20} color={theme.colors.primary.main} />
+            </View>
             <Text style={styles.featureText}>{t('settings.about.feature5')}</Text>
           </View>
         </View>
@@ -172,8 +185,7 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.xl * 2,
     backgroundColor: theme.colors.background.primary,
   },
-  logo: {
-    fontSize: 64,
+  logoContainer: {
     marginBottom: theme.spacing.lg,
   },
   appName: {
@@ -241,8 +253,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border.light,
   },
-  featureIcon: {
-    fontSize: 20,
+  featureIconContainer: {
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: theme.spacing.base,
   },
   featureText: {

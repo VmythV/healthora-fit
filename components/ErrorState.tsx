@@ -5,6 +5,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '@/constants/theme';
 import { AnimatedButton } from './AnimatedButton';
+import { Icon } from '@/components/icons';
 
 interface ErrorStateProps {
   title?: string;
@@ -21,7 +22,9 @@ export function ErrorState({
 }: ErrorStateProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>⚠️</Text>
+      <View style={styles.iconContainer}>
+        <Icon name="tips" size={64} color={theme.colors.text.tertiary} />
+      </View>
       <Text style={styles.title}>{title || '出错了'}</Text>
       <Text style={styles.message}>{message || '加载失败，请稍后重试'}</Text>
       {onRetry && (
@@ -44,8 +47,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: theme.spacing.xl,
   },
-  icon: {
-    fontSize: 64,
+  iconContainer: {
     marginBottom: theme.spacing.xl,
   },
   title: {

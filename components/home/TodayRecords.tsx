@@ -12,6 +12,8 @@ import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { Card, Empty } from '@/components/ui';
+import { Icon } from '@/components/icons';
+import { IconName } from '@/components/icons/Icon';
 
 interface Record {
   id: number;
@@ -26,10 +28,10 @@ interface TodayRecordsProps {
 }
 
 // 记录类型图标
-const RECORD_ICONS: Record<string, string> = {
-  diet: '🍚',
-  exercise: '🏃',
-  weight: '⚖️',
+const RECORD_ICONS: { [key: string]: IconName } = {
+  diet: 'bowl',
+  exercise: 'running',
+  weight: 'weight',
 };
 
 /**
@@ -66,7 +68,9 @@ export function TodayRecords({ records }: TodayRecordsProps) {
   if (records.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyIcon}>📝</Text>
+        <View style={styles.emptyIconContainer}>
+          <Icon name="note" size={48} color={theme.colors.text.tertiary} />
+        </View>
         <Text style={styles.emptyText}>{t('common.noData')}</Text>
       </View>
     );
@@ -82,9 +86,9 @@ export function TodayRecords({ records }: TodayRecordsProps) {
         >
           <Card style={styles.recordCard}>
             <View style={styles.recordRow}>
-              <Text style={styles.recordIcon}>
-                {RECORD_ICONS[record.type]}
-              </Text>
+              <View style={styles.recordIconContainer}>
+                <Icon name={RECORD_ICONS[record.type]} size={24} color={theme.colors.primary.main} />
+              </View>
               <View style={styles.recordInfo}>
                 <Text style={styles.recordTitle}>{record.title}</Text>
                 <Text style={styles.recordDetail}>{record.detail}</Text>
@@ -106,8 +110,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: theme.spacing['2xl'],
   },
-  emptyIcon: {
-    fontSize: 48,
+  emptyIconContainer: {
     marginBottom: theme.spacing.base,
   },
   emptyText: {
@@ -122,8 +125,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing.md,
   },
-  recordIcon: {
-    fontSize: 24,
+  recordIconContainer: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   recordInfo: {
     flex: 1,
