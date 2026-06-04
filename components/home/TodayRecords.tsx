@@ -80,7 +80,7 @@ export function TodayRecords({ records }: TodayRecordsProps) {
     <View style={styles.container}>
       {records.map((record, index) => (
         <TouchableOpacity
-          key={record.id}
+          key={`${record.type}-${record.id}`}
           onPress={() => handlePress(record)}
           activeOpacity={0.7}
         >
