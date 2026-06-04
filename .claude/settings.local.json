@@ -4,7 +4,9 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(chmod +x *)",
-      "Bash(npx eas-cli *)"
+      "Bash(npx eas-cli *)",
+      "Bash(npx expo *)",
+      "Bash(awk -F\"'\" '{print $2}')"
     ]
   }
 }
