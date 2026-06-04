@@ -43,7 +43,7 @@ export default function DietRecordScreen() {
     }
 
     const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       quality: 0.8,
     });
 
@@ -62,7 +62,7 @@ export default function DietRecordScreen() {
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       quality: 0.8,
     });
 
@@ -74,7 +74,14 @@ export default function DietRecordScreen() {
 
   // AI 分析
   const analyzeImage = async (uri: string) => {
+    console.log('[AI] diet/record - 开始分析图片:', uri);
+    // 确保配置已加载
     if (!aiService.isConfigured()) {
+      console.log('[AI] diet/record - 配置未缓存，尝试加载...');
+      await aiService.loadConfig();
+    }
+    if (!aiService.isConfigured()) {
+      console.warn('[AI] diet/record - 配置加载后仍不可用');
       Alert.alert(
         t('settings.ai.title'),
         t('settings.ai.notConfigured'),
@@ -92,9 +99,10 @@ export default function DietRecordScreen() {
     setAnalyzing(true);
     try {
       const result = await aiService.analyzeFood(uri);
+      console.log('[AI] diet/record - 分析结果:', JSON.stringify(result));
       setFoods(result.foods);
     } catch (error) {
-      console.error('AI 分析失败:', error);
+      console.error('[AI] diet/record - 分析失败:', error);
       Alert.alert(t('common.error'), t('error.aiFailed'));
     } finally {
       setAnalyzing(false);

@@ -42,9 +42,10 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
   // 加载 AI 配置
   const loadAiConfig = async () => {
     try {
+      console.log('[AI] ScreenshotPicker - 组件挂载，加载配置...');
       await aiService.loadConfig();
     } catch (err) {
-      console.error('加载 AI 配置失败:', err);
+      console.error('[AI] ScreenshotPicker - 加载配置失败:', err);
     }
   };
 
@@ -109,23 +110,28 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
 
   // 分析图片
   const analyzeImage = async (uri: string) => {
+    console.log('[AI] ScreenshotPicker - 开始分析:', uri);
     setAnalyzing(true);
     setError(null);
 
     try {
       // 确保 AI 配置已加载
       if (!aiService.isConfigured()) {
+        console.log('[AI] ScreenshotPicker - 配置未缓存，尝试加载...');
         await aiService.loadConfig();
       }
 
       if (!aiService.isConfigured()) {
+        console.warn('[AI] ScreenshotPicker - 配置不可用');
         throw new Error(t('exercise.aiNotConfigured'));
       }
 
       const result = await exerciseAnalysisService.analyzeScreenshot(uri);
+      console.log('[AI] ScreenshotPicker - 分析完成:', JSON.stringify(result));
       onAnalysisComplete(result, uri);
     } catch (err) {
       const message = err instanceof Error ? err.message : t('exercise.analysisFailed');
+      console.error('[AI] ScreenshotPicker - 分析失败:', err);
       setError(message);
       onError?.(message);
     } finally {

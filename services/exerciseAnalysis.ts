@@ -39,18 +39,24 @@ export class ExerciseAnalysisService {
    * 分析运动截图
    */
   async analyzeScreenshot(imageUri: string): Promise<ExerciseAnalysisResult> {
+    console.log('[AI] 开始分析运动截图');
+    console.log('[AI] 图片 URI:', imageUri);
+
     // 确保 AI 配置已加载
     if (!aiService.isConfigured()) {
+      console.log('[AI] 配置未加载，尝试加载...');
       await aiService.loadConfig();
     }
 
     if (!aiService.isConfigured()) {
+      console.error('[AI] 配置加载后仍然不可用');
       throw new Error('AI 服务未配置，请先在设置中配置');
     }
 
     try {
       // 转换图片为 Base64
       const base64 = await aiService.imageToBase64(imageUri);
+      console.log('[AI] 图片 Base64 长度:', base64.length, '字符');
 
       // 构建请求
       const prompt = `请分析这张运动截图，提取运动数据。这可能是运动 App 的截图、智能手表的运动记录、或者运动设备的显示屏。
@@ -76,10 +82,14 @@ export class ExerciseAnalysisService {
 
       const config = aiService.getConfig()!;
       const apiEndpoint = aiService.getApiEndpoint();
+      console.log('[AI] 请求端点:', apiEndpoint);
+      console.log('[AI] API 类型:', config.apiType);
+      console.log('[AI] 模型:', config.model);
       let response: Response;
 
       if (config.apiType === 'responses') {
         // Responses API 格式
+        console.log('[AI] 使用 Responses API 发送请求...');
         response = await fetch(apiEndpoint, {
           method: 'POST',
           headers: {
@@ -108,6 +118,7 @@ export class ExerciseAnalysisService {
         });
       } else {
         // Chat Completions API 格式
+        console.log('[AI] 使用 Chat Completions API 发送请求...');
         response = await fetch(apiEndpoint, {
           method: 'POST',
           headers: {
@@ -137,11 +148,14 @@ export class ExerciseAnalysisService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('AI 请求失败:', errorText);
+        console.error('[AI] HTTP 状态:', response.status);
+        console.error('[AI] 响应错误:', errorText);
         throw new Error('AI 识别失败，请重试');
       }
 
+      console.log('[AI] HTTP 状态:', response.status, 'OK');
       const data = await response.json();
+      console.log('[AI] 原始响应:', JSON.stringify(data).substring(0, 500));
 
       // 根据 API 类型解析响应
       let content: string | undefined;
@@ -153,20 +167,33 @@ export class ExerciseAnalysisService {
         content = data.choices?.[0]?.message?.content;
       }
 
+      console.log('[AI] 解析出的内容:', content ? content.substring(0, 300) : '(空)');
+
       if (!content) {
+        console.error('[AI] 返回内容为空，完整响应:', JSON.stringify(data));
         throw new Error('AI 返回内容为空');
       }
 
       // 解析 JSON
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
+        console.error('[AI] 未找到 JSON，原始内容:', content);
         throw new Error('AI 返回格式错误');
       }
 
+      console.log('[AI] JSON 匹配:', jsonMatch[0].substring(0, 300));
       const result = JSON.parse(jsonMatch[0]);
+      console.log('[AI] 解析结果:', JSON.stringify(result));
 
       // 映射运动类型
       const exerciseType = this.mapExerciseType(result.exerciseType);
+
+      console.log('[AI] 分析完成:',
+        `类型=${exerciseType},`,
+        `时长=${result.durationMinutes}分钟,`,
+        `卡路里=${result.caloriesBurned},`,
+        `置信度=${result.confidence}`
+      );
 
       return {
         exerciseType,
@@ -179,7 +206,7 @@ export class ExerciseAnalysisService {
         rawText: content,
       };
     } catch (error) {
-      console.error('运动截图分析失败:', error);
+      console.error('[AI] 运动截图分析失败:', error);
       throw error;
     }
   }
