@@ -165,8 +165,12 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
         {/* 今日统计 */}
         <View style={styles.statsRow}>
           <Card style={styles.statCard}>
-            <Text style={styles.statValue}>{totalCalories + totalExerciseCalories}</Text>
-            <Text style={styles.statLabel}>{t('home.kcal')}</Text>
+            <Text style={styles.statValue}>{totalCalories}</Text>
+            <Text style={styles.statLabel}>{t('calendar.caloriesIn')}</Text>
+          </Card>
+          <Card style={styles.statCard}>
+            <Text style={styles.statValue}>{totalExerciseCalories}</Text>
+            <Text style={styles.statLabel}>{t('calendar.caloriesOut')}</Text>
           </Card>
           <Card style={styles.statCard}>
             <Text style={styles.statValue}>{totalMinutes}</Text>
@@ -249,16 +253,16 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    padding: theme.spacing.base,
+    padding: theme.spacing.sm,
     alignItems: 'center',
   },
   statValue: {
-    fontSize: theme.fontSize.h3,
+    fontSize: theme.fontSize.bodyLg,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.primary.main,
   },
   statLabel: {
-    fontSize: theme.fontSize.caption,
+    fontSize: theme.fontSize.tiny,
     color: theme.colors.text.tertiary,
     marginTop: theme.spacing.xs,
   },

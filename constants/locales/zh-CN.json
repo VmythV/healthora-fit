@@ -23,7 +23,7 @@
   },
   "tabs": {
     "home": "首页",
-    "calendar": "日历",
+    "calendar": "日志",
     "record": "快记",
     "analysis": "分析",
     "settings": "设置"
@@ -47,7 +47,7 @@
     "noRecordsMessage": "点击下方按钮开始记录您的健康数据"
   },
   "calendar": {
-    "title": "日历",
+    "title": "日志",
     "monthView": "月视图",
     "dayView": "日视图",
     "summary": "摘要",
@@ -55,6 +55,8 @@
     "exercise": "运动",
     "weight": "体重",
     "status": "状态",
+    "caloriesIn": "摄入",
+    "caloriesOut": "消耗",
     "viewDetails": "查看详细"
   },
   "record": {

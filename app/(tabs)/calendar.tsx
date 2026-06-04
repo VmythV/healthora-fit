@@ -24,7 +24,7 @@ export default function CalendarScreen() {
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
 
-  const [viewMode, setViewMode] = useState<ViewMode>('month');
+  const [viewMode, setViewMode] = useState<ViewMode>('day');
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
   const [selectedDate, setSelectedDate] = useState(todayStr);

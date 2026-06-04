@@ -23,7 +23,7 @@
   },
   "tabs": {
     "home": "Home",
-    "calendar": "Calendar",
+    "calendar": "Log",
     "record": "Record",
     "analysis": "Analysis",
     "settings": "Settings"
@@ -48,7 +48,7 @@
     "noRecordsMessage": "Tap the button below to start tracking your health data"
   },
   "calendar": {
-    "title": "Calendar",
+    "title": "Log",
     "monthView": "Month View",
     "dayView": "Day View",
     "summary": "Summary",
@@ -56,6 +56,8 @@
     "exercise": "Exercise",
     "weight": "Weight",
     "status": "Status",
+    "caloriesIn": "Cal In",
+    "caloriesOut": "Cal Out",
     "viewDetails": "View Details"
   },
   "record": {
