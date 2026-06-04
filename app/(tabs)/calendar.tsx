@@ -38,6 +38,7 @@ export default function CalendarScreen() {
   const [markedDates, setMarkedDates] = useState<string[]>([]);
   const [calendarCollapsed, setCalendarCollapsed] = useState(false);
   const [calHeight, setCalHeight] = useState(360);
+  const [headerBottom, setHeaderBottom] = useState(56);
 
   useEffect(() => {
     loadMarkedDates();
@@ -89,7 +90,10 @@ export default function CalendarScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      <View
+        style={styles.header}
+        onLayout={(e) => setHeaderBottom(e.nativeEvent.layout.y + e.nativeEvent.layout.height)}
+      >
         <Text style={styles.title}>{t('calendar.title')}</Text>
       </View>
 
@@ -138,7 +142,7 @@ const styles = StyleSheet.create({
   },
   calendarFloat: {
     position: 'absolute',
-    top: 56,
+    top: headerBottom + theme.spacing.sm,
     left: 12,
     right: 12,
     zIndex: 10,
