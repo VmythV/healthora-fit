@@ -28,6 +28,7 @@ interface CalendarGridProps {
   onDatePress?: (date: string) => void;
   onMonthChange?: (year: number, month: number) => void;
   collapsed?: boolean; // 折叠模式：只显示选中日期所在周
+  onHeaderLayout?: (height: number) => void; // 回调测量头部高度
 }
 
 // 星期标题将使用 getWeekDays() 动态生成
@@ -44,6 +45,7 @@ export function CalendarGrid({
   onDatePress,
   onMonthChange,
   collapsed = false,
+  onHeaderLayout,
 }: CalendarGridProps) {
   const { t } = useI18n();
   const { getWeekDays, getAdjustedFirstDay } = useWeekStartDay();
@@ -320,7 +322,9 @@ export function CalendarGrid({
   return (
     <GestureDetector gesture={panGesture}>
       <Animated.View style={[styles.container, animatedStyle]}>
-        {/* 月份导航 */}
+        {/* 月份导航 + 星期标题（测量高度） */}
+        <View
+          onLayout={(e) => onHeaderLayout?.(e.nativeEvent.layout.height)}>
         <View style={styles.header}>
           <TouchableOpacity onPress={handlePrevMonth} style={styles.navButton}>
             <Text style={styles.navText}>‹</Text>
@@ -351,6 +355,7 @@ export function CalendarGrid({
               </Text>
             </View>
           ))}
+        </View>
         </View>
 
         {/* 日期网格 */}
