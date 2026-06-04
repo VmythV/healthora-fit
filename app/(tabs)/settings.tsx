@@ -186,21 +186,21 @@ export default function SettingsScreen() {
         {/* 星期开始日 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('settings.weekStart.title')}</Text>
-          {WEEK_START_OPTIONS.map((option) => (
-            <TouchableOpacity
-              key={option.value}
-              style={styles.menuItem}
-              onPress={() => setWeekStartDay(option.value)}
-            >
-              <View style={styles.menuLeft}>
-                <Icon name="calendar" size={20} color={theme.colors.primary.main} />
-                <Text style={styles.menuLabel}>{option.label}</Text>
-              </View>
-              {weekStartDay === option.value && (
-                <Text style={styles.checkmark}>✓</Text>
-              )}
-            </TouchableOpacity>
-          ))}
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push('/settings/week-start')}
+          >
+            <View style={styles.menuLeft}>
+              <Icon name="calendar" size={20} color={theme.colors.primary.main} />
+              <Text style={styles.menuLabel}>{t('settings.weekStart.title')}</Text>
+            </View>
+            <View style={styles.menuRight}>
+              <Text style={styles.menuValue}>
+                {WEEK_START_OPTIONS.find(o => o.value === weekStartDay)?.label}
+              </Text>
+              <Text style={styles.menuArrow}>→</Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* 数据管理 */}

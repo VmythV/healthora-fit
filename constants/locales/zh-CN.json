@@ -268,7 +268,8 @@
       "en": "English"
     },
     "weekStart": {
-      "title": "星期开始日"
+      "title": "星期开始日",
+      "hint": "选择星期从哪一天开始"
     },
     "about": {
       "title": "关于",

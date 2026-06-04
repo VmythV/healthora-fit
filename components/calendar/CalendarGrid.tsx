@@ -158,7 +158,7 @@ export function CalendarGrid({
             nextMonth.getMonth() <= maxDateObj.getMonth());
   }, [year, month, maxDate]);
 
-  // 渲染日历网格（固定 6 行）
+  // 渲染日历网格（固定 6 行，填充上月/下月日期）
   const renderCalendarDays = () => {
     const daysInMonth = getDaysInMonth(year, month);
     const firstDay = getFirstDayOfMonth(year, month);
@@ -166,10 +166,46 @@ export function CalendarGrid({
     const TOTAL_ROWS = 6;
     const TOTAL_CELLS = TOTAL_ROWS * 7; // 6 行 × 7 列 = 42 个单元格
 
-    // 填充上个月的空白
-    for (let i = 0; i < firstDay; i++) {
+    // 计算上月末尾日期
+    const prevMonth = month === 0 ? 11 : month - 1;
+    const prevYear = month === 0 ? year - 1 : year;
+    const daysInPrevMonth = getDaysInMonth(prevYear, prevMonth);
+
+    // 填充上月日期
+    for (let i = firstDay - 1; i >= 0; i--) {
+      const day = daysInPrevMonth - i;
+      const dateStr = formatDate(prevYear, prevMonth, day);
+      const future = isFutureDate(prevYear, prevMonth, day);
+
       days.push(
-        <View key={`empty-${i}`} style={styles.dayCell} />
+        <TouchableOpacity
+          key={`prev-${day}`}
+          style={[
+            styles.dayCell,
+            styles.otherMonthDay,
+            future && styles.disabledCell,
+          ]}
+          onPress={() => {
+            if (!future) {
+              // 跳转到上个月
+              handlePrevMonth();
+              // 延迟选中日期
+              setTimeout(() => onDatePress?.(dateStr), 100);
+            }
+          }}
+          activeOpacity={future ? 1 : 0.7}
+          disabled={future}
+        >
+          <Text
+            style={[
+              styles.dayText,
+              styles.otherMonthText,
+              future && styles.disabledText,
+            ]}
+          >
+            {day}
+          </Text>
+        </TouchableOpacity>
       );
     }
 
@@ -211,11 +247,45 @@ export function CalendarGrid({
       );
     }
 
-    // 填充剩余的空白（确保固定 6 行）
+    // 计算下月开始日期
+    const nextMonth = month === 11 ? 0 : month + 1;
+    const nextYear = month === 11 ? year + 1 : year;
     const remainingCells = TOTAL_CELLS - days.length;
-    for (let i = 0; i < remainingCells; i++) {
+
+    // 填充下月日期
+    for (let i = 1; i <= remainingCells; i++) {
+      const dateStr = formatDate(nextYear, nextMonth, i);
+      const future = isFutureDate(nextYear, nextMonth, i);
+
       days.push(
-        <View key={`empty-end-${i}`} style={styles.dayCell} />
+        <TouchableOpacity
+          key={`next-${i}`}
+          style={[
+            styles.dayCell,
+            styles.otherMonthDay,
+            future && styles.disabledCell,
+          ]}
+          onPress={() => {
+            if (!future) {
+              // 跳转到下个月
+              handleNextMonth();
+              // 延迟选中日期
+              setTimeout(() => onDatePress?.(dateStr), 100);
+            }
+          }}
+          activeOpacity={future ? 1 : 0.7}
+          disabled={future}
+        >
+          <Text
+            style={[
+              styles.dayText,
+              styles.otherMonthText,
+              future && styles.disabledText,
+            ]}
+          >
+            {i}
+          </Text>
+        </TouchableOpacity>
       );
     }
 
@@ -360,6 +430,12 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   disabledText: {
+    color: theme.colors.text.tertiary,
+  },
+  otherMonthDay: {
+    opacity: 0.5,
+  },
+  otherMonthText: {
     color: theme.colors.text.tertiary,
   },
   navButtonDisabled: {

@@ -269,7 +269,8 @@
       "en": "English"
     },
     "weekStart": {
-      "title": "Week Start Day"
+      "title": "Week Start Day",
+      "hint": "Choose which day the week starts with"
     },
     "about": {
       "title": "About",
