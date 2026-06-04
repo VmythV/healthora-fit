@@ -1,7 +1,7 @@
 // app/(tabs)/settings.tsx
 // 设置页面
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { useGoals } from '@/hooks/useGoals';
 import { Locale } from '@/constants/i18n';
 import { dataTransferService } from '@/services/dataTransfer';
+import { aiConfigQueries } from '@/database/queries/aiConfig';
 import { Icon, ArrowRightIcon, CheckIcon } from '@/components/icons';
 import { useWeekStartDay, WEEK_START_OPTIONS } from '@/hooks/useWeekStartDay';
 
@@ -28,10 +29,29 @@ export default function SettingsScreen() {
   const { weekStartDay, setWeekStartDay } = useWeekStartDay();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [aiConfigured, setAiConfigured] = useState(false);
+  const [aiEndpoint, setAiEndpoint] = useState('');
 
-  React.useEffect(() => {
+  useEffect(() => {
     loadActive('target_weight');
+    loadAiConfigStatus();
   }, []);
+
+  // 加载 AI 配置状态
+  const loadAiConfigStatus = async () => {
+    try {
+      const config = await aiConfigQueries.getActive();
+      if (config) {
+        setAiConfigured(true);
+        setAiEndpoint(config.apiEndpoint || '');
+      } else {
+        setAiConfigured(false);
+        setAiEndpoint('');
+      }
+    } catch (error) {
+      console.error('Failed to load AI config status:', error);
+    }
+  };
 
   const handleLanguageChange = (newLocale: Locale) => {
     if (newLocale === locale) return;
@@ -144,8 +164,25 @@ export default function SettingsScreen() {
               <Icon name="ai" size={20} color={theme.colors.primary.main} />
               <Text style={styles.menuLabel}>{t('settings.ai.config')}</Text>
             </View>
-            <ArrowRightIcon size={16} color={theme.colors.text.tertiary} />
+            <View style={styles.menuRight}>
+              {aiConfigured ? (
+                <View style={styles.statusBadge}>
+                  <CheckIcon size={12} color={theme.colors.success} />
+                  <Text style={styles.statusText}>{t('settings.ai.configured')}</Text>
+                </View>
+              ) : (
+                <Text style={styles.menuValue}>{t('settings.ai.notConfigured')}</Text>
+              )}
+              <ArrowRightIcon size={16} color={theme.colors.text.tertiary} />
+            </View>
           </TouchableOpacity>
+          {aiConfigured && aiEndpoint && (
+            <View style={styles.menuItemDetail}>
+              <Text style={styles.detailText} numberOfLines={1}>
+                {aiEndpoint}
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* 健康数据 */}
@@ -315,5 +352,26 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.body,
     color: theme.colors.text.tertiary,
     marginRight: theme.spacing.sm,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginRight: theme.spacing.sm,
+  },
+  statusText: {
+    fontSize: theme.fontSize.bodySm,
+    color: theme.colors.success,
+  },
+  menuItemDetail: {
+    backgroundColor: theme.colors.background.primary,
+    paddingHorizontal: theme.spacing.xl,
+    paddingBottom: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border.light,
+  },
+  detailText: {
+    fontSize: theme.fontSize.caption,
+    color: theme.colors.text.tertiary,
   },
 });

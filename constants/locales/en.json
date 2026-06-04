@@ -231,6 +231,8 @@
       "saveFailed": "Save failed, please retry",
       "testSuccess": "Connection test successful!",
       "testFailed": "Connection test failed, please check config",
+      "configured": "Configured",
+      "notConfigured": "Not Configured",
       "help": "Configuration Guide",
       "helpText1": "AI is used to recognize food photos and exercise screenshots",
       "helpText2": "Supports OpenAI-compatible APIs, including Volcengine, local models, etc.",

@@ -230,6 +230,8 @@
       "saveFailed": "保存失败，请重试",
       "testSuccess": "连接测试成功！",
       "testFailed": "连接测试失败，请检查配置",
+      "configured": "已配置",
+      "notConfigured": "未配置",
       "help": "配置说明",
       "helpText1": "AI 功能用于识别食物照片和运动截图，自动提取数据",
       "helpText2": "支持 OpenAI 兼容的 API，包括火山引擎、本地部署的模型等",
