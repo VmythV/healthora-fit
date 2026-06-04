@@ -18,7 +18,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { useGoals } from '@/hooks/useGoals';
 import { Locale } from '@/constants/i18n';
 import { dataTransferService } from '@/services/dataTransfer';
-import { Icon } from '@/components/icons';
+import { Icon, ArrowRightIcon, CheckIcon } from '@/components/icons';
 import { useWeekStartDay, WEEK_START_OPTIONS } from '@/hooks/useWeekStartDay';
 
 export default function SettingsScreen() {
@@ -128,7 +128,7 @@ export default function SettingsScreen() {
               <Text style={styles.menuValue}>
                 {activeGoal ? `${activeGoal.targetValue} kg` : t('settings.goals.notSet')}
               </Text>
-              <Text style={styles.menuArrow}>→</Text>
+              <ArrowRightIcon size={16} color={theme.colors.text.tertiary} />
             </View>
           </TouchableOpacity>
         </View>
@@ -144,7 +144,7 @@ export default function SettingsScreen() {
               <Icon name="ai" size={20} color={theme.colors.primary.main} />
               <Text style={styles.menuLabel}>{t('settings.ai.config')}</Text>
             </View>
-            <Text style={styles.menuArrow}>→</Text>
+            <ArrowRightIcon size={16} color={theme.colors.text.tertiary} />
           </TouchableOpacity>
         </View>
 
@@ -159,7 +159,7 @@ export default function SettingsScreen() {
               <Icon name="connected" size={20} color={theme.colors.primary.main} />
               <Text style={styles.menuLabel}>{t('settings.health.healthConnect')}</Text>
             </View>
-            <Text style={styles.menuArrow}>→</Text>
+            <ArrowRightIcon size={16} color={theme.colors.text.tertiary} />
           </TouchableOpacity>
         </View>
 
@@ -177,7 +177,7 @@ export default function SettingsScreen() {
                 <Text style={styles.menuLabel}>{loc.nativeName}</Text>
               </View>
               {locale === loc.code && (
-                <Text style={styles.checkmark}>✓</Text>
+                <CheckIcon size={20} color={theme.colors.primary.main} />
               )}
             </TouchableOpacity>
           ))}
@@ -198,7 +198,7 @@ export default function SettingsScreen() {
               <Text style={styles.menuValue}>
                 {WEEK_START_OPTIONS.find(o => o.value === weekStartDay)?.label}
               </Text>
-              <Text style={styles.menuArrow}>→</Text>
+              <ArrowRightIcon size={16} color={theme.colors.text.tertiary} />
             </View>
           </TouchableOpacity>
         </View>
@@ -218,7 +218,7 @@ export default function SettingsScreen() {
             {isExporting ? (
               <ActivityIndicator size="small" color={theme.colors.primary.main} />
             ) : (
-              <Text style={styles.menuArrow}>→</Text>
+              <ArrowRightIcon size={16} color={theme.colors.text.tertiary} />
             )}
           </TouchableOpacity>
           <TouchableOpacity
@@ -233,7 +233,7 @@ export default function SettingsScreen() {
             {isImporting ? (
               <ActivityIndicator size="small" color={theme.colors.primary.main} />
             ) : (
-              <Text style={styles.menuArrow}>→</Text>
+              <ArrowRightIcon size={16} color={theme.colors.text.tertiary} />
             )}
           </TouchableOpacity>
         </View>
@@ -251,7 +251,7 @@ export default function SettingsScreen() {
             </View>
             <View style={styles.menuRight}>
               <Text style={styles.menuValue}>1.0.0</Text>
-              <Text style={styles.menuArrow}>→</Text>
+              <ArrowRightIcon size={16} color={theme.colors.text.tertiary} />
             </View>
           </TouchableOpacity>
         </View>
@@ -315,14 +315,5 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.body,
     color: theme.colors.text.tertiary,
     marginRight: theme.spacing.sm,
-  },
-  menuArrow: {
-    fontSize: theme.fontSize.bodyLg,
-    color: theme.colors.text.tertiary,
-  },
-  checkmark: {
-    fontSize: theme.fontSize.bodyLg,
-    color: theme.colors.primary.main,
-    fontWeight: theme.fontWeight.bold,
   },
 });

@@ -54,3 +54,12 @@ export { TrendFlatIcon } from './TrendFlatIcon';
 // 其他图标
 export { EyeIcon } from './EyeIcon';
 export { EyeOffIcon } from './EyeOffIcon';
+
+// 新增图标
+export { ArrowRightIcon } from './ArrowRightIcon';
+export { StarIcon } from './StarIcon';
+export { StarOutlineIcon } from './StarOutlineIcon';
+export { CheckIcon } from './CheckIcon';
+export { CloseIcon } from './CloseIcon';
+export { WarningIcon } from './WarningIcon';
+export { InfoIcon } from './InfoIcon';

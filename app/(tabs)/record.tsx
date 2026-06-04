@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
-import { Icon } from '@/components/icons';
+import { Icon, ArrowRightIcon } from '@/components/icons';
 
 export default function RecordScreen() {
   const router = useRouter();
@@ -28,7 +28,7 @@ export default function RecordScreen() {
             <Text style={styles.cardTitle}>{t('record.diet.title')}</Text>
             <Text style={styles.cardDesc}>{t('record.diet.desc')}</Text>
           </View>
-          <Text style={styles.cardArrow}>→</Text>
+          <ArrowRightIcon size={20} color={theme.colors.text.tertiary} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -42,7 +42,7 @@ export default function RecordScreen() {
             <Text style={styles.cardTitle}>{t('record.exercise.title')}</Text>
             <Text style={styles.cardDesc}>{t('record.exercise.desc')}</Text>
           </View>
-          <Text style={styles.cardArrow}>→</Text>
+          <ArrowRightIcon size={20} color={theme.colors.text.tertiary} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -56,7 +56,7 @@ export default function RecordScreen() {
             <Text style={styles.cardTitle}>{t('record.weight.title')}</Text>
             <Text style={styles.cardDesc}>{t('record.weight.desc')}</Text>
           </View>
-          <Text style={styles.cardArrow}>→</Text>
+          <ArrowRightIcon size={20} color={theme.colors.text.tertiary} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -111,9 +111,5 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.bodySm,
     color: theme.colors.text.tertiary,
     marginTop: theme.spacing.xs,
-  },
-  cardArrow: {
-    fontSize: theme.fontSize.h3,
-    color: theme.colors.text.tertiary,
   },
 });

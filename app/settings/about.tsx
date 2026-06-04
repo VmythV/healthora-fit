@@ -14,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
-import { Icon } from '@/components/icons';
+import { Icon, BackIcon } from '@/components/icons';
 
 export default function AboutScreen() {
   const { t } = useI18n();
@@ -40,7 +40,7 @@ export default function AboutScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>←</Text>
+          <BackIcon size={24} color={theme.colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.title}>{t('settings.about.title')}</Text>
         <View style={styles.placeholder} />
@@ -164,10 +164,6 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  backText: {
-    fontSize: 24,
-    color: theme.colors.text.primary,
   },
   title: {
     fontSize: theme.fontSize.h3,

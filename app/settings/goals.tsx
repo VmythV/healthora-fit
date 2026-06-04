@@ -18,7 +18,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { useGoals } from '@/hooks/useGoals';
 import { useWeightRecords } from '@/hooks/useWeightRecords';
 import { ProgressRing } from '@/components/charts/ProgressRing';
-import { Icon } from '@/components/icons';
+import { Icon, BackIcon } from '@/components/icons';
 
 export default function GoalsScreen() {
   const { t } = useI18n();
@@ -90,7 +90,7 @@ export default function GoalsScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>←</Text>
+          <BackIcon size={24} color={theme.colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.title}>{t('settings.goals.title')}</Text>
         <View style={styles.placeholder} />
@@ -209,10 +209,6 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  backText: {
-    fontSize: 24,
-    color: theme.colors.text.primary,
   },
   title: {
     fontSize: theme.fontSize.h3,

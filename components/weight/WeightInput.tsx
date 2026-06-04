@@ -5,6 +5,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
+import { Icon } from '@/components/icons';
+import { TrendUpIcon, TrendDownIcon, TrendFlatIcon } from '@/components/icons';
 
 interface WeightInputProps {
   value: number; // kg
@@ -78,15 +80,22 @@ export function WeightInput({
             <Text style={styles.infoLabel}>{t('weight.lastRecord')}</Text>
             <Text style={styles.infoValue}>{lastWeight.toFixed(1)} {t('weight.kg')}</Text>
             {lastDiff !== null && (
-              <Text
-                style={[
-                  styles.infoDiff,
-                  lastDiff > 0 ? styles.diffUp : lastDiff < 0 ? styles.diffDown : styles.diffSame,
-                ]}
-              >
-                {lastDiff > 0 ? '↑' : lastDiff < 0 ? '↓' : '→'}{' '}
-                {Math.abs(lastDiff).toFixed(1)} {t('weight.kg')}
-              </Text>
+              <View style={styles.diffRow}>
+                {lastDiff > 0
+                  ? <TrendUpIcon size={14} color={theme.colors.error} />
+                  : lastDiff < 0
+                  ? <TrendDownIcon size={14} color={theme.colors.success} />
+                  : <TrendFlatIcon size={14} color={theme.colors.text.tertiary} />
+                }
+                <Text
+                  style={[
+                    styles.infoDiff,
+                    lastDiff > 0 ? styles.diffUp : lastDiff < 0 ? styles.diffDown : styles.diffSame,
+                  ]}
+                >
+                  {Math.abs(lastDiff).toFixed(1)} {t('weight.kg')}
+                </Text>
+              </View>
             )}
           </View>
         )}
@@ -97,14 +106,22 @@ export function WeightInput({
             <Text style={styles.infoLabel}>{t('weight.targetWeight')}</Text>
             <Text style={styles.infoValue}>{targetWeight.toFixed(1)} {t('weight.kg')}</Text>
             {targetDiff !== null && (
-              <Text
-                style={[
-                  styles.infoDiff,
-                  targetDiff > 0 ? styles.diffUp : targetDiff < 0 ? styles.diffDown : styles.diffSame,
-                ]}
-              >
-                {t('weight.toTarget')}: {Math.abs(targetDiff).toFixed(1)} {t('weight.kg')}
-              </Text>
+              <View style={styles.diffRow}>
+                {targetDiff > 0
+                  ? <TrendUpIcon size={14} color={theme.colors.error} />
+                  : targetDiff < 0
+                  ? <TrendDownIcon size={14} color={theme.colors.success} />
+                  : <TrendFlatIcon size={14} color={theme.colors.text.tertiary} />
+                }
+                <Text
+                  style={[
+                    styles.infoDiff,
+                    targetDiff > 0 ? styles.diffUp : targetDiff < 0 ? styles.diffDown : styles.diffSame,
+                  ]}
+                >
+                  {Math.abs(targetDiff).toFixed(1)} {t('weight.kg')}
+                </Text>
+              </View>
             )}
           </View>
         )}
@@ -179,10 +196,15 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.text.primary,
   },
+  diffRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: theme.spacing.xs,
+    gap: 4,
+  },
   infoDiff: {
     fontSize: theme.fontSize.bodySm,
     fontWeight: theme.fontWeight.medium,
-    marginTop: theme.spacing.xs,
   },
   diffUp: {
     color: theme.colors.error,

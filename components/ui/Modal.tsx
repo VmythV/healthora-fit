@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { theme } from '@/constants/theme';
 import { Button } from './Button';
+import { CloseIcon } from '@/components/icons';
 
 type ModalType = 'alert' | 'bottom';
 
@@ -97,7 +98,7 @@ export function Modal({
               {title && <Text style={styles.title}>{title}</Text>}
               {showClose && (
                 <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                  <Text style={styles.closeText}>✕</Text>
+                  <CloseIcon size={18} color={theme.colors.text.tertiary} />
                 </TouchableOpacity>
               )}
             </View>

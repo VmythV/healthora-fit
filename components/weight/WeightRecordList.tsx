@@ -15,7 +15,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { useWeightRecords } from '@/hooks/useWeightRecords';
 import { WeightRecord } from '@/types/weight';
 import { Card, Empty } from '@/components/ui';
-import { Icon } from '@/components/icons';
+import { Icon, TrendUpIcon, TrendDownIcon, TrendFlatIcon } from '@/components/icons';
 
 interface WeightRecordListProps {
   onRecordPress?: (record: WeightRecord) => void;
@@ -62,9 +62,9 @@ export function WeightRecordList({ onRecordPress }: WeightRecordListProps) {
     const current = records[index].weight;
     const previous = records[index + 1].weight;
     const diff = current - previous;
-    if (diff > 0) return { icon: '↑', color: theme.colors.error, diff };
-    if (diff < 0) return { icon: '↓', color: theme.colors.success, diff };
-    return { icon: '→', color: theme.colors.text.tertiary, diff: 0 };
+    if (diff > 0) return { direction: 'up' as const, color: theme.colors.error, diff };
+    if (diff < 0) return { direction: 'down' as const, color: theme.colors.success, diff };
+    return { direction: 'flat' as const, color: theme.colors.text.tertiary, diff: 0 };
   };
 
   // 删除记录
@@ -107,9 +107,14 @@ export function WeightRecordList({ onRecordPress }: WeightRecordListProps) {
           {/* 趋势和详情 */}
           <View style={styles.detailRow}>
             {trend && (
-              <Text style={[styles.trendText, { color: trend.color }]}>
-                {trend.icon} {Math.abs(trend.diff).toFixed(1)} {t('weight.kg')}
-              </Text>
+              <View style={styles.trendRow}>
+                {trend.direction === 'up' && <TrendUpIcon size={14} color={trend.color} />}
+                {trend.direction === 'down' && <TrendDownIcon size={14} color={trend.color} />}
+                {trend.direction === 'flat' && <TrendFlatIcon size={14} color={trend.color} />}
+                <Text style={[styles.trendText, { color: trend.color }]}>
+                  {Math.abs(trend.diff).toFixed(1)} {t('weight.kg')}
+                </Text>
+              </View>
             )}
             {item.note && (
               <View style={styles.noteContainer}>
@@ -203,6 +208,11 @@ const styles = StyleSheet.create({
     paddingTop: theme.spacing.sm,
     borderTopWidth: 1,
     borderTopColor: theme.colors.border.light,
+  },
+  trendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   trendText: {
     fontSize: theme.fontSize.bodySm,

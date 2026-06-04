@@ -6,6 +6,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { Card } from '@/components/ui';
+import { StarIcon, StarOutlineIcon } from '@/components/icons';
 
 interface StatusCardProps {
   score: number; // 0-100
@@ -19,7 +20,6 @@ export function StatusCard({ score }: StatusCardProps) {
 
   // 计算星级（1-5星）
   const stars = Math.round(score / 20);
-  const starIcons = '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
 
   // 获取状态文字
   const getStatusText = () => {
@@ -40,7 +40,13 @@ export function StatusCard({ score }: StatusCardProps) {
   return (
     <Card style={styles.container}>
       <Text style={styles.title}>{t('home.todayStatus')}</Text>
-      <Text style={styles.stars}>{starIcons}</Text>
+      <View style={styles.starsRow}>
+        {Array.from({ length: 5 }, (_, i) => (
+          i < stars
+            ? <StarIcon key={i} size={28} color={theme.colors.warning} />
+            : <StarOutlineIcon key={i} size={28} color={theme.colors.border.light} />
+        ))}
+      </View>
       <Text style={[styles.status, { color: getStatusColor() }]}>
         {getStatusText()}
       </Text>
@@ -62,9 +68,9 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     marginBottom: theme.spacing.sm,
   },
-  stars: {
-    fontSize: 28,
-    letterSpacing: 4,
+  starsRow: {
+    flexDirection: 'row',
+    gap: 4,
   },
   status: {
     fontSize: theme.fontSize.bodyLg,

@@ -41,6 +41,13 @@ import { TrendDownIcon } from './TrendDownIcon';
 import { TrendFlatIcon } from './TrendFlatIcon';
 import { EyeIcon } from './EyeIcon';
 import { EyeOffIcon } from './EyeOffIcon';
+import { ArrowRightIcon } from './ArrowRightIcon';
+import { StarIcon } from './StarIcon';
+import { StarOutlineIcon } from './StarOutlineIcon';
+import { CheckIcon } from './CheckIcon';
+import { CloseIcon } from './CloseIcon';
+import { WarningIcon } from './WarningIcon';
+import { InfoIcon } from './InfoIcon';
 
 export type IconName =
   | 'home'
@@ -81,7 +88,14 @@ export type IconName =
   | 'trend-down'
   | 'trend-flat'
   | 'eye'
-  | 'eye-off';
+  | 'eye-off'
+  | 'arrow-right'
+  | 'star'
+  | 'star-outline'
+  | 'check'
+  | 'close'
+  | 'warning'
+  | 'info';
 
 interface IconProps {
   name: IconName;
@@ -181,6 +195,20 @@ export function Icon({ name, size = 24, color = '#000000' }: IconProps) {
       return <EyeIcon {...iconProps} />;
     case 'eye-off':
       return <EyeOffIcon {...iconProps} />;
+    case 'arrow-right':
+      return <ArrowRightIcon {...iconProps} />;
+    case 'star':
+      return <StarIcon {...iconProps} />;
+    case 'star-outline':
+      return <StarOutlineIcon {...iconProps} />;
+    case 'check':
+      return <CheckIcon {...iconProps} />;
+    case 'close':
+      return <CloseIcon {...iconProps} />;
+    case 'warning':
+      return <WarningIcon {...iconProps} />;
+    case 'info':
+      return <InfoIcon {...iconProps} />;
     default:
       return null;
   }

@@ -10,6 +10,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { theme } from '@/constants/theme';
+import { CheckIcon, CloseIcon, WarningIcon, InfoIcon } from '@/components/icons';
 
 type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -77,23 +78,15 @@ export function Toast({
         { opacity: fadeAnim },
       ]}
     >
-      <Text style={styles.icon}>{getIcon(type)}</Text>
+      <View style={styles.iconContainer}>
+        {type === 'success' && <CheckIcon size={18} color="#FFFFFF" />}
+        {type === 'error' && <CloseIcon size={18} color="#FFFFFF" />}
+        {type === 'warning' && <WarningIcon size={18} color="#FFFFFF" />}
+        {type === 'info' && <InfoIcon size={18} color="#FFFFFF" />}
+      </View>
       <Text style={styles.message}>{message}</Text>
     </Animated.View>
   );
-}
-
-function getIcon(type: ToastType): string {
-  switch (type) {
-    case 'success':
-      return '✓';
-    case 'error':
-      return '✕';
-    case 'warning':
-      return '⚠';
-    case 'info':
-      return 'ℹ';
-  }
 }
 
 const { width } = Dimensions.get('window');
@@ -122,10 +115,7 @@ const styles = StyleSheet.create({
   container_info: {
     backgroundColor: theme.colors.info,
   },
-  icon: {
-    fontSize: 18,
-    color: '#FFFFFF',
-    fontWeight: theme.fontWeight.bold,
+  iconContainer: {
     marginRight: theme.spacing.sm,
   },
   message: {
