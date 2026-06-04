@@ -142,8 +142,6 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
   // 计算今日统计
   const totalCalories = dietRecords.reduce((sum, r) => sum + (r.totalCalories || 0), 0);
   const totalExerciseCalories = exerciseRecords.reduce((sum, r) => sum + (r.caloriesBurned || 0), 0);
-  const totalMinutes = exerciseRecords.reduce((sum, r) => sum + r.durationMinutes, 0);
-
   return (
     <GestureDetector gesture={panGesture}>
       <Animated.View style={[styles.container, animatedStyle]}>
@@ -171,10 +169,6 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
           <Card style={styles.statCard}>
             <Text style={styles.statValue}>{totalExerciseCalories}</Text>
             <Text style={styles.statLabel}>{t('calendar.caloriesOut')}</Text>
-          </Card>
-          <Card style={styles.statCard}>
-            <Text style={styles.statValue}>{totalMinutes}</Text>
-            <Text style={styles.statLabel}>{t('home.minutes')}</Text>
           </Card>
           <Card style={styles.statCard}>
             <Text style={styles.statValue}>
@@ -253,16 +247,16 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    padding: theme.spacing.sm,
+    padding: theme.spacing.base,
     alignItems: 'center',
   },
   statValue: {
-    fontSize: theme.fontSize.bodyLg,
+    fontSize: theme.fontSize.h3,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.primary.main,
   },
   statLabel: {
-    fontSize: theme.fontSize.tiny,
+    fontSize: theme.fontSize.caption,
     color: theme.colors.text.tertiary,
     marginTop: theme.spacing.xs,
   },
