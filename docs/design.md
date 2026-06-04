@@ -574,12 +574,39 @@ export const detailTransition = {
 
 ## 🎯 图标设计规范
 
+### 核心原则
+
+**禁止使用 emoji**：代码和翻译文件中都禁止使用 emoji 字符，所有图标必须使用 SVG 绘制的 React 组件。
+
 ### 设计风格
 
 - **线条极简风**：使用 1.5-2px 线条
 - **几何感**：基于基本几何形状
 - **圆角处理**：线条末端和转角使用圆角
 - **统一视觉重量**：所有图标看起来密度相近
+- **SVG 绘制**：使用 `react-native-svg` 绘制，不使用 emoji 或图片
+
+### 图标实现规范
+
+1. **组件位置**：`components/icons/`
+2. **统一入口**：`components/icons/Icon.tsx`
+3. **类型定义**：使用 `IconName` 类型
+4. **使用方法**：
+   ```tsx
+   import { Icon } from '@/components/icons';
+   <Icon name="home" size={24} color="#10B981" />
+   ```
+
+5. **新增图标规范**：
+   - 使用 `react-native-svg` 绘制
+   - 统一 viewBox：`0 0 24 24`
+   - 线条宽度：1.5-2px
+   - 圆角：round
+   - 支持 `size` 和 `color` 属性
+
+6. **翻译文件规范**：
+   - `constants/locales/zh-CN.json` 和 `en.json` 中不要使用 emoji
+   - 图标通过组件渲染，不要在文本中嵌入 emoji
 
 ### 图标尺寸
 

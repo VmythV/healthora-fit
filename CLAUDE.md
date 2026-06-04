@@ -147,3 +147,58 @@ Use `/iterate` skill for structured development cycles:
 7. **Language persistence**
    - User's language choice is saved in AsyncStorage
    - Default language follows device locale
+
+## 图标规范
+
+### 核心原则
+
+- **不要使用 emoji**：代码和翻译文件中都禁止使用 emoji 字符
+- **使用 SVG 图标**：所有图标必须使用 SVG 绘制的 React 组件
+- **简约风格**：图标设计应简约、现代，与底部导航栏风格一致
+
+### 图标系统
+
+1. **图标组件位置**
+   - 所有图标组件：`components/icons/`
+   - 统一入口：`components/icons/Icon.tsx`
+   - 类型定义：`IconName`
+
+2. **使用方法**
+   ```tsx
+   import { Icon } from '@/components/icons';
+   
+   // 基本使用
+   <Icon name="home" size={24} color="#10B981" />
+   
+   // 支持的图标名称
+   type IconName = 
+     | 'home' | 'calendar' | 'add' | 'chart' | 'settings'
+     | 'food' | 'exercise' | 'weight' | 'camera' | 'edit'
+     | 'delete' | 'back' | 'sunrise' | 'moon' | 'cookie'
+     | 'bowl' | 'plate' | 'running' | 'walking' | 'cycling'
+     | 'swimming' | 'strength' | 'yoga' | 'hiit' | 'other-exercise'
+     | 'note' | 'search' | 'tips' | 'help' | 'ai'
+     | 'chart-bar' | 'fire' | 'connected' | 'disconnected'
+     | 'trend-up' | 'trend-down' | 'trend-flat'
+     | 'eye' | 'eye-off';
+   ```
+
+3. **新增图标规范**
+   - 使用 `react-native-svg` 绘制
+   - 统一 viewBox：`0 0 24 24`
+   - 线条宽度：1.5-2px
+   - 圆角：round
+   - 支持 `size` 和 `color` 属性
+
+4. **翻译文件规范**
+   - `constants/locales/zh-CN.json` 和 `en.json` 中不要使用 emoji
+   - 图标通过组件渲染，不要在文本中嵌入 emoji
+
+### 图标分类
+
+- **餐食相关**：sunrise（早餐）、moon（晚餐）、cookie（加餐）、bowl（餐食）、plate（餐盘）
+- **运动相关**：running、walking、cycling、swimming、strength、yoga、hiit、other-exercise
+- **功能相关**：note、search、tips、help、ai、chart-bar、fire
+- **状态相关**：connected、disconnected
+- **趋势相关**：trend-up、trend-down、trend-flat
+- **其他**：eye、eye-off
