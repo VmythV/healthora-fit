@@ -41,7 +41,7 @@ export default function WeekStartScreen() {
       </View>
 
       {/* 选项列表 */}
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.section}>
           <Text style={styles.sectionHint}>{t('settings.weekStart.hint')}</Text>
           {WEEK_START_OPTIONS.map((option) => (

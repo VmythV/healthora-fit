@@ -79,7 +79,7 @@ export function WeightRecordForm({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* 体重输入 */}
         <View style={styles.section}>
           <WeightInput

@@ -254,7 +254,7 @@ export default function AIConfigScreen() {
         )}
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {isEditing ? (
           /* 编辑表单 */
           <View style={styles.formCard}>

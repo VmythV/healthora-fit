@@ -72,7 +72,7 @@ export default function IconsPreviewScreen() {
         }}
       />
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* 控制面板 */}
         <View style={styles.controlPanel}>
           <Text style={styles.sectionTitle}>颜色选择</Text>

@@ -102,7 +102,7 @@ export function ExerciseRecordDetail({ record, onDelete }: ExerciseRecordDetailP
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* 头部信息 */}
       <Card style={styles.headerCard}>
         <View style={styles.headerRow}>

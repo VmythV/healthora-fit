@@ -179,7 +179,7 @@ export function DietRecordForm({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* 餐次选择 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('diet.mealType')}</Text>

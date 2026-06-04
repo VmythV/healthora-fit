@@ -96,7 +96,7 @@ export default function GoalsScreen() {
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* 目标进度卡片 */}
         {progressInfo && !isEditing && (
           <View style={styles.progressCard}>

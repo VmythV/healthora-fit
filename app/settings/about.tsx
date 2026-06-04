@@ -47,7 +47,7 @@ export default function AboutScreen() {
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* App Logo 和名称 */}
         <View style={styles.logoSection}>
           <View style={styles.logoContainer}>

@@ -186,7 +186,7 @@ export function ExerciseRecordForm({
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* AI 识别成功提示 */}
         {aiSuccessMessage && (
           <View style={styles.successBanner}>

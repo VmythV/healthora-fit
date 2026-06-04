@@ -138,7 +138,7 @@ export default function HealthConnectScreen() {
         <View style={styles.placeholder} />
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* 连接状态卡片 */}
         <View style={styles.statusCard}>
           <View style={styles.statusHeader}>

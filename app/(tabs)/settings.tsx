@@ -141,7 +141,7 @@ export default function SettingsScreen() {
         <Text style={styles.title}>{t('settings.title')}</Text>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* 目标设置 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('settings.goals.title')}</Text>
