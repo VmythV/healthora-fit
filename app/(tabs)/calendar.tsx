@@ -1,5 +1,5 @@
 // app/(tabs)/calendar.tsx
-// 日历页面
+// 日志页面 - 月历 + 日详情
 
 import { logger } from '@/utils/logger';
 import React, { useState, useCallback, useEffect } from 'react';
@@ -7,16 +7,13 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { dietQueries } from '@/database/queries/diet';
 import { exerciseQueries } from '@/database/queries/exercise';
-import { CalendarGrid, DayView } from '@/components/calendar';
-
-type ViewMode = 'month' | 'day';
+import { CalendarGrid, DayDetail } from '@/components/calendar';
 
 export default function CalendarScreen() {
   const { t } = useI18n();
@@ -24,7 +21,6 @@ export default function CalendarScreen() {
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
 
-  const [viewMode, setViewMode] = useState<ViewMode>('day');
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
   const [selectedDate, setSelectedDate] = useState(todayStr);
@@ -59,79 +55,34 @@ export default function CalendarScreen() {
     setMonth(newMonth);
   }, []);
 
-  // 日期选择
+  // 点击日期
   const handleDatePress = useCallback((date: string) => {
-    setSelectedDate(date);
-    setViewMode('day');
-  }, []);
-
-  // 日期切换（日视图）
-  const handleDateChange = useCallback((date: string) => {
     setSelectedDate(date);
   }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>{t('calendar.title')}</Text>
-        <View style={styles.viewToggle}>
-          <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              viewMode === 'month' && styles.toggleButtonActive,
-            ]}
-            onPress={() => setViewMode('month')}
-          >
-            <Text
-              style={[
-                styles.toggleText,
-                viewMode === 'month' && styles.toggleTextActive,
-              ]}
-            >
-              {t('calendar.monthView')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              viewMode === 'day' && styles.toggleButtonActive,
-            ]}
-            onPress={() => setViewMode('day')}
-          >
-            <Text
-              style={[
-                styles.toggleText,
-                viewMode === 'day' && styles.toggleTextActive,
-              ]}
-            >
-              {t('calendar.dayView')}
-            </Text>
-          </TouchableOpacity>
-        </View>
       </View>
 
-      {/* 内容 */}
       <View style={styles.content}>
-        {viewMode === 'month' ? (
-          <View style={styles.monthView}>
-            <CalendarGrid
-              year={year}
-              month={month}
-              selectedDate={selectedDate}
-              markedDates={markedDates}
-              maxDate={todayStr}
-              onDatePress={handleDatePress}
-              onMonthChange={handleMonthChange}
-            />
-          </View>
-        ) : (
-          <DayView
-            date={selectedDate}
-            maxDate={todayStr}
-            onDateChange={handleDateChange}
-          />
-        )}
+        {/* 月历 */}
+        <CalendarGrid
+          year={year}
+          month={month}
+          selectedDate={selectedDate}
+          markedDates={markedDates}
+          maxDate={todayStr}
+          onDatePress={handleDatePress}
+          onMonthChange={handleMonthChange}
+        />
+
+        {/* 当日详情 */}
+        <DayDetail
+          date={selectedDate}
+          maxDate={todayStr}
+        />
       </View>
     </SafeAreaView>
   );
@@ -143,9 +94,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background.secondary,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     paddingHorizontal: theme.spacing.xl,
     paddingVertical: theme.spacing.base,
     backgroundColor: theme.colors.background.primary,
@@ -155,33 +103,9 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.text.primary,
   },
-  viewToggle: {
-    flexDirection: 'row',
-    backgroundColor: theme.colors.background.tertiary,
-    borderRadius: theme.borderRadius.full,
-    padding: 2,
-  },
-  toggleButton: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
-    borderRadius: theme.borderRadius.full,
-  },
-  toggleButtonActive: {
-    backgroundColor: theme.colors.primary.main,
-  },
-  toggleText: {
-    fontSize: theme.fontSize.bodySm,
-    color: theme.colors.text.secondary,
-  },
-  toggleTextActive: {
-    color: '#FFFFFF',
-    fontWeight: theme.fontWeight.semibold,
-  },
   content: {
     flex: 1,
-    padding: theme.spacing.xl,
-  },
-  monthView: {
-    flex: 1,
+    padding: theme.spacing.md,
+    gap: theme.spacing.md,
   },
 });

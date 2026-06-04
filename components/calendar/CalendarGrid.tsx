@@ -1,7 +1,7 @@
 // components/calendar/CalendarGrid.tsx
 // 日历网格组件
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -166,8 +166,8 @@ export function CalendarGrid({
     return Math.ceil(totalCells / 7);
   };
 
-  // 渲染日历网格（固定 6 行，填充上月/下月日期）
-  const renderCalendarDays = () => {
+  // 渲染日历网格（固定 6 行，填充上月/下月日期）- useMemo 优化切换月卡顿
+  const calendarDays = useMemo(() => {
     const daysInMonth = getDaysInMonth(year, month);
     const firstDay = getFirstDayOfMonth(year, month);
     const days = [];
@@ -298,7 +298,7 @@ export function CalendarGrid({
     }
 
     return days;
-  };
+  }, [year, month, selectedDate, markedDates, maxDate, handlePrevMonth, handleNextMonth, onDatePress]);
 
   // 月份名称
   const monthNames = [
@@ -343,7 +343,7 @@ export function CalendarGrid({
         </View>
 
         {/* 日期网格 */}
-        <View style={styles.daysGrid}>{renderCalendarDays()}</View>
+        <View style={styles.daysGrid}>{calendarDays}</View>
       </Animated.View>
     </GestureDetector>
   );
