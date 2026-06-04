@@ -44,6 +44,8 @@ android/gradle/wrapper/gradle-wrapper.jar
 android/app/debug.keystore
 android/app/release.keystore
 android/.cxx/
+android/keystore/
+android/keystore.properties
 
 # iOS - 忽略构建产物，保留项目配置
 ios/Pods/
