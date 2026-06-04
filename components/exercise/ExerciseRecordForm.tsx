@@ -1,6 +1,7 @@
 // components/exercise/ExerciseRecordForm.tsx
 // 运动记录表单
 
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -173,7 +174,7 @@ export function ExerciseRecordForm({
       onSuccess?.();
       router.back();
     } catch (error) {
-      console.error('保存失败:', error);
+      logger.error('[ExerciseForm] 保存失败:', error);
       Alert.alert(t('common.error'), t('error.saveFailed'));
     } finally {
       setSaving(false);
@@ -200,7 +201,7 @@ export function ExerciseRecordForm({
             onAnalysisComplete={handleAnalysisComplete}
             onError={(error) => {
               setAnalysisResult(null);
-              console.error('截图分析错误:', error);
+              logger.error('[ExerciseForm] 截图分析错误:', error);
             }}
           />
         </View>

@@ -1,6 +1,7 @@
 // hooks/useExerciseRecords.ts
 // 运动记录 Hook
 
+import { logger } from '@/utils/logger';
 import { useState, useCallback, useEffect } from 'react';
 import { exerciseQueries } from '@/database/queries';
 import { ExerciseRecord } from '@/types/exercise';
@@ -106,7 +107,7 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载今日记录失败';
       setError(message);
-      console.error('[useExerciseRecords] loadToday 失败:', err);
+      logger.error('[useExerciseRecords] loadToday 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -122,7 +123,7 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载记录失败';
       setError(message);
-      console.error('[useExerciseRecords] loadByDate 失败:', err);
+      logger.error('[useExerciseRecords] loadByDate 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -138,7 +139,7 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载记录失败';
       setError(message);
-      console.error('[useExerciseRecords] loadByDateRange 失败:', err);
+      logger.error('[useExerciseRecords] loadByDateRange 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -169,7 +170,7 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '添加记录失败';
       setError(message);
-      console.error('[useExerciseRecords] addRecord 失败:', err);
+      logger.error('[useExerciseRecords] addRecord 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -188,7 +189,7 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '更新记录失败';
       setError(message);
-      console.error('[useExerciseRecords] updateRecord 失败:', err);
+      logger.error('[useExerciseRecords] updateRecord 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -207,7 +208,7 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '删除记录失败';
       setError(message);
-      console.error('[useExerciseRecords] deleteRecord 失败:', err);
+      logger.error('[useExerciseRecords] deleteRecord 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -218,7 +219,7 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
     try {
       return await exerciseQueries.getDailyStats(startDate, endDate);
     } catch (err) {
-      console.error('[useExerciseRecords] getDailyStats 失败:', err);
+      logger.error('[useExerciseRecords] getDailyStats 失败:', err);
       return [];
     }
   }, []);
@@ -227,7 +228,7 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
     try {
       return await exerciseQueries.getTypeStats(startDate, endDate);
     } catch (err) {
-      console.error('[useExerciseRecords] getTypeStats 失败:', err);
+      logger.error('[useExerciseRecords] getTypeStats 失败:', err);
       return [];
     }
   }, []);

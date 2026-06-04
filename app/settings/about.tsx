@@ -1,6 +1,7 @@
 // app/settings/about.tsx
 // 关于页面
 
+import { logger } from '@/utils/logger';
 import React from 'react';
 import {
   View,
@@ -32,7 +33,7 @@ export default function AboutScreen() {
 
   const openLink = (url: string) => {
     Linking.openURL(url).catch((err) =>
-      console.error('Failed to open URL:', err)
+      logger.error('[Settings] Failed to open URL:', err)
     );
   };
 

@@ -1,6 +1,7 @@
 // utils/errorHandler.ts
 // 统一错误处理工具
 
+import { logger } from '@/utils/logger';
 import { Alert } from 'react-native';
 
 export type ErrorCode =
@@ -38,7 +39,7 @@ export function createError(
  * 处理数据库错误
  */
 export function handleDatabaseError(error: unknown): AppError {
-  console.error('[Database Error]', error);
+  logger.error('[Database Error]', error);
 
   const message = error instanceof Error ? error.message : '数据库操作失败';
   return createError('DATABASE_ERROR', '数据库操作失败', message);
@@ -48,7 +49,7 @@ export function handleDatabaseError(error: unknown): AppError {
  * 处理网络错误
  */
 export function handleNetworkError(error: unknown): AppError {
-  console.error('[Network Error]', error);
+  logger.error('[Network Error]', error);
 
   const message = error instanceof Error ? error.message : '网络连接失败';
   return createError('NETWORK_ERROR', '网络连接失败，请检查网络设置', message);
@@ -58,7 +59,7 @@ export function handleNetworkError(error: unknown): AppError {
  * 处理 AI 服务错误
  */
 export function handleAIServiceError(error: unknown): AppError {
-  console.error('[AI Service Error]', error);
+  logger.error('[AI Service Error]', error);
 
   const message = error instanceof Error ? error.message : 'AI 服务请求失败';
   return createError('AI_SERVICE_ERROR', 'AI 识别失败，请重试或手动输入', message);
@@ -68,7 +69,7 @@ export function handleAIServiceError(error: unknown): AppError {
  * 处理权限错误
  */
 export function handlePermissionError(error: unknown): AppError {
-  console.error('[Permission Error]', error);
+  logger.error('[Permission Error]', error);
 
   const message = error instanceof Error ? error.message : '权限请求失败';
   return createError('PERMISSION_ERROR', '需要权限才能使用此功能', message);
@@ -78,7 +79,7 @@ export function handlePermissionError(error: unknown): AppError {
  * 处理验证错误
  */
 export function handleValidationError(message: string): AppError {
-  console.warn('[Validation Error]', message);
+  logger.warn('[Validation Error]', message);
 
   return createError('VALIDATION_ERROR', message);
 }
@@ -87,7 +88,7 @@ export function handleValidationError(message: string): AppError {
  * 处理未知错误
  */
 export function handleUnknownError(error: unknown): AppError {
-  console.error('[Unknown Error]', error);
+  logger.error('[Unknown Error]', error);
 
   const message = error instanceof Error ? error.message : '发生未知错误';
   return createError('UNKNOWN_ERROR', '操作失败，请稍后重试', message);
@@ -143,7 +144,7 @@ export function handleError(
   }
 
   // 记录上下文
-  console.error(`[${context}]`, appError);
+  logger.error(`[${context}]`, appError);
 
   // 显示错误提示
   if (options?.showAlert !== false) {

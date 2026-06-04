@@ -1,6 +1,7 @@
 // app/settings/health-connect.tsx
 // 健康数据连接页面
 
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -44,7 +45,7 @@ export default function HealthConnectScreen() {
     try {
       await getConnectionStatus();
     } catch (error) {
-      console.error('Failed to load health status:', error);
+      logger.error('[Health] Failed to load health status:', error);
     }
   };
 

@@ -1,6 +1,7 @@
 // hooks/useDietRecords.ts
 // 饮食记录 Hook
 
+import { logger } from '@/utils/logger';
 import { useState, useCallback, useEffect } from 'react';
 import { dietQueries } from '@/database/queries';
 import { DietRecord } from '@/types/diet';
@@ -110,7 +111,7 @@ export function useDietRecords(date?: string): UseDietRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载今日记录失败';
       setError(message);
-      console.error('[useDietRecords] loadToday 失败:', err);
+      logger.error('[useDietRecords] loadToday 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +127,7 @@ export function useDietRecords(date?: string): UseDietRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载记录失败';
       setError(message);
-      console.error('[useDietRecords] loadByDate 失败:', err);
+      logger.error('[useDietRecords] loadByDate 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -142,7 +143,7 @@ export function useDietRecords(date?: string): UseDietRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载记录失败';
       setError(message);
-      console.error('[useDietRecords] loadByDateRange 失败:', err);
+      logger.error('[useDietRecords] loadByDateRange 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +159,7 @@ export function useDietRecords(date?: string): UseDietRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载记录失败';
       setError(message);
-      console.error('[useDietRecords] loadRecent 失败:', err);
+      logger.error('[useDietRecords] loadRecent 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -189,7 +190,7 @@ export function useDietRecords(date?: string): UseDietRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '添加记录失败';
       setError(message);
-      console.error('[useDietRecords] addRecord 失败:', err);
+      logger.error('[useDietRecords] addRecord 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -208,7 +209,7 @@ export function useDietRecords(date?: string): UseDietRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '更新记录失败';
       setError(message);
-      console.error('[useDietRecords] updateRecord 失败:', err);
+      logger.error('[useDietRecords] updateRecord 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -227,7 +228,7 @@ export function useDietRecords(date?: string): UseDietRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '删除记录失败';
       setError(message);
-      console.error('[useDietRecords] deleteRecord 失败:', err);
+      logger.error('[useDietRecords] deleteRecord 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -238,7 +239,7 @@ export function useDietRecords(date?: string): UseDietRecordsReturn {
     try {
       return await dietQueries.getDailyCaloriesStats(startDate, endDate);
     } catch (err) {
-      console.error('[useDietRecords] getDailyCaloriesStats 失败:', err);
+      logger.error('[useDietRecords] getDailyCaloriesStats 失败:', err);
       return [];
     }
   }, []);
@@ -247,7 +248,7 @@ export function useDietRecords(date?: string): UseDietRecordsReturn {
     try {
       return await dietQueries.getMealTypeStats(startDate, endDate);
     } catch (err) {
-      console.error('[useDietRecords] getMealTypeStats 失败:', err);
+      logger.error('[useDietRecords] getMealTypeStats 失败:', err);
       return [];
     }
   }, []);

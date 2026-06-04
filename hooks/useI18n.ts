@@ -1,6 +1,7 @@
 // hooks/useI18n.ts
 // 国际化 Hook
 
+import { logger } from '@/utils/logger';
 import { useState, useCallback, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { t, setLocale, getCurrentLocale, Locale, SUPPORTED_LOCALES } from '@/constants/i18n';
@@ -45,7 +46,7 @@ export function useI18n(): UseI18nReturn {
         setCurrentLocale(savedLocale);
       }
     } catch (error) {
-      console.error('[useI18n] 加载语言设置失败:', error);
+      logger.error('[useI18n] 加载语言设置失败:', error);
     }
   };
 
@@ -64,7 +65,7 @@ export function useI18n(): UseI18nReturn {
       // 更新状态
       setCurrentLocale(newLocale);
     } catch (error) {
-      console.error('[useI18n] 保存语言设置失败:', error);
+      logger.error('[useI18n] 保存语言设置失败:', error);
     }
   }, []);
 

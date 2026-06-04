@@ -1,6 +1,7 @@
 // components/diet/DietRecordForm.tsx
 // 饮食记录表单组件
 
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -70,6 +71,14 @@ export function DietRecordForm({
   const [foods, setFoods] = useState<FoodItem[]>(initialFoods);
   const [note, setNote] = useState(initialNote);
   const [saving, setSaving] = useState(false);
+
+  // 当 initialFoods 变化时同步更新（AI 分析完成后回填数据）
+  useEffect(() => {
+    if (initialFoods.length > 0) {
+      setFoods(initialFoods);
+      logger.log('[DietForm] initialFoods 更新:', initialFoods.length, '种食物');
+    }
+  }, [initialFoods]);
 
   // 计算营养成分总量
   const totals = {
@@ -158,7 +167,7 @@ export function DietRecordForm({
       onSuccess?.();
       router.back();
     } catch (error) {
-      console.error('保存失败:', error);
+      logger.error('[DietForm] 保存失败:', error);
       Alert.alert(t('common.error'), t('error.saveFailed'));
     } finally {
       setSaving(false);

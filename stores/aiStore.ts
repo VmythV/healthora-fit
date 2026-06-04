@@ -1,6 +1,7 @@
 // stores/aiStore.ts
 // AI 服务状态
 
+import { logger } from '@/utils/logger';
 import { create } from 'zustand';
 import { aiConfigQueries } from '@/database/queries';
 import { AIConfig } from '@/types/ai';
@@ -67,7 +68,7 @@ export const useAIStore = create<AIState>((set, get) => ({
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载 AI 配置失败';
       set({ error: message });
-      console.error('[aiStore] loadConfig 失败:', err);
+      logger.error('[aiStore] loadConfig 失败:', err);
     }
   },
 
@@ -83,7 +84,7 @@ export const useAIStore = create<AIState>((set, get) => ({
     } catch (err) {
       const message = err instanceof Error ? err.message : '保存 AI 配置失败';
       set({ error: message });
-      console.error('[aiStore] saveConfig 失败:', err);
+      logger.error('[aiStore] saveConfig 失败:', err);
       throw err;
     }
   },
@@ -97,7 +98,7 @@ export const useAIStore = create<AIState>((set, get) => ({
     } catch (err) {
       const message = err instanceof Error ? err.message : '测试连接失败';
       set({ error: message });
-      console.error('[aiStore] testConnection 失败:', err);
+      logger.error('[aiStore] testConnection 失败:', err);
       return false;
     }
   },

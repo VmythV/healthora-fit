@@ -330,6 +330,10 @@
       "feature4": "数据分析与可视化图表",
       "feature5": "AI 驱动的健康洞察",
       "allRightsReserved": "保留所有权利"
+    },
+    "debug": {
+      "title": "调试模式",
+      "description": "开启后在开发工具控制台输出详细日志"
     }
   },
   "status": {

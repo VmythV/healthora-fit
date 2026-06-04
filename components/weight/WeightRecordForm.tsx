@@ -1,6 +1,7 @@
 // components/weight/WeightRecordForm.tsx
 // 体重记录表单
 
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -66,7 +67,7 @@ export function WeightRecordForm({
       onSuccess?.();
       router.back();
     } catch (error) {
-      console.error('保存失败:', error);
+      logger.error('[WeightForm] 保存失败:', error);
       Alert.alert(t('common.error'), t('error.saveFailed'));
     } finally {
       setSaving(false);

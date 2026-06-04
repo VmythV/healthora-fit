@@ -1,6 +1,7 @@
 // utils/performance.ts
 // 性能优化工具
 
+import { logger } from '@/utils/logger';
 import { useCallback, useRef, useMemo } from 'react';
 
 /**
@@ -186,7 +187,7 @@ export class BatchProcessor<T> {
       try {
         await this.processFn(batch);
       } catch (error) {
-        console.error('[BatchProcessor] Error processing batch:', error);
+        logger.error('[BatchProcessor] Error processing batch:', error);
       }
 
       if (this.delay > 0 && this.queue.length > 0) {
@@ -286,7 +287,7 @@ export async function measureTime<T>(
   const result = await fn();
   const end = performance.now();
 
-  console.log(`[Performance] ${name}: ${(end - start).toFixed(2)}ms`);
+  logger.log(`[Performance] ${name}: ${(end - start).toFixed(2)}ms`);
 
   return result;
 }

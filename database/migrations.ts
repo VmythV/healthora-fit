@@ -1,6 +1,7 @@
 // database/migrations.ts
 // 数据库迁移管理
 
+import { logger } from '@/utils/logger';
 import { SQLite } from 'expo-sqlite';
 import {
   DB_VERSION,
@@ -76,25 +77,25 @@ async function getCurrentVersion(db: SQLite.SQLiteDatabase): Promise<number> {
  */
 export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   try {
-    console.log('[Migration] 开始检查数据库迁移...');
+    logger.log('[Migration] 开始检查数据库迁移...');
 
     // 创建迁移版本表
     await db.execAsync(CREATE_MIGRATION_TABLE_SQL);
 
     // 获取当前版本
     const currentVersion = await getCurrentVersion(db);
-    console.log(`[Migration] 当前数据库版本: ${currentVersion}, 目标版本: ${DB_VERSION}`);
+    logger.log(`[Migration] 当前数据库版本: ${currentVersion}, 目标版本: ${DB_VERSION}`);
 
     // 如果已经是最新版本，直接返回
     if (currentVersion >= DB_VERSION) {
-      console.log('[Migration] 数据库已是最新版本');
+      logger.log('[Migration] 数据库已是最新版本');
       return;
     }
 
     // 执行未执行的迁移
     for (const migration of migrations) {
       if (migration.version > currentVersion) {
-        console.log(`[Migration] 执行迁移 v${migration.version}: ${migration.description}`);
+        logger.log(`[Migration] 执行迁移 v${migration.version}: ${migration.description}`);
 
         try {
           await migration.up(db);
@@ -105,17 +106,17 @@ export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
             [migration.version, migration.description]
           );
 
-          console.log(`[Migration] 迁移 v${migration.version} 完成`);
+          logger.log(`[Migration] 迁移 v${migration.version} 完成`);
         } catch (error) {
-          console.error(`[Migration] 迁移 v${migration.version} 失败:`, error);
+          logger.error(`[Migration] 迁移 v${migration.version} 失败:`, error);
           throw error;
         }
       }
     }
 
-    console.log('[Migration] 所有迁移执行完成');
+    logger.log('[Migration] 所有迁移执行完成');
   } catch (error) {
-    console.error('[Migration] 迁移执行失败:', error);
+    logger.error('[Migration] 迁移执行失败:', error);
     throw error;
   }
 }
@@ -145,7 +146,7 @@ export async function getMigrationHistory(
  * 重置数据库（危险操作）
  */
 export async function resetDatabase(db: SQLite.SQLiteDatabase): Promise<void> {
-  console.log('[Migration] 正在重置数据库...');
+  logger.log('[Migration] 正在重置数据库...');
 
   // 删除所有表
   await db.execAsync(`
@@ -161,5 +162,5 @@ export async function resetDatabase(db: SQLite.SQLiteDatabase): Promise<void> {
   // 重新执行迁移
   await runMigrations(db);
 
-  console.log('[Migration] 数据库重置完成');
+  logger.log('[Migration] 数据库重置完成');
 }

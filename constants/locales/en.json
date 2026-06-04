@@ -331,6 +331,10 @@
       "feature4": "Data analysis & visualization charts",
       "feature5": "AI-powered health insights",
       "allRightsReserved": "All Rights Reserved"
+    },
+    "debug": {
+      "title": "Debug Mode",
+      "description": "Enable detailed console logs in developer tools"
     }
   },
   "status": {

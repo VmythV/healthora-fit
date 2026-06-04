@@ -1,6 +1,7 @@
 // hooks/useGoals.ts
 // 目标设置 Hook
 
+import { logger } from '@/utils/logger';
 import { useState, useCallback } from 'react';
 import { goalQueries } from '@/database/queries';
 import { Goal } from '@/types/goal';
@@ -73,7 +74,7 @@ export function useGoals(): UseGoalsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载目标失败';
       setError(message);
-      console.error('[useGoals] loadAll 失败:', err);
+      logger.error('[useGoals] loadAll 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -89,7 +90,7 @@ export function useGoals(): UseGoalsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载目标失败';
       setError(message);
-      console.error('[useGoals] loadActive 失败:', err);
+      logger.error('[useGoals] loadActive 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +116,7 @@ export function useGoals(): UseGoalsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '设置目标失败';
       setError(message);
-      console.error('[useGoals] setGoal 失败:', err);
+      logger.error('[useGoals] setGoal 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -134,7 +135,7 @@ export function useGoals(): UseGoalsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '更新目标失败';
       setError(message);
-      console.error('[useGoals] updateGoal 失败:', err);
+      logger.error('[useGoals] updateGoal 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -153,7 +154,7 @@ export function useGoals(): UseGoalsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '删除目标失败';
       setError(message);
-      console.error('[useGoals] deleteGoal 失败:', err);
+      logger.error('[useGoals] deleteGoal 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -172,7 +173,7 @@ export function useGoals(): UseGoalsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '停用目标失败';
       setError(message);
-      console.error('[useGoals] deactivateGoal 失败:', err);
+      logger.error('[useGoals] deactivateGoal 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);

@@ -1,6 +1,7 @@
 // database/queries/aiConfig.ts
 // AI 配置查询
 
+import { logger } from '@/utils/logger';
 import { database } from '../index';
 import { AIConfig } from '@/types/ai';
 
@@ -223,7 +224,7 @@ export const aiConfigQueries = {
 
       return { success: false, error: errorMessage };
     } catch (error) {
-      console.error('测试连接失败:', error);
+      logger.error('[AI Config] 测试连接失败:', error);
       const message = error instanceof Error ? error.message : '网络连接失败';
       return { success: false, error: message };
     }

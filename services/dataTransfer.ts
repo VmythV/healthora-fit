@@ -1,6 +1,7 @@
 // services/dataTransfer.ts
 // 数据导入导出服务
 
+import { logger } from '@/utils/logger';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
@@ -86,7 +87,7 @@ export const dataTransferService = {
 
       return filePath;
     } catch (error) {
-      console.error('Export failed:', error);
+      logger.error('[DataTransfer] Export failed:', error);
       throw new Error('数据导出失败');
     }
   },
@@ -147,7 +148,7 @@ export const dataTransferService = {
             });
             counts.dietRecords++;
           } catch (e) {
-            console.warn('Skip diet record:', e);
+            logger.warn('[DataTransfer] Skip diet record:', e);
           }
         }
       }
@@ -170,7 +171,7 @@ export const dataTransferService = {
             });
             counts.exerciseRecords++;
           } catch (e) {
-            console.warn('Skip exercise record:', e);
+            logger.warn('[DataTransfer] Skip exercise record:', e);
           }
         }
       }
@@ -189,7 +190,7 @@ export const dataTransferService = {
             });
             counts.weightRecords++;
           } catch (e) {
-            console.warn('Skip weight record:', e);
+            logger.warn('[DataTransfer] Skip weight record:', e);
           }
         }
       }
@@ -207,7 +208,7 @@ export const dataTransferService = {
             });
             counts.goals++;
           } catch (e) {
-            console.warn('Skip goal:', e);
+            logger.warn('[DataTransfer] Skip goal:', e);
           }
         }
       }
@@ -223,7 +224,7 @@ export const dataTransferService = {
             });
             counts.aiConfig++;
           } catch (e) {
-            console.warn('Skip AI config:', e);
+            logger.warn('[DataTransfer] Skip AI config:', e);
           }
         }
       }
@@ -234,7 +235,7 @@ export const dataTransferService = {
         counts,
       };
     } catch (error) {
-      console.error('Import failed:', error);
+      logger.error('[DataTransfer] Import failed:', error);
       throw error instanceof Error ? error : new Error('数据导入失败');
     }
   },

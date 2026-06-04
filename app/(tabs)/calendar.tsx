@@ -1,6 +1,7 @@
 // app/(tabs)/calendar.tsx
 // 日历页面
 
+import { logger } from '@/utils/logger';
 import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
@@ -48,7 +49,7 @@ export default function CalendarScreen() {
 
       setMarkedDates([...new Set([...dietDates, ...exerciseDates])]);
     } catch (err) {
-      console.error('加载标记日期失败:', err);
+      logger.error('[Calendar] 加载标记日期失败:', err);
     }
   };
 

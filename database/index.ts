@@ -1,6 +1,7 @@
 // database/index.ts
 // 数据库初始化和管理
 
+import { logger } from '@/utils/logger';
 import * as SQLite from 'expo-sqlite';
 import { runMigrations } from './migrations';
 
@@ -19,7 +20,7 @@ class Database {
     }
 
     try {
-      console.log('[Database] 正在初始化数据库...');
+      logger.log('[Database] 正在初始化数据库...');
 
       // 打开数据库
       this.db = await SQLite.openDatabaseAsync(DB_NAME);
@@ -31,9 +32,9 @@ class Database {
       await runMigrations(this.db);
 
       this.isInitialized = true;
-      console.log('[Database] 数据库初始化完成');
+      logger.log('[Database] 数据库初始化完成');
     } catch (error) {
-      console.error('[Database] 初始化失败:', error);
+      logger.error('[Database] 初始化失败:', error);
       throw error;
     }
   }

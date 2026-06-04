@@ -1,6 +1,7 @@
 // hooks/useWeightRecords.ts
 // 体重记录 Hook
 
+import { logger } from '@/utils/logger';
 import { useState, useCallback, useEffect } from 'react';
 import { weightQueries } from '@/database/queries';
 import { WeightRecord, WeightStats } from '@/types/weight';
@@ -79,7 +80,7 @@ export function useWeightRecords(): UseWeightRecordsReturn {
       const result = await weightQueries.getByDate(dateStr);
       setYesterdayWeight(result);
     } catch (err) {
-      console.error('[useWeightRecords] loadYesterday 失败:', err);
+      logger.error('[useWeightRecords] loadYesterday 失败:', err);
     }
   }, []);
 
@@ -93,7 +94,7 @@ export function useWeightRecords(): UseWeightRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载最新体重失败';
       setError(message);
-      console.error('[useWeightRecords] loadLatest 失败:', err);
+      logger.error('[useWeightRecords] loadLatest 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -109,7 +110,7 @@ export function useWeightRecords(): UseWeightRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载记录失败';
       setError(message);
-      console.error('[useWeightRecords] loadRecent 失败:', err);
+      logger.error('[useWeightRecords] loadRecent 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -125,7 +126,7 @@ export function useWeightRecords(): UseWeightRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载记录失败';
       setError(message);
-      console.error('[useWeightRecords] loadByDate 失败:', err);
+      logger.error('[useWeightRecords] loadByDate 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -141,7 +142,7 @@ export function useWeightRecords(): UseWeightRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载记录失败';
       setError(message);
-      console.error('[useWeightRecords] loadByDateRange 失败:', err);
+      logger.error('[useWeightRecords] loadByDateRange 失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -168,7 +169,7 @@ export function useWeightRecords(): UseWeightRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '添加记录失败';
       setError(message);
-      console.error('[useWeightRecords] addRecord 失败:', err);
+      logger.error('[useWeightRecords] addRecord 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -187,7 +188,7 @@ export function useWeightRecords(): UseWeightRecordsReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '删除记录失败';
       setError(message);
-      console.error('[useWeightRecords] deleteRecord 失败:', err);
+      logger.error('[useWeightRecords] deleteRecord 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -198,7 +199,7 @@ export function useWeightRecords(): UseWeightRecordsReturn {
     try {
       return await weightQueries.getStats(startDate, endDate);
     } catch (err) {
-      console.error('[useWeightRecords] getStats 失败:', err);
+      logger.error('[useWeightRecords] getStats 失败:', err);
       return null;
     }
   }, []);
@@ -207,7 +208,7 @@ export function useWeightRecords(): UseWeightRecordsReturn {
     try {
       return await weightQueries.getDailyWeights(startDate, endDate);
     } catch (err) {
-      console.error('[useWeightRecords] getDailyWeights 失败:', err);
+      logger.error('[useWeightRecords] getDailyWeights 失败:', err);
       return [];
     }
   }, []);

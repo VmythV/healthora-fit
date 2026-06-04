@@ -1,6 +1,7 @@
 // hooks/useDatabase.ts
 // 数据库初始化 Hook
 
+import { logger } from '@/utils/logger';
 import { useState, useEffect, useCallback } from 'react';
 import { database } from '@/database';
 
@@ -42,7 +43,7 @@ export function useDatabase(): UseDatabaseReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '数据库初始化失败';
       setError(message);
-      console.error('[useDatabase] 初始化失败:', err);
+      logger.error('[useDatabase] 初始化失败:', err);
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +61,7 @@ export function useDatabase(): UseDatabaseReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '数据库重置失败';
       setError(message);
-      console.error('[useDatabase] 重置失败:', err);
+      logger.error('[useDatabase] 重置失败:', err);
     } finally {
       setIsLoading(false);
     }

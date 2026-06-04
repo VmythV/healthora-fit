@@ -10,6 +10,7 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -21,6 +22,7 @@ import { dataTransferService } from '@/services/dataTransfer';
 import { aiConfigQueries } from '@/database/queries/aiConfig';
 import { Icon, ArrowRightIcon, CheckIcon } from '@/components/icons';
 import { useWeekStartDay, WEEK_START_OPTIONS } from '@/hooks/useWeekStartDay';
+import { logger } from '@/utils/logger';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -31,6 +33,7 @@ export default function SettingsScreen() {
   const [isImporting, setIsImporting] = useState(false);
   const [aiConfigured, setAiConfigured] = useState(false);
   const [aiEndpoint, setAiEndpoint] = useState('');
+  const [debugMode, setDebugMode] = useState(logger.isEnabled());
 
   useEffect(() => {
     loadActive('target_weight');
@@ -49,7 +52,7 @@ export default function SettingsScreen() {
         setAiEndpoint('');
       }
     } catch (error) {
-      console.error('Failed to load AI config status:', error);
+      logger.error('[Settings] 加载 AI 配置状态失败:', error);
     }
   };
 
@@ -92,6 +95,12 @@ export default function SettingsScreen() {
         },
       ]
     );
+  };
+
+  // 切换调试模式
+  const handleToggleDebugMode = async (value: boolean) => {
+    setDebugMode(value);
+    await logger.setEnabled(value);
   };
 
   // 导入数据
@@ -275,6 +284,26 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* 调试模式 */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('settings.debug.title')}</Text>
+          <View style={styles.menuItem}>
+            <View style={styles.menuLeft}>
+              <Icon name="eye" size={20} color={theme.colors.primary.main} />
+              <View>
+                <Text style={styles.menuLabel}>{t('settings.debug.title')}</Text>
+                <Text style={styles.debugHint}>{t('settings.debug.description')}</Text>
+              </View>
+            </View>
+            <Switch
+              value={debugMode}
+              onValueChange={handleToggleDebugMode}
+              trackColor={{ false: '#D1D5DB', true: theme.colors.primary.main }}
+              thumbColor={debugMode ? '#FFFFFF' : '#F9FAFB'}
+            />
+          </View>
+        </View>
+
         {/* 关于 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('settings.about.title')}</Text>
@@ -373,5 +402,10 @@ const styles = StyleSheet.create({
   detailText: {
     fontSize: theme.fontSize.caption,
     color: theme.colors.text.tertiary,
+  },
+  debugHint: {
+    fontSize: theme.fontSize.caption,
+    color: theme.colors.text.tertiary,
+    marginTop: 2,
   },
 });

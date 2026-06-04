@@ -6,11 +6,17 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useDatabase } from '@/hooks/useDatabase';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { logger } from '@/utils/logger';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 
 export default function RootLayout() {
   useFrameworkReady();
   const { isReady, isLoading, error } = useDatabase();
+
+  // 初始化日志系统
+  useEffect(() => {
+    logger.init();
+  }, []);
 
   if (isLoading) {
     return (

@@ -1,6 +1,7 @@
 // app/settings/ai-config.tsx
 // AI 配置页面
 
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -46,12 +47,12 @@ export default function AIConfigScreen() {
 
   const loadConfigs = async () => {
     try {
-      console.log('[AI Config] Loading configs...');
+      logger.log('[AI Config] Loading configs...');
       const allConfigs = await aiConfigQueries.getAll();
       const active = await aiConfigQueries.getActive();
 
-      console.log('[AI Config] All configs:', allConfigs);
-      console.log('[AI Config] Active config:', active);
+      logger.log('[AI Config] All configs:', allConfigs);
+      logger.log('[AI Config] Active config:', active);
 
       setConfigs(allConfigs || []);
       setActiveConfig(active);
@@ -61,16 +62,16 @@ export default function AIConfigScreen() {
         loadConfigToForm(active);
       }
     } catch (error) {
-      console.error('[AI Config] Failed to load configs:', error);
+      logger.error('[AI Config] Failed to load configs:', error);
     }
   };
 
   // 加载配置到表单
   const loadConfigToForm = (config: AIConfig) => {
-    console.log('[AI Config] Loading config to form:', config);
-    console.log('[AI Config] apiEndpoint:', config.apiEndpoint);
-    console.log('[AI Config] apiKey:', config.apiKey);
-    console.log('[AI Config] modelName:', config.modelName);
+    logger.log('[AI Config] Loading config to form:', config);
+    logger.log('[AI Config] apiEndpoint:', config.apiEndpoint);
+    logger.log('[AI Config] apiKey:', config.apiKey);
+    logger.log('[AI Config] modelName:', config.modelName);
 
     setApiEndpoint(config.apiEndpoint || '');
     setApiKey(config.apiKey || '');
@@ -85,12 +86,12 @@ export default function AIConfigScreen() {
       setApiType('auto');
     }
 
-    console.log('[AI Config] Form loaded successfully');
+    logger.log('[AI Config] Form loaded successfully');
   };
 
   // 点击配置项
   const handleConfigPress = (config: AIConfig) => {
-    console.log('[AI Config] Config pressed:', config);
+    logger.log('[AI Config] Config pressed:', config);
     setEditingConfig(config);
     loadConfigToForm(config);
     setIsEditing(true);
@@ -133,7 +134,7 @@ export default function AIConfigScreen() {
               await aiService.loadConfig();
               Alert.alert(t('common.success'), t('settings.ai.deleteSuccess'));
             } catch (error) {
-              console.error('[AI Config] Delete failed:', error);
+              logger.error('[AI Config] Delete failed:', error);
               Alert.alert(t('common.error'), t('settings.ai.deleteFailed'));
             }
           },
@@ -159,7 +160,7 @@ export default function AIConfigScreen() {
 
     try {
       setIsSaving(true);
-      console.log('[AI Config] Saving config...');
+      logger.log('[AI Config] Saving config...');
 
       // 根据 API 类型处理端点
       let finalEndpoint = apiEndpoint.trim();
@@ -169,7 +170,7 @@ export default function AIConfigScreen() {
         finalEndpoint = finalEndpoint.replace(/\/responses$/, '') + '/chat/completions';
       }
 
-      console.log('[AI Config] Final endpoint:', finalEndpoint);
+      logger.log('[AI Config] Final endpoint:', finalEndpoint);
 
       if (editingConfig) {
         // 更新现有配置
@@ -188,7 +189,7 @@ export default function AIConfigScreen() {
         });
       }
 
-      console.log('[AI Config] Config saved successfully');
+      logger.log('[AI Config] Config saved successfully');
 
       // 重新加载配置
       await loadConfigs();
@@ -199,7 +200,7 @@ export default function AIConfigScreen() {
 
       Alert.alert(t('common.success'), t('settings.ai.saveSuccess'));
     } catch (error) {
-      console.error('[AI Config] Save failed:', error);
+      logger.error('[AI Config] Save failed:', error);
       Alert.alert(t('common.error'), t('settings.ai.saveFailed'));
     } finally {
       setIsSaving(false);

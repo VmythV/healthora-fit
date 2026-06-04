@@ -1,6 +1,7 @@
 // hooks/useWeekStartDay.ts
 // 星期开始日设置 Hook
 
+import { logger } from '@/utils/logger';
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -44,7 +45,7 @@ export function useWeekStartDay() {
         setWeekStartDayState(parseInt(value, 10));
       }
     } catch (error) {
-      console.error('Failed to load week start day:', error);
+      logger.error('[useWeekStartDay] Failed to load week start day:', error);
     } finally {
       setIsLoading(false);
     }
@@ -56,7 +57,7 @@ export function useWeekStartDay() {
       await AsyncStorage.setItem(WEEK_START_DAY_KEY, day.toString());
       setWeekStartDayState(day);
     } catch (error) {
-      console.error('Failed to save week start day:', error);
+      logger.error('[useWeekStartDay] Failed to save week start day:', error);
     }
   }, []);
 

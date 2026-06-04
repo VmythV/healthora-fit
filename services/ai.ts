@@ -1,6 +1,7 @@
 // services/ai.ts
 // AI 服务基类
 
+import { logger } from '@/utils/logger';
 import { File } from 'expo-file-system';
 import { aiConfigQueries } from '@/database/queries/aiConfig';
 
@@ -59,7 +60,7 @@ export class AiService {
    * 加载配置
    */
   async loadConfig(): Promise<void> {
-    console.log('[AI] 正在加载配置...');
+    logger.log('[AI] 正在加载配置...');
     const config = await aiConfigQueries.getActive();
     if (config) {
       this.config = {
@@ -68,14 +69,14 @@ export class AiService {
         model: config.modelName || 'gpt-4-vision-preview',
         apiType: this.detectApiType(config.apiEndpoint || ''),
       };
-      console.log('[AI] 配置已加载:', {
+      logger.log('[AI] 配置已加载:', {
         endpoint: this.config.endpoint,
         model: this.config.model,
         apiType: this.config.apiType,
         hasKey: !!this.config.apiKey,
       });
     } else {
-      console.log('[AI] 未找到活跃配置');
+      logger.log('[AI] 未找到活跃配置');
     }
   }
 
@@ -221,7 +222,7 @@ export class AiService {
 
       return { success: false, error: errorMessage };
     } catch (error) {
-      console.error('测试连接失败:', error);
+      logger.error('[AI] 测试连接失败:', error);
       const message = error instanceof Error ? error.message : '网络连接失败';
       return { success: false, error: message };
     }
@@ -237,7 +238,7 @@ export class AiService {
       const base64 = await file.base64();
       return base64;
     } catch (error) {
-      console.error('图片转 Base64 失败:', error);
+      logger.error('[AI] 图片转 Base64 失败:', error);
       throw new Error('图片读取失败');
     }
   }
@@ -251,12 +252,12 @@ export class AiService {
     }
 
     try {
-      console.log('[AI] 开始分析食物图片');
-      console.log('[AI] 图片 URI:', imageUri);
+      logger.log('[AI] 开始分析食物图片');
+      logger.log('[AI] 图片 URI:', imageUri);
 
       // 转换图片为 Base64
       const base64 = await this.imageToBase64(imageUri);
-      console.log('[AI] 图片 Base64 长度:', base64.length, '字符');
+      logger.log('[AI] 图片 Base64 长度:', base64.length, '字符');
 
       // 构建请求
       const prompt = `请分析这张食物图片，识别出所有食物并估算营养成分。
@@ -281,14 +282,14 @@ export class AiService {
 3. 只返回 JSON，不要有其他文字`;
 
       const apiEndpoint = this.getApiEndpoint();
-      console.log('[AI] 请求端点:', apiEndpoint);
-      console.log('[AI] API 类型:', this.config!.apiType);
-      console.log('[AI] 模型:', this.config!.model);
+      logger.log('[AI] 请求端点:', apiEndpoint);
+      logger.log('[AI] API 类型:', this.config!.apiType);
+      logger.log('[AI] 模型:', this.config!.model);
       let response: Response;
 
       if (this.config!.apiType === 'responses') {
         // Responses API 格式
-        console.log('[AI] 使用 Responses API 发送请求...');
+        logger.log('[AI] 使用 Responses API 发送请求...');
         response = await fetch(apiEndpoint, {
           method: 'POST',
           headers: {
@@ -317,7 +318,7 @@ export class AiService {
         });
       } else {
         // Chat Completions API 格式
-        console.log('[AI] 使用 Chat Completions API 发送请求...');
+        logger.log('[AI] 使用 Chat Completions API 发送请求...');
         response = await fetch(apiEndpoint, {
           method: 'POST',
           headers: {
@@ -347,14 +348,14 @@ export class AiService {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('[AI] HTTP 状态:', response.status);
-        console.error('[AI] 响应错误:', errorText);
+        logger.error('[AI] HTTP 状态:', response.status);
+        logger.error('[AI] 响应错误:', errorText);
         throw new Error('AI 识别失败，请重试');
       }
 
-      console.log('[AI] HTTP 状态:', response.status, 'OK');
+      logger.log('[AI] HTTP 状态:', response.status, 'OK');
       const data = await response.json();
-      console.log('[AI] 原始响应:', JSON.stringify(data).substring(0, 500));
+      logger.log('[AI] 原始响应:', JSON.stringify(data).substring(0, 500));
 
       // 根据 API 类型解析响应
       let content: string | undefined;
@@ -366,23 +367,23 @@ export class AiService {
         content = data.choices?.[0]?.message?.content;
       }
 
-      console.log('[AI] 解析出的内容:', content ? content.substring(0, 300) : '(空)');
+      logger.log('[AI] 解析出的内容:', content ? content.substring(0, 300) : '(空)');
 
       if (!content) {
-        console.error('[AI] 返回内容为空，完整响应:', JSON.stringify(data));
+        logger.error('[AI] 返回内容为空，完整响应:', JSON.stringify(data));
         throw new Error('AI 返回内容为空');
       }
 
       // 解析 JSON
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
-        console.error('[AI] 未找到 JSON，原始内容:', content);
+        logger.error('[AI] 未找到 JSON，原始内容:', content);
         throw new Error('AI 返回格式错误');
       }
 
-      console.log('[AI] JSON 匹配:', jsonMatch[0].substring(0, 300));
+      logger.log('[AI] JSON 匹配:', jsonMatch[0].substring(0, 300));
       const result = JSON.parse(jsonMatch[0]);
-      console.log('[AI] 解析结果:', JSON.stringify(result));
+      logger.log('[AI] 解析结果:', JSON.stringify(result));
 
       // 计算总量
       const foods: FoodItem[] = result.foods || [];
@@ -391,7 +392,7 @@ export class AiService {
       const totalCarbs = foods.reduce((sum, f) => sum + (f.carbs || 0), 0);
       const totalFat = foods.reduce((sum, f) => sum + (f.fat || 0), 0);
 
-      console.log('[AI] 分析完成:',
+      logger.log('[AI] 分析完成:',
         `${foods.length} 种食物,`,
         `${totalCalories} kcal,`,
         `蛋白质 ${totalProtein}g,`,
@@ -407,7 +408,7 @@ export class AiService {
         totalFat,
       };
     } catch (error) {
-      console.error('[AI] 食物分析失败:', error);
+      logger.error('[AI] 食物分析失败:', error);
       throw error;
     }
   }

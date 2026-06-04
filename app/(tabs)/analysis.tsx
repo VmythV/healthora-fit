@@ -1,6 +1,7 @@
 // app/(tabs)/analysis.tsx
 // 分析页面
 
+import { logger } from '@/utils/logger';
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
@@ -96,7 +97,7 @@ export default function AnalysisScreen() {
       setExerciseTypeData(typeStats || []);
       setExerciseTotal(totalExercise);
     } catch (error) {
-      console.error('Failed to load analysis data:', error);
+      logger.error('[Analysis] Failed to load analysis data:', error);
     }
   }, [isReady]);
 

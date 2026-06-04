@@ -1,6 +1,7 @@
 // hooks/useHealthData.ts
 // 健康数据 Hook
 
+import { logger } from '@/utils/logger';
 import { useState, useCallback } from 'react';
 import {
   HealthDataService,
@@ -66,7 +67,7 @@ export function useHealthData(): UseHealthDataReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '检查健康平台可用性失败';
       setError(message);
-      console.error('[useHealthData] checkAvailability 失败:', err);
+      logger.error('[useHealthData] checkAvailability 失败:', err);
       return false;
     } finally {
       setIsLoading(false);
@@ -90,7 +91,7 @@ export function useHealthData(): UseHealthDataReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '请求权限失败';
       setError(message);
-      console.error('[useHealthData] requestPermissions 失败:', err);
+      logger.error('[useHealthData] requestPermissions 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -109,7 +110,7 @@ export function useHealthData(): UseHealthDataReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '检查权限失败';
       setError(message);
-      console.error('[useHealthData] checkPermissions 失败:', err);
+      logger.error('[useHealthData] checkPermissions 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -128,7 +129,7 @@ export function useHealthData(): UseHealthDataReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '获取连接状态失败';
       setError(message);
-      console.error('[useHealthData] getConnectionStatus 失败:', err);
+      logger.error('[useHealthData] getConnectionStatus 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -155,7 +156,7 @@ export function useHealthData(): UseHealthDataReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '同步数据失败';
       setError(message);
-      console.error('[useHealthData] syncData 失败:', err);
+      logger.error('[useHealthData] syncData 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
@@ -178,7 +179,7 @@ export function useHealthData(): UseHealthDataReturn {
     } catch (err) {
       const message = err instanceof Error ? err.message : '断开连接失败';
       setError(message);
-      console.error('[useHealthData] disconnect 失败:', err);
+      logger.error('[useHealthData] disconnect 失败:', err);
       throw err;
     } finally {
       setIsLoading(false);
