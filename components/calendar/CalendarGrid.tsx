@@ -16,6 +16,7 @@ interface CalendarGridProps {
   month: number; // 0-11
   selectedDate?: string; // YYYY-MM-DD
   markedDates?: string[]; // 有记录的日期
+  maxDate?: string; // YYYY-MM-DD，最大可选日期
   onDatePress?: (date: string) => void;
   onMonthChange?: (year: number, month: number) => void;
 }
@@ -30,6 +31,7 @@ export function CalendarGrid({
   month,
   selectedDate,
   markedDates = [],
+  maxDate,
   onDatePress,
   onMonthChange,
 }: CalendarGridProps) {
@@ -70,6 +72,23 @@ export function CalendarGrid({
     return markedDates.includes(formatDate(y, m, d));
   };
 
+  // 判断是否是未来日期（超过最大日期）
+  const isFutureDate = (y: number, m: number, d: number) => {
+    if (!maxDate) return false;
+    const dateStr = formatDate(y, m, d);
+    return dateStr > maxDate;
+  };
+
+  // 判断是否可以跳转到下个月
+  const canGoNextMonth = () => {
+    if (!maxDate) return true;
+    const maxDateObj = new Date(maxDate);
+    const nextMonth = new Date(year, month + 1, 1);
+    return nextMonth.getFullYear() < maxDateObj.getFullYear() ||
+           (nextMonth.getFullYear() === maxDateObj.getFullYear() &&
+            nextMonth.getMonth() <= maxDateObj.getMonth());
+  };
+
   // 上个月
   const handlePrevMonth = () => {
     if (month === 0) {
@@ -81,6 +100,7 @@ export function CalendarGrid({
 
   // 下个月
   const handleNextMonth = () => {
+    if (!canGoNextMonth()) return;
     if (month === 11) {
       onMonthChange?.(year + 1, 0);
     } else {
@@ -107,6 +127,7 @@ export function CalendarGrid({
       const today = isToday(year, month, day);
       const selected = isSelected(year, month, day);
       const marked = isMarked(year, month, day);
+      const future = isFutureDate(year, month, day);
 
       days.push(
         <TouchableOpacity
@@ -115,20 +136,23 @@ export function CalendarGrid({
             styles.dayCell,
             today && styles.todayCell,
             selected && styles.selectedCell,
+            future && styles.disabledCell,
           ]}
-          onPress={() => onDatePress?.(dateStr)}
-          activeOpacity={0.7}
+          onPress={() => !future && onDatePress?.(dateStr)}
+          activeOpacity={future ? 1 : 0.7}
+          disabled={future}
         >
           <Text
             style={[
               styles.dayText,
               today && styles.todayText,
               selected && styles.selectedText,
+              future && styles.disabledText,
             ]}
           >
             {day}
           </Text>
-          {marked && (
+          {marked && !future && (
             <View style={[styles.dot, selected && styles.dotSelected]} />
           )}
         </TouchableOpacity>
@@ -154,8 +178,12 @@ export function CalendarGrid({
         <Text style={styles.monthTitle}>
           {year}年{monthNames[month]}
         </Text>
-        <TouchableOpacity onPress={handleNextMonth} style={styles.navButton}>
-          <Text style={styles.navText}>›</Text>
+        <TouchableOpacity
+          onPress={handleNextMonth}
+          style={[styles.navButton, !canGoNextMonth() && styles.navButtonDisabled]}
+          disabled={!canGoNextMonth()}
+        >
+          <Text style={[styles.navText, !canGoNextMonth() && styles.navTextDisabled]}>›</Text>
         </TouchableOpacity>
       </View>
 
@@ -264,5 +292,17 @@ const styles = StyleSheet.create({
   },
   dotSelected: {
     backgroundColor: '#FFFFFF',
+  },
+  disabledCell: {
+    opacity: 0.4,
+  },
+  disabledText: {
+    color: theme.colors.text.tertiary,
+  },
+  navButtonDisabled: {
+    opacity: 0.3,
+  },
+  navTextDisabled: {
+    color: theme.colors.text.tertiary,
   },
 });

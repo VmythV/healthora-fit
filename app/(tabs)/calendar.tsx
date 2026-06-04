@@ -105,6 +105,7 @@ export default function CalendarScreen() {
               month={month}
               selectedDate={selectedDate}
               markedDates={markedDates}
+              maxDate={todayStr}
               onDatePress={handleDatePress}
               onMonthChange={handleMonthChange}
             />
