@@ -141,7 +141,8 @@
     "confidenceMedium": "中置信度",
     "confidenceLow": "低置信度",
     "retry": "重新识别",
-    "acceptResult": "使用结果"
+    "acceptResult": "使用结果",
+    "aiNotConfigured": "AI 服务未配置，请先在设置中配置"
   },
   "weight": {
     "title": "记录体重",

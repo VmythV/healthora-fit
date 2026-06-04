@@ -59,7 +59,7 @@ export class AiService {
    * 加载配置
    */
   async loadConfig(): Promise<void> {
-    const config = await aiConfigQueries.get();
+    const config = await aiConfigQueries.getActive();
     if (config) {
       this.config = {
         endpoint: config.apiEndpoint || '',

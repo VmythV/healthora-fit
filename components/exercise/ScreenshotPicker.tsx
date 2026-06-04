@@ -1,7 +1,7 @@
 // components/exercise/ScreenshotPicker.tsx
 // 运动截图选择组件
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,6 +17,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { Card } from '@/components/ui';
 import { Icon } from '@/components/icons';
 import { ExerciseAnalysisResult, exerciseAnalysisService } from '@/services/exerciseAnalysis';
+import { aiService } from '@/services/ai';
 
 interface ScreenshotPickerProps {
   onAnalysisComplete: (result: ExerciseAnalysisResult) => void;
@@ -32,6 +33,20 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // 组件挂载时加载 AI 配置
+  useEffect(() => {
+    loadAiConfig();
+  }, []);
+
+  // 加载 AI 配置
+  const loadAiConfig = async () => {
+    try {
+      await aiService.loadConfig();
+    } catch (err) {
+      console.error('加载 AI 配置失败:', err);
+    }
+  };
+
   // 选择图片
   const pickImage = async () => {
     try {
@@ -44,7 +59,7 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
 
       // 选择图片
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ImagePicker.MediaType.Images,
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
@@ -97,6 +112,15 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
     setError(null);
 
     try {
+      // 确保 AI 配置已加载
+      if (!aiService.isConfigured()) {
+        await aiService.loadConfig();
+      }
+
+      if (!aiService.isConfigured()) {
+        throw new Error(t('exercise.aiNotConfigured'));
+      }
+
       const result = await exerciseAnalysisService.analyzeScreenshot(uri);
       onAnalysisComplete(result);
     } catch (err) {

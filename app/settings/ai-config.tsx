@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { aiConfigQueries } from '@/database/queries/aiConfig';
+import { aiService } from '@/services/ai';
 import { AIConfig } from '@/types/ai';
 import { Icon, BackIcon } from '@/components/icons';
 
@@ -95,6 +96,8 @@ export default function AIConfigScreen() {
         modelName: modelName.trim(),
       });
       await loadConfig();
+      // 重新加载 AI 服务配置
+      await aiService.loadConfig();
       Alert.alert(t('common.success'), t('settings.ai.saveSuccess'));
     } catch (error) {
       Alert.alert(t('common.error'), t('settings.ai.saveFailed'));

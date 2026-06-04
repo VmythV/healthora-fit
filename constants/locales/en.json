@@ -142,7 +142,8 @@
     "confidenceMedium": "Medium Confidence",
     "confidenceLow": "Low Confidence",
     "retry": "Retry",
-    "acceptResult": "Use Result"
+    "acceptResult": "Use Result",
+    "aiNotConfigured": "AI service not configured, please configure in settings first"
   },
   "weight": {
     "title": "Record Weight",
