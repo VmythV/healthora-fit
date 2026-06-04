@@ -204,6 +204,7 @@
       "targetWeight": "Target Weight",
       "notSet": "Not Set",
       "setTarget": "Set Target Weight",
+      "editTarget": "Edit Target Weight",
       "saveSuccess": "Goal saved",
       "saveFailed": "Save failed, please retry",
       "achieved": "Achieved!",

@@ -97,46 +97,12 @@ export default function GoalsScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* 目标进度卡片 */}
-        {progressInfo && !isEditing && (
-          <View style={styles.progressCard}>
-            <ProgressRing
-              progress={progressInfo.progress}
-              size={120}
-              color={progressInfo.isAchieved ? theme.colors.success : theme.colors.primary.main}
-              label={progressInfo.isAchieved ? t('settings.goals.achieved') : t('settings.goals.inProgress')}
-            />
-
-            <View style={styles.progressInfo}>
-              <View style={styles.progressRow}>
-                <Text style={styles.progressLabel}>{t('weight.currentWeight')}</Text>
-                <Text style={styles.progressValue}>{progressInfo.current} kg</Text>
-              </View>
-              <View style={styles.progressRow}>
-                <Text style={styles.progressLabel}>{t('weight.targetWeight')}</Text>
-                <Text style={styles.progressValue}>{progressInfo.target} kg</Text>
-              </View>
-              <View style={styles.progressRow}>
-                <Text style={styles.progressLabel}>{t('weight.toTarget')}</Text>
-                <Text style={[styles.progressValue, styles.highlight]}>
-                  {progressInfo.remaining > 0 ? `${progressInfo.remaining.toFixed(1)} kg` : t('settings.goals.achieved')}
-                </Text>
-              </View>
-            </View>
-
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => setIsEditing(true)}
-            >
-              <Text style={styles.editButtonText}>{t('common.edit')}</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* 目标输入表单 */}
-        {(isEditing || !activeGoal) && (
+        {/* 编辑模式：显示输入表单 */}
+        {isEditing && (
           <View style={styles.formCard}>
-            <Text style={styles.formTitle}>{t('settings.goals.setTarget')}</Text>
+            <Text style={styles.formTitle}>
+              {activeGoal ? t('settings.goals.editTarget') : t('settings.goals.setTarget')}
+            </Text>
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>{t('weight.targetWeight')} (kg)</Text>
@@ -175,6 +141,96 @@ export default function GoalsScreen() {
                 <Text style={styles.saveButtonText}>{t('common.save')}</Text>
               </TouchableOpacity>
             </View>
+          </View>
+        )}
+
+        {/* 查看模式：显示当前目标 */}
+        {!isEditing && activeGoal && (
+          <View style={styles.progressCard}>
+            {/* 进度环（仅在有体重记录时显示） */}
+            {progressInfo && (
+              <>
+                <ProgressRing
+                  progress={progressInfo.progress}
+                  size={120}
+                  color={progressInfo.isAchieved ? theme.colors.success : theme.colors.primary.main}
+                  label={progressInfo.isAchieved ? t('settings.goals.achieved') : t('settings.goals.inProgress')}
+                />
+                <View style={styles.progressInfo}>
+                  <View style={styles.progressRow}>
+                    <Text style={styles.progressLabel}>{t('weight.currentWeight')}</Text>
+                    <Text style={styles.progressValue}>{progressInfo.current} kg</Text>
+                  </View>
+                  <View style={styles.progressRow}>
+                    <Text style={styles.progressLabel}>{t('weight.targetWeight')}</Text>
+                    <Text style={styles.progressValue}>{progressInfo.target} kg</Text>
+                  </View>
+                  <View style={styles.progressRow}>
+                    <Text style={styles.progressLabel}>{t('weight.toTarget')}</Text>
+                    <Text style={[styles.progressValue, styles.highlight]}>
+                      {progressInfo.remaining > 0 ? `${progressInfo.remaining.toFixed(1)} kg` : t('settings.goals.achieved')}
+                    </Text>
+                  </View>
+                </View>
+              </>
+            )}
+
+            {/* 目标摘要（始终显示） */}
+            <View style={[styles.goalSummary, !progressInfo && styles.goalSummaryFirst]}>
+              <View style={styles.goalSummaryRow}>
+                <Text style={styles.goalSummaryLabel}>{t('weight.targetWeight')}</Text>
+                <Text style={styles.goalSummaryValue}>{activeGoal.targetValue} kg</Text>
+              </View>
+              {latestWeight && (
+                <View style={styles.goalSummaryRow}>
+                  <Text style={styles.goalSummaryLabel}>{t('weight.currentWeight')}</Text>
+                  <Text style={styles.goalSummaryValue}>{latestWeight.weight} kg</Text>
+                </View>
+              )}
+              {activeGoal.startDate && (
+                <View style={styles.goalSummaryRow}>
+                  <Text style={styles.goalSummaryLabel}>{t('common.date')}</Text>
+                  <Text style={styles.goalSummaryValue}>{activeGoal.startDate}</Text>
+                </View>
+              )}
+            </View>
+
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => setIsEditing(true)}
+            >
+              <Text style={styles.editButtonText}>{t('common.edit')}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* 无目标：直接显示设置表单 */}
+        {!isEditing && !activeGoal && (
+          <View style={styles.formCard}>
+            <Text style={styles.formTitle}>{t('settings.goals.setTarget')}</Text>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>{t('weight.targetWeight')} (kg)</Text>
+              <TextInput
+                style={styles.input}
+                value={targetWeight}
+                onChangeText={setTargetWeight}
+                keyboardType="decimal-pad"
+                placeholder="例如: 65.0"
+                placeholderTextColor={theme.colors.text.tertiary}
+              />
+            </View>
+
+            {latestWeight && (
+              <View style={styles.currentWeightInfo}>
+                <Text style={styles.currentWeightLabel}>{t('weight.currentWeight')}:</Text>
+                <Text style={styles.currentWeightValue}>{latestWeight.weight} kg</Text>
+              </View>
+            )}
+
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+              <Text style={styles.saveButtonText}>{t('common.save')}</Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -264,6 +320,29 @@ const styles = StyleSheet.create({
   editButtonText: {
     fontSize: theme.fontSize.body,
     color: theme.colors.primary.main,
+  },
+  goalSummary: {
+    width: '100%',
+    marginTop: theme.spacing.xl,
+  },
+  goalSummaryFirst: {
+    marginTop: 0,
+  },
+  goalSummaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: theme.spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border.light,
+  },
+  goalSummaryLabel: {
+    fontSize: theme.fontSize.body,
+    color: theme.colors.text.secondary,
+  },
+  goalSummaryValue: {
+    fontSize: theme.fontSize.body,
+    fontWeight: theme.fontWeight.medium,
+    color: theme.colors.text.primary,
   },
   formCard: {
     backgroundColor: theme.colors.background.primary,

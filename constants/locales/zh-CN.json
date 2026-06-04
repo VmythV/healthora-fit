@@ -203,6 +203,7 @@
       "targetWeight": "目标体重",
       "notSet": "未设置",
       "setTarget": "设置目标体重",
+      "editTarget": "修改目标体重",
       "saveSuccess": "目标已保存",
       "saveFailed": "保存失败，请重试",
       "achieved": "已达成！",
