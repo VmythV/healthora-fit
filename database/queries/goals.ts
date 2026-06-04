@@ -108,6 +108,21 @@ export const goalQueries = {
         goal.targetDate || null,
       ]
     );
+
+    // 保留最多 5 条历史记录（1 条活跃 + 4 条历史），删除更旧的
+    await db.runAsync(
+      `DELETE FROM goals
+       WHERE goal_type = ?
+         AND is_active = 0
+         AND id NOT IN (
+           SELECT id FROM goals
+           WHERE goal_type = ? AND is_active = 0
+           ORDER BY created_at DESC
+           LIMIT 4
+         )`,
+      [goal.goalType, goal.goalType]
+    );
+
     return result.lastInsertRowId;
   },
 
