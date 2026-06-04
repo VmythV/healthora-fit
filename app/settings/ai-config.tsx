@@ -145,9 +145,11 @@ export default function AIConfigScreen() {
                 style={styles.showButton}
                 onPress={() => setShowApiKey(!showApiKey)}
               >
-                <Text style={styles.showButtonText}>
-                  {showApiKey ? '🙈' : '👁️'}
-                </Text>
+                <Icon
+                  name={showApiKey ? 'eye-off' : 'eye'}
+                  size={20}
+                  color={theme.colors.text.secondary}
+                />
               </TouchableOpacity>
             </View>
             <Text style={styles.inputHint}>{t('settings.ai.apiKeyHint')}</Text>

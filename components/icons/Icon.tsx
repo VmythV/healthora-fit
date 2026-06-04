@@ -39,6 +39,8 @@ import { DisconnectedIcon } from './DisconnectedIcon';
 import { TrendUpIcon } from './TrendUpIcon';
 import { TrendDownIcon } from './TrendDownIcon';
 import { TrendFlatIcon } from './TrendFlatIcon';
+import { EyeIcon } from './EyeIcon';
+import { EyeOffIcon } from './EyeOffIcon';
 
 export type IconName =
   | 'home'
@@ -77,7 +79,9 @@ export type IconName =
   | 'disconnected'
   | 'trend-up'
   | 'trend-down'
-  | 'trend-flat';
+  | 'trend-flat'
+  | 'eye'
+  | 'eye-off';
 
 interface IconProps {
   name: IconName;
@@ -173,6 +177,10 @@ export function Icon({ name, size = 24, color = '#000000' }: IconProps) {
       return <TrendDownIcon {...iconProps} />;
     case 'trend-flat':
       return <TrendFlatIcon {...iconProps} />;
+    case 'eye':
+      return <EyeIcon {...iconProps} />;
+    case 'eye-off':
+      return <EyeOffIcon {...iconProps} />;
     default:
       return null;
   }

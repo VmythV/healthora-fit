@@ -50,3 +50,7 @@ export { DisconnectedIcon } from './DisconnectedIcon';
 export { TrendUpIcon } from './TrendUpIcon';
 export { TrendDownIcon } from './TrendDownIcon';
 export { TrendFlatIcon } from './TrendFlatIcon';
+
+// 其他图标
+export { EyeIcon } from './EyeIcon';
+export { EyeOffIcon } from './EyeOffIcon';
