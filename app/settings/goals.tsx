@@ -251,7 +251,7 @@ export default function GoalsScreen() {
                   key={goal.id}
                   style={[
                     styles.historyItem,
-                    index < goals.filter(g => g.goalType === 'target_weight').length - 1 && styles.historyItemBorder,
+                    index < goals.filter(g => g.goalType === 'target_weight').length - 1 ? styles.historyItemBorder : undefined,
                   ]}
                 >
                   <View style={styles.historyLeft}>
