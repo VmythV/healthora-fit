@@ -81,6 +81,7 @@ export default function GoalsScreen() {
         startValue: latestWeight?.weight,
         startDate: new Date().toISOString().split('T')[0],
       });
+      await loadAll();
       setIsEditing(false);
       showNotification(t('settings.goals.saveSuccess'), 'success');
     } catch (error) {
