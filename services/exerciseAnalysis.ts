@@ -48,6 +48,11 @@ export class ExerciseAnalysisService {
    * 分析运动截图
    */
   async analyzeScreenshot(imageUri: string): Promise<ExerciseAnalysisResult> {
+    // 确保 AI 配置已加载
+    if (!aiService.isConfigured()) {
+      await aiService.loadConfig();
+    }
+
     if (!aiService.isConfigured()) {
       throw new Error('AI 服务未配置，请先在设置中配置');
     }
