@@ -35,16 +35,26 @@ export const aiConfigQueries = {
   }): Promise<number> {
     const db = database.getDatabase();
 
-    // 先将所有配置设为非激活
-    await db.runAsync(`UPDATE ai_config SET is_active = 0`);
+    // 检查是否已有激活的配置
+    const existing = await this.getActive();
 
-    // 插入新配置
-    const result = await db.runAsync(
-      `INSERT INTO ai_config (api_endpoint, api_key, model_name, is_active)
-       VALUES (?, ?, ?, 1)`,
-      [config.apiEndpoint, config.apiKey, config.modelName]
-    );
-    return result.lastInsertRowId;
+    if (existing) {
+      // 更新现有配置
+      await db.runAsync(
+        `UPDATE ai_config SET api_endpoint = ?, api_key = ?, model_name = ?, updated_at = datetime('now', 'localtime')
+         WHERE id = ?`,
+        [config.apiEndpoint, config.apiKey, config.modelName, existing.id]
+      );
+      return existing.id;
+    } else {
+      // 插入新配置
+      const result = await db.runAsync(
+        `INSERT INTO ai_config (api_endpoint, api_key, model_name, is_active)
+         VALUES (?, ?, ?, 1)`,
+        [config.apiEndpoint, config.apiKey, config.modelName]
+      );
+      return result.lastInsertRowId;
+    }
   },
 
   /**

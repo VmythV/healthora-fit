@@ -41,12 +41,16 @@ export default function AIConfigScreen() {
 
   const loadConfig = async () => {
     try {
+      console.log('[AI Config] Loading config...');
       const activeConfig = await aiConfigQueries.getActive();
+      console.log('[AI Config] Active config:', activeConfig);
+
       if (activeConfig) {
         setConfig(activeConfig);
-        setApiEndpoint(activeConfig.apiEndpoint);
-        setApiKey(activeConfig.apiKey);
-        setModelName(activeConfig.modelName);
+        setApiEndpoint(activeConfig.apiEndpoint || '');
+        setApiKey(activeConfig.apiKey || '');
+        setModelName(activeConfig.modelName || '');
+
         // 检测 API 类型
         if (activeConfig.apiEndpoint?.endsWith('/responses')) {
           setApiType('responses');
@@ -55,9 +59,13 @@ export default function AIConfigScreen() {
         } else {
           setApiType('auto');
         }
+
+        console.log('[AI Config] Config loaded successfully');
+      } else {
+        console.log('[AI Config] No active config found');
       }
     } catch (error) {
-      console.error('Failed to load AI config:', error);
+      console.error('[AI Config] Failed to load config:', error);
     }
   };
 
@@ -78,6 +86,7 @@ export default function AIConfigScreen() {
 
     try {
       setIsSaving(true);
+      console.log('[AI Config] Saving config...');
 
       // 根据 API 类型处理端点
       let finalEndpoint = apiEndpoint.trim();
@@ -90,16 +99,25 @@ export default function AIConfigScreen() {
       }
       // auto 模式保持原样
 
-      await aiConfigQueries.save({
+      console.log('[AI Config] Final endpoint:', finalEndpoint);
+
+      const savedId = await aiConfigQueries.save({
         apiEndpoint: finalEndpoint,
         apiKey: apiKey.trim(),
         modelName: modelName.trim(),
       });
+
+      console.log('[AI Config] Saved with ID:', savedId);
+
+      // 重新加载配置
       await loadConfig();
+
       // 重新加载 AI 服务配置
       await aiService.loadConfig();
+
       Alert.alert(t('common.success'), t('settings.ai.saveSuccess'));
     } catch (error) {
+      console.error('[AI Config] Save failed:', error);
       Alert.alert(t('common.error'), t('settings.ai.saveFailed'));
     } finally {
       setIsSaving(false);
