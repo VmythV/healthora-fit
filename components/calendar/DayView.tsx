@@ -48,6 +48,7 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
 
   // 动画值
   const translateX = useSharedValue(0);
+  const isGestureActive = useSharedValue(false);
 
   // 判断是否可以跳转到下一天
   const canGoNextDay = useCallback(() => {
@@ -75,11 +76,21 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
 
   // 滑动手势
   const panGesture = Gesture.Pan()
+    .onStart(() => {
+      isGestureActive.value = true;
+    })
     .onUpdate((event) => {
-      translateX.value = event.translationX;
+      // 限制滑动幅度，最大为 30px
+      const maxTranslation = 30;
+      const clampedTranslation = Math.max(
+        -maxTranslation,
+        Math.min(maxTranslation, event.translationX * 0.3)
+      );
+      translateX.value = clampedTranslation;
     })
     .onEnd((event) => {
-      const threshold = 50;
+      isGestureActive.value = false;
+      const threshold = 20;
       if (event.translationX < -threshold) {
         // 向左滑动，切换到下一天
         runOnJS(handleNextDay)();
@@ -87,7 +98,12 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
         // 向右滑动，切换到上一天
         runOnJS(handlePrevDay)();
       }
-      translateX.value = withSpring(0);
+      // 平滑回弹动画
+      translateX.value = withSpring(0, {
+        damping: 20,
+        stiffness: 200,
+        mass: 0.5,
+      });
     });
 
   // 动画样式
