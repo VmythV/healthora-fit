@@ -35,7 +35,7 @@ export default function GoalsScreen() {
   }, []);
 
   useEffect(() => {
-    if (activeGoal) {
+    if (activeGoal && activeGoal.targetValue != null) {
       setTargetWeight(activeGoal.targetValue.toString());
     }
   }, [activeGoal]);
@@ -163,7 +163,9 @@ export default function GoalsScreen() {
                   style={styles.cancelButton}
                   onPress={() => {
                     setIsEditing(false);
-                    setTargetWeight(activeGoal.targetValue.toString());
+                    if (activeGoal?.targetValue != null) {
+                      setTargetWeight(activeGoal.targetValue.toString());
+                    }
                   }}
                 >
                   <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>

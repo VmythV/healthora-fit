@@ -10,7 +10,17 @@ export const goalQueries = {
    */
   async getActive(type?: string): Promise<Goal | null> {
     const db = database.getDatabase();
-    let query = `SELECT * FROM goals WHERE is_active = 1`;
+    let query = `SELECT
+      id,
+      goal_type AS "goalType",
+      target_value AS "targetValue",
+      start_value AS "startValue",
+      start_date AS "startDate",
+      target_date AS "targetDate",
+      is_active AS "isActive",
+      created_at AS "createdAt",
+      updated_at AS "updatedAt"
+     FROM goals WHERE is_active = 1`;
     const params: any[] = [];
 
     if (type) {
@@ -28,7 +38,17 @@ export const goalQueries = {
   async getAll(): Promise<Goal[]> {
     const db = database.getDatabase();
     return db.getAllAsync<Goal>(
-      `SELECT * FROM goals ORDER BY created_at DESC`
+      `SELECT
+        id,
+        goal_type AS "goalType",
+        target_value AS "targetValue",
+        start_value AS "startValue",
+        start_date AS "startDate",
+        target_date AS "targetDate",
+        is_active AS "isActive",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM goals ORDER BY created_at DESC`
     );
   },
 
@@ -38,7 +58,17 @@ export const goalQueries = {
   async getByType(goalType: string): Promise<Goal | null> {
     const db = database.getDatabase();
     return db.getFirstAsync<Goal>(
-      `SELECT * FROM goals
+      `SELECT
+        id,
+        goal_type AS "goalType",
+        target_value AS "targetValue",
+        start_value AS "startValue",
+        start_date AS "startDate",
+        target_date AS "targetDate",
+        is_active AS "isActive",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM goals
        WHERE goal_type = ? AND is_active = 1
        ORDER BY created_at DESC
        LIMIT 1`,
