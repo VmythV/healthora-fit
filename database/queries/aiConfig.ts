@@ -67,6 +67,12 @@ export const aiConfigQueries = {
     isActive: boolean;
   }>): Promise<void> {
     const db = database.getDatabase();
+
+    // 如果要设置为激活，先将其他配置设为非激活
+    if (updates.isActive) {
+      await db.runAsync(`UPDATE ai_config SET is_active = 0 WHERE id != ?`, [id]);
+    }
+
     const setClauses: string[] = [];
     const params: any[] = [];
 
