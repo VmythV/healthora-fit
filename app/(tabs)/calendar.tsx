@@ -9,8 +9,6 @@ import {
   StyleSheet,
   ScrollView,
   LayoutAnimation,
-  Platform,
-  UIManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '@/constants/theme';
@@ -18,11 +16,6 @@ import { useI18n } from '@/hooks/useI18n';
 import { dietQueries } from '@/database/queries/diet';
 import { exerciseQueries } from '@/database/queries/exercise';
 import { CalendarGrid, DayDetail } from '@/components/calendar';
-
-// Android 需要启用 LayoutAnimation
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 const COLLAPSE_THRESHOLD = 60;
 
@@ -99,7 +92,7 @@ export default function CalendarScreen() {
 
       {/* 日历 - 绝对定位 */}
       <View
-        style={styles.calendarFloat}
+        style={[styles.calendarFloat, { top: headerBottom + theme.spacing.sm }]}
         onLayout={handleCalLayout}
       >
         <CalendarGrid
@@ -142,7 +135,6 @@ const styles = StyleSheet.create({
   },
   calendarFloat: {
     position: 'absolute',
-    top: headerBottom + theme.spacing.sm,
     left: 12,
     right: 12,
     zIndex: 10,
