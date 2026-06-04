@@ -27,6 +27,7 @@ interface CalendarGridProps {
   maxDate?: string; // YYYY-MM-DD，最大可选日期
   onDatePress?: (date: string) => void;
   onMonthChange?: (year: number, month: number) => void;
+  collapsed?: boolean; // 折叠模式：只显示选中日期所在周
 }
 
 // 星期标题将使用 getWeekDays() 动态生成
@@ -42,6 +43,7 @@ export function CalendarGrid({
   maxDate,
   onDatePress,
   onMonthChange,
+  collapsed = false,
 }: CalendarGridProps) {
   const { t } = useI18n();
   const { getWeekDays, getAdjustedFirstDay } = useWeekStartDay();
@@ -165,6 +167,15 @@ export function CalendarGrid({
     const totalCells = firstDay + daysInMonth;
     return Math.ceil(totalCells / 7);
   };
+
+  // 计算选中日期所在行（0-based）
+  const selectedRow = useMemo(() => {
+    if (!selectedDate) return 0;
+    const [y, m, d] = selectedDate.split('-').map(Number);
+    if (y !== year || m !== month + 1) return 0;
+    const firstDay = getFirstDayOfMonth(year, month);
+    return Math.floor((firstDay + d - 1) / 7);
+  }, [selectedDate, year, month]);
 
   // 渲染日历网格（固定 6 行，填充上月/下月日期）- useMemo 优化切换月卡顿
   const calendarDays = useMemo(() => {
@@ -343,7 +354,15 @@ export function CalendarGrid({
         </View>
 
         {/* 日期网格 */}
-        <View style={styles.daysGrid}>{calendarDays}</View>
+        <View style={[styles.daysGrid, collapsed && { height: 44, overflow: 'hidden' }]}>
+          {collapsed ? (
+            <View style={{ marginTop: -selectedRow * 44 }}>
+              {calendarDays}
+            </View>
+          ) : (
+            calendarDays
+          )}
+        </View>
       </Animated.View>
     </GestureDetector>
   );

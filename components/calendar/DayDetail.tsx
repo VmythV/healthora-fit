@@ -129,7 +129,7 @@ export function DayDetail({ date }: DayDetailProps) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    minHeight: 200,
   },
   summarySection: {
     backgroundColor: theme.colors.background.primary,
