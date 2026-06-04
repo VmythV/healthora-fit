@@ -1,5 +1,5 @@
 // app/(tabs)/calendar.tsx
-// 日志页面 - 三区布局：日历 → 概括 → 时间线
+// 日志页面 - 三区布局：日历(绝对定位) + 概括 + 时间线
 
 import { logger } from '@/utils/logger';
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
@@ -37,12 +37,11 @@ export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [markedDates, setMarkedDates] = useState<string[]>([]);
 
-  // 日历头部测量
   const [calHeaderH, setCalHeaderH] = useState(60);
+  const [calTop, setCalTop] = useState(60);
   const fullGridH = 6 * GRID_ROW_H;
-  const fullCalH = calHeaderH + fullGridH + PADDING; // 完整日历高度
+  const fullCalH = calHeaderH + fullGridH + PADDING;
 
-  // 选中日期所在行
   const selectedRow = useMemo(() => {
     const d = new Date(selectedDate);
     if (d.getFullYear() !== year || d.getMonth() !== month) return 0;
@@ -80,14 +79,13 @@ export default function CalendarScreen() {
     setSelectedDate(date);
   }, []);
 
-  // 时间线的滚动驱动日历折叠
   const timelineScrollY = useSharedValue(0);
 
   const handleTimelineScroll = useCallback((event: any) => {
     timelineScrollY.value = event.nativeEvent.contentOffset.y;
   }, [timelineScrollY]);
 
-  // 日历容器：高度随 timeline 滚动缩小
+  // 日历高度动画
   const calAnimatedStyle = useAnimatedStyle(() => {
     const gridH = interpolate(
       timelineScrollY.value,
@@ -95,29 +93,29 @@ export default function CalendarScreen() {
       [fullGridH, GRID_ROW_H],
       Extrapolation.CLAMP
     );
-    return {
-      height: calHeaderH + gridH + PADDING,
-    };
+    return { height: calHeaderH + gridH + PADDING };
   });
 
-  // 网格平移：折叠时让选中行可见
+  // 网格平移
   const calInnerStyle = useAnimatedStyle(() => {
-    const progress = timelineScrollY.value / fullGridH;
-    const clamped = Math.min(1, Math.max(0, progress));
-    return {
-      transform: [{ translateY: -clamped * selectedRow * GRID_ROW_H }],
-    };
+    const progress = Math.min(1, timelineScrollY.value / fullGridH);
+    return { transform: [{ translateY: -progress * selectedRow * GRID_ROW_H }] };
   });
 
   return (
     <SafeAreaView style={styles.container}>
       {/* 标题栏 */}
-      <View style={styles.header}>
+      <View
+        style={styles.header}
+        onLayout={(e) => {
+          setCalTop(e.nativeEvent.layout.y + e.nativeEvent.layout.height + 8);
+        }}
+      >
         <Text style={styles.title}>{t('calendar.title')}</Text>
       </View>
 
-      {/* ===== 第1部分：日历（随滚动折叠）===== */}
-      <Animated.View style={[styles.calSection, calAnimatedStyle]}>
+      {/* 日历 - 绝对定位，高度变化不干扰布局 */}
+      <Animated.View style={[styles.calFloat, { top: calTop }, calAnimatedStyle]}>
         <Animated.View style={calInnerStyle}>
           <CalendarGrid
             year={year}
@@ -132,8 +130,15 @@ export default function CalendarScreen() {
         </Animated.View>
       </Animated.View>
 
-      {/* ===== 第2部分：概括 + 可滚动时间线 ===== */}
-      <DayDetail date={selectedDate} maxDate={todayStr} onScroll={handleTimelineScroll} />
+      {/* 概括 + 时间线（填充剩余空间） */}
+      <View style={styles.bodyContainer}>
+        <DayDetail
+          date={selectedDate}
+          maxDate={todayStr}
+          onScroll={handleTimelineScroll}
+          topPadding={fullCalH}
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -147,15 +152,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.xl,
     paddingVertical: theme.spacing.base,
     backgroundColor: theme.colors.background.primary,
+    zIndex: 20,
   },
   title: {
     fontSize: theme.fontSize.h2,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.text.primary,
   },
-  calSection: {
-    marginHorizontal: theme.spacing.md,
-    marginTop: theme.spacing.md,
+  calFloat: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    zIndex: 10,
     overflow: 'hidden',
+  },
+  bodyContainer: {
+    flex: 1,
+    paddingHorizontal: theme.spacing.md,
   },
 });

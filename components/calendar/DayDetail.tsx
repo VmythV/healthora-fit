@@ -24,13 +24,14 @@ interface DayDetailProps {
   date: string;
   maxDate?: string;
   onScroll?: (event: any) => void;
+  topPadding?: number;
 }
 
 /**
  * 日详情组件
  * 展示选定日期的统计摘要 + 时间轴记录列表
  */
-export function DayDetail({ date, onScroll }: DayDetailProps) {
+export function DayDetail({ date, onScroll, topPadding = 360 }: DayDetailProps) {
   const { t } = useI18n();
 
   const [selectedItem, setSelectedItem] = useState<TimelineItemData | null>(null);
@@ -70,7 +71,7 @@ export function DayDetail({ date, onScroll }: DayDetailProps) {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: topPadding }]}>
       {/* 日期标签 + 统计 */}
       <View style={styles.summarySection}>
         <Text style={styles.dateLabel}>{dateLabel}</Text>
@@ -131,7 +132,7 @@ export function DayDetail({ date, onScroll }: DayDetailProps) {
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: 200,
+    flex: 1,
   },
   summarySection: {
     backgroundColor: theme.colors.background.primary,
