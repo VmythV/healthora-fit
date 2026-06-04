@@ -158,6 +158,14 @@ export function CalendarGrid({
             nextMonth.getMonth() <= maxDateObj.getMonth());
   }, [year, month, maxDate]);
 
+  // 计算实际行数
+  const getActualRows = () => {
+    const daysInMonth = getDaysInMonth(year, month);
+    const firstDay = getFirstDayOfMonth(year, month);
+    const totalCells = firstDay + daysInMonth;
+    return Math.ceil(totalCells / 7);
+  };
+
   // 渲染日历网格（固定 6 行，填充上月/下月日期）
   const renderCalendarDays = () => {
     const daysInMonth = getDaysInMonth(year, month);
@@ -388,10 +396,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     height: 6 * 44, // 固定 6 行高度，每行 44px
+    alignContent: 'space-between', // 均匀分布行
   },
   dayCell: {
     width: '14.28%',
-    aspectRatio: 1,
+    height: 44, // 固定每行高度
     alignItems: 'center',
     justifyContent: 'center',
     padding: theme.spacing.xs,
