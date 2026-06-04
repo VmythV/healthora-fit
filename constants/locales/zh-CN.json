@@ -267,6 +267,9 @@
       "zh-CN": "简体中文",
       "en": "English"
     },
+    "weekStart": {
+      "title": "星期开始日"
+    },
     "about": {
       "title": "关于",
       "version": "版本",

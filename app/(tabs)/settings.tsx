@@ -19,11 +19,13 @@ import { useGoals } from '@/hooks/useGoals';
 import { Locale } from '@/constants/i18n';
 import { dataTransferService } from '@/services/dataTransfer';
 import { Icon } from '@/components/icons';
+import { useWeekStartDay, WEEK_START_OPTIONS } from '@/hooks/useWeekStartDay';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { t, locale, setLocale, supportedLocales } = useI18n();
   const { activeGoal, loadActive } = useGoals();
+  const { weekStartDay, setWeekStartDay } = useWeekStartDay();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
@@ -175,6 +177,26 @@ export default function SettingsScreen() {
                 <Text style={styles.menuLabel}>{loc.nativeName}</Text>
               </View>
               {locale === loc.code && (
+                <Text style={styles.checkmark}>✓</Text>
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* 星期开始日 */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>{t('settings.weekStart.title')}</Text>
+          {WEEK_START_OPTIONS.map((option) => (
+            <TouchableOpacity
+              key={option.value}
+              style={styles.menuItem}
+              onPress={() => setWeekStartDay(option.value)}
+            >
+              <View style={styles.menuLeft}>
+                <Icon name="calendar" size={20} color={theme.colors.primary.main} />
+                <Text style={styles.menuLabel}>{option.label}</Text>
+              </View>
+              {weekStartDay === option.value && (
                 <Text style={styles.checkmark}>✓</Text>
               )}
             </TouchableOpacity>

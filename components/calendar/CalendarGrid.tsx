@@ -17,6 +17,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
+import { useWeekStartDay } from '@/hooks/useWeekStartDay';
 
 interface CalendarGridProps {
   year: number;
@@ -28,7 +29,7 @@ interface CalendarGridProps {
   onMonthChange?: (year: number, month: number) => void;
 }
 
-const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
+// 星期标题将使用 getWeekDays() 动态生成
 
 /**
  * 日历网格组件
@@ -43,6 +44,7 @@ export function CalendarGrid({
   onMonthChange,
 }: CalendarGridProps) {
   const { t } = useI18n();
+  const { getWeekDays, getAdjustedFirstDay } = useWeekStartDay();
 
   // 动画值
   const translateX = useSharedValue(0);
@@ -109,9 +111,9 @@ export function CalendarGrid({
     return new Date(y, m + 1, 0).getDate();
   };
 
-  // 获取月份第一天是星期几
+  // 获取月份第一天是星期几（调整后的）
   const getFirstDayOfMonth = (y: number, m: number) => {
-    return new Date(y, m, 1).getDay();
+    return getAdjustedFirstDay(y, m);
   };
 
   // 格式化日期
@@ -156,11 +158,13 @@ export function CalendarGrid({
             nextMonth.getMonth() <= maxDateObj.getMonth());
   }, [year, month, maxDate]);
 
-  // 渲染日历网格
+  // 渲染日历网格（固定 6 行）
   const renderCalendarDays = () => {
     const daysInMonth = getDaysInMonth(year, month);
     const firstDay = getFirstDayOfMonth(year, month);
     const days = [];
+    const TOTAL_ROWS = 6;
+    const TOTAL_CELLS = TOTAL_ROWS * 7; // 6 行 × 7 列 = 42 个单元格
 
     // 填充上个月的空白
     for (let i = 0; i < firstDay; i++) {
@@ -207,6 +211,14 @@ export function CalendarGrid({
       );
     }
 
+    // 填充剩余的空白（确保固定 6 行）
+    const remainingCells = TOTAL_CELLS - days.length;
+    for (let i = 0; i < remainingCells; i++) {
+      days.push(
+        <View key={`empty-end-${i}`} style={styles.dayCell} />
+      );
+    }
+
     return days;
   };
 
@@ -238,7 +250,7 @@ export function CalendarGrid({
 
         {/* 星期标题 */}
         <View style={styles.weekdayRow}>
-          {WEEKDAYS.map((day, index) => (
+          {getWeekDays().map((day, index) => (
             <View key={index} style={styles.weekdayCell}>
               <Text
                 style={[
@@ -305,6 +317,7 @@ const styles = StyleSheet.create({
   daysGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    height: 6 * 44, // 固定 6 行高度，每行 44px
   },
   dayCell: {
     width: '14.28%',
