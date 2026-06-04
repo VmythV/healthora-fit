@@ -116,6 +116,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.background.primary,
     borderRadius: theme.borderRadius.lg,
     padding: theme.spacing.lg,
-    ...theme.shadow.md,
+    ...theme.shadow.sm,
   },
 });

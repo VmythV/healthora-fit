@@ -84,7 +84,7 @@ export function TodayRecords({ records }: TodayRecordsProps) {
           onPress={() => handlePress(record)}
           activeOpacity={0.7}
         >
-          <Card style={styles.recordCard}>
+          <Card style={styles.recordCard} shadow="none">
             <View style={styles.recordRow}>
               <View style={styles.recordIconContainer}>
                 <Icon name={RECORD_ICONS[record.type]} size={24} color={theme.colors.primary.main} />

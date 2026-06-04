@@ -212,7 +212,9 @@
       "tips": "Tips",
       "tip1": "Set a realistic target weight, aim for 0.5-1 kg per week",
       "tip2": "Keep diet and exercise records to help reach your goal",
-      "tip3": "Record weight regularly to track your progress"
+      "tip3": "Record weight regularly to track your progress",
+      "history": "Change History",
+      "historyHint": "Green dot indicates the currently active goal"
     },
     "ai": {
       "title": "AI Configuration",

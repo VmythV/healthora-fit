@@ -38,7 +38,7 @@ export function StatusCard({ score }: StatusCardProps) {
   };
 
   return (
-    <Card style={styles.container}>
+    <Card style={styles.container} shadow="none">
       <Text style={styles.title}>{t('home.todayStatus')}</Text>
       <View style={styles.starsRow}>
         {Array.from({ length: 5 }, (_, i) => (

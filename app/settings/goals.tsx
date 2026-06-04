@@ -24,7 +24,7 @@ import { showNotification, showConfirm } from '@/components/ui';
 export default function GoalsScreen() {
   const { t } = useI18n();
   const router = useRouter();
-  const { activeGoal, loadActive, setGoal } = useGoals();
+  const { activeGoal, goals, loadActive, loadAll, setGoal } = useGoals();
   const { latestWeight, loadLatest } = useWeightRecords();
 
   const [targetWeight, setTargetWeight] = useState('');
@@ -32,6 +32,7 @@ export default function GoalsScreen() {
 
   useEffect(() => {
     loadActive('target_weight');
+    loadAll();
     loadLatest();
   }, []);
 
@@ -232,6 +233,47 @@ export default function GoalsScreen() {
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
               <Text style={styles.saveButtonText}>{t('common.save')}</Text>
             </TouchableOpacity>
+          </View>
+        )}
+
+        {/* 历史变更 */}
+        {goals.length > 1 && (
+          <View style={styles.historyCard}>
+            <View style={styles.tipsTitleRow}>
+              <Icon name="chart-bar" size={18} color={theme.colors.text.primary} />
+              <Text style={styles.tipsTitle}>{t('settings.goals.history')}</Text>
+            </View>
+            {goals
+              .filter(g => g.goalType === 'target_weight')
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .map((goal, index) => (
+                <View
+                  key={goal.id}
+                  style={[
+                    styles.historyItem,
+                    index < goals.filter(g => g.goalType === 'target_weight').length - 1 && styles.historyItemBorder,
+                  ]}
+                >
+                  <View style={styles.historyLeft}>
+                    <View style={[
+                      styles.historyDot,
+                      { backgroundColor: goal.isActive ? theme.colors.primary.main : theme.colors.text.tertiary },
+                    ]} />
+                    <View>
+                      <Text style={styles.historyValue}>{goal.targetValue} kg</Text>
+                      <Text style={styles.historyDate}>
+                        {goal.startDate || goal.createdAt?.split('T')[0]}
+                      </Text>
+                    </View>
+                  </View>
+                  {goal.isActive && (
+                    <View style={styles.activeBadge}>
+                      <Text style={styles.activeBadgeText}>{t('settings.ai.active')}</Text>
+                    </View>
+                  )}
+                </View>
+              ))}
+            <Text style={styles.historyHint}>{t('settings.goals.historyHint')}</Text>
           </View>
         )}
 
@@ -437,5 +479,56 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     marginBottom: theme.spacing.sm,
     lineHeight: 20,
+  },
+  historyCard: {
+    backgroundColor: theme.colors.background.primary,
+    borderRadius: theme.borderRadius.lg,
+    padding: theme.spacing.xl,
+    marginBottom: theme.spacing.xl,
+  },
+  historyItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: theme.spacing.md,
+  },
+  historyItemBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border.light,
+  },
+  historyLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+  },
+  historyDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  historyValue: {
+    fontSize: theme.fontSize.body,
+    fontWeight: theme.fontWeight.medium,
+    color: theme.colors.text.primary,
+  },
+  historyDate: {
+    fontSize: theme.fontSize.caption,
+    color: theme.colors.text.tertiary,
+    marginTop: 2,
+  },
+  historyHint: {
+    fontSize: theme.fontSize.caption,
+    color: theme.colors.text.tertiary,
+    marginTop: theme.spacing.sm,
+  },
+  activeBadge: {
+    backgroundColor: theme.colors.primary.light,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 2,
+    borderRadius: theme.borderRadius.sm,
+  },
+  activeBadgeText: {
+    fontSize: theme.fontSize.caption,
+    color: theme.colors.primary.dark,
   },
 });

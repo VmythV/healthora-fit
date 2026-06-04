@@ -1,19 +1,18 @@
 // app/(tabs)/settings.tsx
 // 设置页面
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
   ActivityIndicator,
   Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { useGoals } from '@/hooks/useGoals';
@@ -36,10 +35,12 @@ export default function SettingsScreen() {
   const [aiEndpoint, setAiEndpoint] = useState('');
   const [debugMode, setDebugMode] = useState(logger.isEnabled());
 
-  useEffect(() => {
-    loadActive('target_weight');
-    loadAiConfigStatus();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadActive('target_weight');
+      loadAiConfigStatus();
+    }, [])
+  );
 
   // 加载 AI 配置状态
   const loadAiConfigStatus = async () => {

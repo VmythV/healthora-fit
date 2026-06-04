@@ -35,7 +35,7 @@ export function SummaryCards({
   return (
     <View style={styles.container}>
       {/* 体重卡片 */}
-      <Card style={styles.weightCard}>
+      <Card style={styles.weightCard} shadow="none">
         <View style={styles.cardIcon}>
           <Icon name="weight" size={24} color={theme.colors.primary.main} />
         </View>
@@ -57,7 +57,7 @@ export function SummaryCards({
       </Card>
 
       {/* 饮食卡片 */}
-      <Card style={styles.dietCard}>
+      <Card style={styles.dietCard} shadow="none">
         <View style={styles.cardIcon}>
           <Icon name="bowl" size={24} color={theme.colors.primary.main} />
         </View>
@@ -68,7 +68,7 @@ export function SummaryCards({
       </Card>
 
       {/* 运动卡片 */}
-      <Card style={styles.exerciseCard}>
+      <Card style={styles.exerciseCard} shadow="none">
         <View style={styles.cardIcon}>
           <Icon name="exercise" size={24} color={theme.colors.primary.main} />
         </View>
