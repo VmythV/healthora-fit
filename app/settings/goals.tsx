@@ -246,33 +246,35 @@ export default function GoalsScreen() {
             {goals
               .filter(g => g.goalType === 'target_weight')
               .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-              .map((goal, index) => (
-                <View
-                  key={goal.id}
-                  style={[
-                    styles.historyItem,
-                    index < goals.filter(g => g.goalType === 'target_weight').length - 1 ? styles.historyItemBorder : undefined,
-                  ]}
-                >
-                  <View style={styles.historyLeft}>
-                    <View style={[
-                      styles.historyDot,
-                      { backgroundColor: goal.isActive ? theme.colors.primary.main : theme.colors.text.tertiary },
-                    ]} />
-                    <View>
-                      <Text style={styles.historyValue}>{goal.targetValue} kg</Text>
-                      <Text style={styles.historyDate}>
-                        {goal.startDate || goal.createdAt?.split('T')[0]}
-                      </Text>
+              .map((goal, index, arr) => {
+                const dateStr = goal.startDate || (goal.createdAt ? goal.createdAt.split('T')[0] : '');
+                const isLast = index === arr.length - 1;
+                return (
+                  <View
+                    key={goal.id}
+                    style={[
+                      styles.historyItem,
+                      isLast ? undefined : styles.historyItemBorder,
+                    ]}
+                  >
+                    <View style={styles.historyLeft}>
+                      <View style={[
+                        styles.historyDot,
+                        { backgroundColor: goal.isActive ? theme.colors.primary.main : theme.colors.text.tertiary },
+                      ]} />
+                      <View>
+                        <Text style={styles.historyValue}>{goal.targetValue} kg</Text>
+                        <Text style={styles.historyDate}>{dateStr}</Text>
+                      </View>
                     </View>
+                    {goal.isActive ? (
+                      <View style={styles.activeBadge}>
+                        <Text style={styles.activeBadgeText}>{t('settings.ai.active')}</Text>
+                      </View>
+                    ) : null}
                   </View>
-                  {goal.isActive && (
-                    <View style={styles.activeBadge}>
-                      <Text style={styles.activeBadgeText}>{t('settings.ai.active')}</Text>
-                    </View>
-                  )}
-                </View>
-              ))}
+                );
+              })}
             <Text style={styles.historyHint}>{t('settings.goals.historyHint')}</Text>
           </View>
         )}
