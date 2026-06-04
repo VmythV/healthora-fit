@@ -27,7 +27,7 @@ interface ErrorProps {
  * />
  *
  * <Error
- *   icon="😔"
+ *   icon="tips"
  *   title="加载失败"
  *   message="无法加载数据，请稍后重试"
  *   retryText="重新加载"
