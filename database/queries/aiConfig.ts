@@ -100,6 +100,7 @@ export const aiConfigQueries = {
    * 支持多种 API 提供商：
    * - OpenAI 兼容 API（使用 /models 端点）
    * - 火山引擎等（使用简单聊天请求测试）
+   * - Responses API（使用 /responses 端点）
    */
   async testConnection(): Promise<{ success: boolean; error?: string }> {
     const config = await this.getActive();
@@ -108,9 +109,13 @@ export const aiConfigQueries = {
     }
 
     try {
+      // 检测 API 类型
+      const isResponsesApi = config.apiEndpoint?.endsWith('/responses');
+      const baseUrl = config.apiEndpoint?.replace(/\/(chat\/completions|responses)$/, '') || '';
+
       // 首先尝试 /models 端点（适用于 OpenAI 兼容 API）
       try {
-        const modelsResponse = await fetch(`${config.apiEndpoint}/models`, {
+        const modelsResponse = await fetch(`${baseUrl}/models`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${config.apiKey}`,
@@ -125,36 +130,73 @@ export const aiConfigQueries = {
         // /models 端点不可用，继续尝试其他方式
       }
 
-      // 如果 /models 不可用，发送一个简单的聊天请求测试
-      const chatResponse = await fetch(`${config.apiEndpoint}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${config.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: config.modelName,
-          messages: [
-            {
-              role: 'user',
-              content: 'Hi',
-            },
-          ],
-          max_tokens: 5,
-        }),
-      });
+      // 根据 API 类型发送测试请求
+      let testResponse: Response;
 
-      if (chatResponse.ok) {
+      if (isResponsesApi) {
+        // Responses API 格式
+        const apiEndpoint = config.apiEndpoint?.endsWith('/responses')
+          ? config.apiEndpoint
+          : `${config.apiEndpoint}/responses`;
+
+        testResponse = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${config.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: config.modelName,
+            input: [
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'input_text',
+                    text: 'Hi',
+                  },
+                ],
+              },
+            ],
+            max_output_tokens: 5,
+          }),
+        });
+      } else {
+        // Chat Completions API 格式
+        const apiEndpoint = config.apiEndpoint?.endsWith('/chat/completions')
+          ? config.apiEndpoint
+          : `${config.apiEndpoint}/chat/completions`;
+
+        testResponse = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${config.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: config.modelName,
+            messages: [
+              {
+                role: 'user',
+                content: 'Hi',
+              },
+            ],
+            max_tokens: 5,
+          }),
+        });
+      }
+
+      if (testResponse.ok) {
         return { success: true };
       }
 
       // 解析错误信息
       let errorMessage = '连接失败';
       try {
-        const errorData = await chatResponse.json();
-        errorMessage = errorData.error?.message || errorData.message || `HTTP ${chatResponse.status}`;
+        const errorData = await testResponse.json();
+        errorMessage = errorData.error?.message || errorData.message || `HTTP ${testResponse.status}`;
       } catch {
-        errorMessage = `HTTP ${chatResponse.status}`;
+        errorMessage = `HTTP ${testResponse.status}`;
       }
 
       return { success: false, error: errorMessage };

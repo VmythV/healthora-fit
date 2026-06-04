@@ -28,6 +28,7 @@ export default function AIConfigScreen() {
   const [apiEndpoint, setApiEndpoint] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [modelName, setModelName] = useState('');
+  const [apiType, setApiType] = useState<'auto' | 'chat-completions' | 'responses'>('auto');
   const [isTesting, setIsTesting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
@@ -45,6 +46,14 @@ export default function AIConfigScreen() {
         setApiEndpoint(activeConfig.apiEndpoint);
         setApiKey(activeConfig.apiKey);
         setModelName(activeConfig.modelName);
+        // 检测 API 类型
+        if (activeConfig.apiEndpoint?.endsWith('/responses')) {
+          setApiType('responses');
+        } else if (activeConfig.apiEndpoint?.endsWith('/chat/completions')) {
+          setApiType('chat-completions');
+        } else {
+          setApiType('auto');
+        }
       }
     } catch (error) {
       console.error('Failed to load AI config:', error);
@@ -68,8 +77,20 @@ export default function AIConfigScreen() {
 
     try {
       setIsSaving(true);
+
+      // 根据 API 类型处理端点
+      let finalEndpoint = apiEndpoint.trim();
+      if (apiType === 'responses' && !finalEndpoint.endsWith('/responses')) {
+        // 如果选择 Responses API，确保端点以 /responses 结尾
+        finalEndpoint = finalEndpoint.replace(/\/(chat\/completions)?$/, '') + '/responses';
+      } else if (apiType === 'chat-completions' && !finalEndpoint.endsWith('/chat/completions')) {
+        // 如果选择 Chat Completions API，确保端点以 /chat/completions 结尾
+        finalEndpoint = finalEndpoint.replace(/\/responses$/, '') + '/chat/completions';
+      }
+      // auto 模式保持原样
+
       await aiConfigQueries.save({
-        apiEndpoint: apiEndpoint.trim(),
+        apiEndpoint: finalEndpoint,
         apiKey: apiKey.trim(),
         modelName: modelName.trim(),
       });
@@ -169,6 +190,61 @@ export default function AIConfigScreen() {
             <Text style={styles.inputHint}>{t('settings.ai.modelHint')}</Text>
           </View>
 
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>{t('settings.ai.apiType')}</Text>
+            <View style={styles.apiTypeContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.apiTypeButton,
+                  apiType === 'auto' && styles.apiTypeButtonActive,
+                ]}
+                onPress={() => setApiType('auto')}
+              >
+                <Text
+                  style={[
+                    styles.apiTypeText,
+                    apiType === 'auto' && styles.apiTypeTextActive,
+                  ]}
+                >
+                  {t('settings.ai.autoDetect')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.apiTypeButton,
+                  apiType === 'chat-completions' && styles.apiTypeButtonActive,
+                ]}
+                onPress={() => setApiType('chat-completions')}
+              >
+                <Text
+                  style={[
+                    styles.apiTypeText,
+                    apiType === 'chat-completions' && styles.apiTypeTextActive,
+                  ]}
+                >
+                  {t('settings.ai.chatCompletions')}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.apiTypeButton,
+                  apiType === 'responses' && styles.apiTypeButtonActive,
+                ]}
+                onPress={() => setApiType('responses')}
+              >
+                <Text
+                  style={[
+                    styles.apiTypeText,
+                    apiType === 'responses' && styles.apiTypeTextActive,
+                  ]}
+                >
+                  {t('settings.ai.responses')}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.inputHint}>{t('settings.ai.apiTypeHint')}</Text>
+          </View>
+
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={[styles.button, styles.testButton]}
@@ -218,6 +294,10 @@ export default function AIConfigScreen() {
             <View style={styles.exampleItem}>
               <Text style={styles.exampleLabel}>{t('settings.ai.volcengine')}:</Text>
               <Text style={styles.exampleValue}>https://ark.cn-beijing.volces.com/api/v3</Text>
+            </View>
+            <View style={styles.exampleItem}>
+              <Text style={styles.exampleLabel}>{t('settings.ai.volcengine')} Responses:</Text>
+              <Text style={styles.exampleValue}>https://ark.cn-beijing.volces.com/api/v3/responses</Text>
             </View>
             <View style={styles.exampleItem}>
               <Text style={styles.exampleLabel}>{t('settings.ai.localModel')}:</Text>
@@ -312,6 +392,29 @@ const styles = StyleSheet.create({
   },
   showButtonText: {
     fontSize: 20,
+  },
+  apiTypeContainer: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+  },
+  apiTypeButton: {
+    flex: 1,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.base,
+    borderRadius: theme.borderRadius.base,
+    backgroundColor: theme.colors.background.secondary,
+    alignItems: 'center',
+  },
+  apiTypeButtonActive: {
+    backgroundColor: theme.colors.primary.main,
+  },
+  apiTypeText: {
+    fontSize: theme.fontSize.bodySm,
+    color: theme.colors.text.secondary,
+  },
+  apiTypeTextActive: {
+    color: '#FFFFFF',
+    fontWeight: theme.fontWeight.medium,
   },
   buttonRow: {
     flexDirection: 'row',

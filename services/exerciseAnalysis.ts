@@ -76,31 +76,66 @@ export class ExerciseAnalysisService {
 4. 卡路里必须是数字
 5. 只返回 JSON，不要有其他文字`;
 
-      const response = await fetch(`${aiService.getConfig()!.endpoint}/chat/completions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${aiService.getConfig()!.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: aiService.getConfig()!.model,
-          messages: [
-            {
-              role: 'user',
-              content: [
-                { type: 'text', text: prompt },
-                {
-                  type: 'image_url',
-                  image_url: {
-                    url: `data:image/jpeg;base64,${base64}`,
+      const config = aiService.getConfig()!;
+      const apiEndpoint = aiService.getApiEndpoint();
+      let response: Response;
+
+      if (config.apiType === 'responses') {
+        // Responses API 格式
+        response = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${config.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: config.model,
+            input: [
+              {
+                role: 'user',
+                content: [
+                  {
+                    type: 'input_text',
+                    text: prompt,
                   },
-                },
-              ],
-            },
-          ],
-          max_tokens: 500,
-        }),
-      });
+                  {
+                    type: 'input_image',
+                    image_url: `data:image/jpeg;base64,${base64}`,
+                  },
+                ],
+              },
+            ],
+            max_output_tokens: 500,
+          }),
+        });
+      } else {
+        // Chat Completions API 格式
+        response = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${config.apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: config.model,
+            messages: [
+              {
+                role: 'user',
+                content: [
+                  { type: 'text', text: prompt },
+                  {
+                    type: 'image_url',
+                    image_url: {
+                      url: `data:image/jpeg;base64,${base64}`,
+                    },
+                  },
+                ],
+              },
+            ],
+            max_tokens: 500,
+          }),
+        });
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -109,7 +144,16 @@ export class ExerciseAnalysisService {
       }
 
       const data = await response.json();
-      const content = data.choices?.[0]?.message?.content;
+
+      // 根据 API 类型解析响应
+      let content: string | undefined;
+      if (config.apiType === 'responses') {
+        // Responses API 格式
+        content = data.output?.[0]?.content?.[0]?.text || data.choices?.[0]?.message?.content;
+      } else {
+        // Chat Completions API 格式
+        content = data.choices?.[0]?.message?.content;
+      }
 
       if (!content) {
         throw new Error('AI 返回内容为空');
