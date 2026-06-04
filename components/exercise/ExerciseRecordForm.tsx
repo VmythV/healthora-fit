@@ -61,7 +61,7 @@ export function ExerciseRecordForm({
 }: ExerciseRecordFormProps) {
   const { t } = useI18n();
   const router = useRouter();
-  const { createRecord, updateRecord } = useExerciseRecords();
+  const { addRecord, updateRecord } = useExerciseRecords();
 
   const [exerciseType, setExerciseType] = useState(initialType);
   const [duration, setDuration] = useState(initialDuration);
@@ -139,7 +139,7 @@ export function ExerciseRecordForm({
       if (recordId) {
         await updateRecord(recordId, recordData);
       } else {
-        await createRecord(recordData);
+        await addRecord(recordData);
       }
 
       onSuccess?.();
