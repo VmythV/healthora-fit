@@ -23,13 +23,14 @@ import { TimelineItemData } from './TimelineItem';
 interface DayDetailProps {
   date: string;
   maxDate?: string;
+  onScroll?: (event: any) => void;
 }
 
 /**
  * 日详情组件
  * 展示选定日期的统计摘要 + 时间轴记录列表
  */
-export function DayDetail({ date }: DayDetailProps) {
+export function DayDetail({ date, onScroll }: DayDetailProps) {
   const { t } = useI18n();
 
   const [selectedItem, setSelectedItem] = useState<TimelineItemData | null>(null);
@@ -95,6 +96,7 @@ export function DayDetail({ date }: DayDetailProps) {
           dietRecords={dietRecords}
           exerciseRecords={exerciseRecords}
           onItemPress={handleItemPress}
+          onScroll={onScroll}
         />
       </View>
 

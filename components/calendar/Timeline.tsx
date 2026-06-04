@@ -20,6 +20,7 @@ interface TimelineProps {
   dietRecords: DietRecord[];
   exerciseRecords: ExerciseRecord[];
   onItemPress: (item: TimelineItemData) => void;
+  onScroll?: (event: any) => void;
 }
 
 // 记录类型图标
@@ -32,7 +33,7 @@ const RECORD_ICONS: Record<string, IconName> = {
  * 时间轴组件
  * 左侧时间轴 + 右侧事件卡片，按时间升序排列
  */
-export function Timeline({ dietRecords, exerciseRecords, onItemPress }: TimelineProps) {
+export function Timeline({ dietRecords, exerciseRecords, onItemPress, onScroll }: TimelineProps) {
   const { t } = useI18n();
 
   // 格式化时间标签
@@ -141,7 +142,7 @@ export function Timeline({ dietRecords, exerciseRecords, onItemPress }: Timeline
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false} onScroll={onScroll} scrollEventThrottle={16}>
       <View style={styles.timeline}>
         {timelineItems.map((item, index) => (
           <TimelineItem

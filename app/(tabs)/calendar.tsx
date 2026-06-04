@@ -1,5 +1,5 @@
 // app/(tabs)/calendar.tsx
-// 日志页面 - 滑动折叠月历为周视图
+// 日志页面 - 三区布局：日历 → 概括 → 时间线
 
 import { logger } from '@/utils/logger';
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
@@ -15,7 +15,6 @@ import Animated, {
   useAnimatedStyle,
   interpolate,
   Extrapolation,
-  runOnJS,
 } from 'react-native-reanimated';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
@@ -24,18 +23,8 @@ import { exerciseQueries } from '@/database/queries/exercise';
 import { CalendarGrid, DayDetail } from '@/components/calendar';
 import { useWeekStartDay } from '@/hooks/useWeekStartDay';
 
-const COLLAPSE_RANGE = 150; // 过渡区间
-const HEADER_BASE = 56;
-const MONTH_NAV_H = 40;
-const WEEKDAY_H = 22;
 const GRID_ROW_H = 44;
 const PADDING = 16;
-// 6行完整月历的格子区高度
-const FULL_GRID_H = 6 * GRID_ROW_H;
-// 折叠后 1 行
-const COLLAPSED_GRID_H = GRID_ROW_H;
-// 日历总高（格子 + 头部）
-const CAL_HEADER_H = MONTH_NAV_H + WEEKDAY_H + 8;
 
 export default function CalendarScreen() {
   const { t } = useI18n();
@@ -49,21 +38,18 @@ export default function CalendarScreen() {
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [markedDates, setMarkedDates] = useState<string[]>([]);
 
-  // 由滚动驱动的折叠进度（0=展开, 1=折叠）
-  const collapseProgress = useSharedValue(0);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // 日历头部测量
+  const [calHeaderH, setCalHeaderH] = useState(60);
+  const fullGridH = 6 * GRID_ROW_H;
+  const fullCalH = calHeaderH + fullGridH + PADDING; // 完整日历高度
 
-  // 选中日期在网格中的行号（0-5），使用与 CalendarGrid 一致的星期开始日
+  // 选中日期所在行
   const selectedRow = useMemo(() => {
     const d = new Date(selectedDate);
     if (d.getFullYear() !== year || d.getMonth() !== month) return 0;
     const firstDay = getAdjustedFirstDay(year, month);
     return Math.floor((firstDay + d.getDate() - 1) / 7);
   }, [selectedDate, year, month, getAdjustedFirstDay]);
-
-  // 测量日历头部实际高度
-  const [calHeaderMeasured, setCalHeaderMeasured] = useState(CAL_HEADER_H);
-  const [fullCalH, setFullCalH] = useState(calHeaderMeasured + FULL_GRID_H + PADDING * 2);
 
   useEffect(() => {
     loadMarkedDates();
@@ -95,74 +81,47 @@ export default function CalendarScreen() {
     setSelectedDate(date);
   }, []);
 
-  // === 滚动驱动折叠 ===
-  const scrollY = useSharedValue(0);
-
-  const updateCollapsed = useCallback((v: boolean) => {
-    setIsCollapsed(v);
-  }, []);
+  // 时间线的滚动驱动日历折叠
+  const timelineScrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-      const prog = Math.min(1, Math.max(0, event.contentOffset.y / COLLAPSE_RANGE));
-      collapseProgress.value = prog;
-      runOnJS(updateCollapsed)(prog >= 1);
+      timelineScrollY.value = event.contentOffset.y;
     },
   });
 
-  // 日历容器高度：展开全高 → 折叠后只有头部+1行
-  const calendarHeightStyle = useAnimatedStyle(() => {
+  // 日历容器：高度随 timeline 滚动缩小
+  const calAnimatedStyle = useAnimatedStyle(() => {
     const gridH = interpolate(
-      collapseProgress.value,
-      [0, 1],
-      [FULL_GRID_H, COLLAPSED_GRID_H],
+      timelineScrollY.value,
+      [0, fullGridH],
+      [fullGridH, GRID_ROW_H],
       Extrapolation.CLAMP
     );
-    const totalH = PADDING + calHeaderMeasured + gridH + PADDING;
-    return { height: totalH };
+    return {
+      height: calHeaderH + gridH + PADDING,
+    };
   });
 
-  // 网格内容向上平移，让选中周行在缩小后的窗口内可见
-  const calendarInnerStyle = useAnimatedStyle(() => {
-    const translateY = interpolate(
-      collapseProgress.value,
-      [0, 1],
-      [0, -selectedRow * GRID_ROW_H],
-      Extrapolation.CLAMP
-    );
-    return { transform: [{ translateY }] };
+  // 网格平移：折叠时让选中行可见
+  const calInnerStyle = useAnimatedStyle(() => {
+    const progress = timelineScrollY.value / fullGridH;
+    const clamped = Math.min(1, Math.max(0, progress));
+    return {
+      transform: [{ translateY: -clamped * selectedRow * GRID_ROW_H }],
+    };
   });
-
-  // 日历顶部位置
-  const [calTop, setCalTop] = useState(HEADER_BASE);
-
-  const onCalLayout = useCallback((e: any) => {
-    const h = e.nativeEvent.layout.height;
-    if (h > 0 && collapseProgress.value < 1) {
-      setFullCalH(h + 12);
-    }
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       {/* 标题栏 */}
-      <View
-        style={styles.header}
-        onLayout={(e) => {
-          const bottom = e.nativeEvent.layout.y + e.nativeEvent.layout.height;
-          setCalTop(bottom + theme.spacing.sm);
-        }}
-      >
+      <View style={styles.header}>
         <Text style={styles.title}>{t('calendar.title')}</Text>
       </View>
 
-      {/* 日历 - 绝对定位，高度随滚动平滑缩小 */}
-      <Animated.View
-        style={[styles.calendarFloat, { top: calTop }, calendarHeightStyle]}
-        onLayout={onCalLayout}
-      >
-        <Animated.View style={calendarInnerStyle}>
+      {/* ===== 第1部分：日历（随滚动折叠）===== */}
+      <Animated.View style={[styles.calSection, calAnimatedStyle]}>
+        <Animated.View style={calInnerStyle}>
           <CalendarGrid
             year={year}
             month={month}
@@ -171,25 +130,13 @@ export default function CalendarScreen() {
             maxDate={todayStr}
             onDatePress={handleDatePress}
             onMonthChange={handleMonthChange}
-            onHeaderLayout={(h: number) => {
-              if (h > 0 && h !== calHeaderMeasured) setCalHeaderMeasured(h);
-            }}
+            onHeaderLayout={setCalHeaderH}
           />
         </Animated.View>
       </Animated.View>
 
-      {/* 外层滚动 - 折叠后禁止滚动 */}
-      <Animated.ScrollView
-        style={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        onScroll={scrollHandler}
-        scrollEventThrottle={16}
-        scrollEnabled={!isCollapsed}
-        contentContainerStyle={{ paddingTop: fullCalH }}
-      >
-        <DayDetail date={selectedDate} maxDate={todayStr} />
-        <View style={{ height: 40 }} />
-      </Animated.ScrollView>
+      {/* ===== 第2部分：概括 + 可滚动时间线 ===== */}
+      <DayDetail date={selectedDate} maxDate={todayStr} onScroll={scrollHandler} />
     </SafeAreaView>
   );
 }
@@ -203,22 +150,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.xl,
     paddingVertical: theme.spacing.base,
     backgroundColor: theme.colors.background.primary,
-    zIndex: 20,
   },
   title: {
     fontSize: theme.fontSize.h2,
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.text.primary,
   },
-  calendarFloat: {
-    position: 'absolute',
-    left: 12,
-    right: 12,
-    zIndex: 10,
+  calSection: {
+    marginHorizontal: theme.spacing.md,
+    marginTop: theme.spacing.md,
     overflow: 'hidden',
-  },
-  scrollContent: {
-    flex: 1,
-    paddingHorizontal: theme.spacing.md,
   },
 });
