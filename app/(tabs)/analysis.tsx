@@ -101,6 +101,13 @@ export default function AnalysisScreen() {
     }
   }, [isReady]);
 
+  // 数据库就绪后加载数据（修复首次进入无数据的竞态问题）
+  useEffect(() => {
+    if (isReady && currentRange) {
+      loadData(currentRange);
+    }
+  }, [isReady]);
+
   // 处理时间范围变化
   const handleRangeChange = useCallback((range: DateRange) => {
     setCurrentRange(range);

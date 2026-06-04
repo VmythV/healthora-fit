@@ -1,7 +1,7 @@
 // app/(tabs)/index.tsx
 // 首页
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { useDietRecords } from '@/hooks/useDietRecords';
@@ -18,18 +19,56 @@ import { useWeightRecords } from '@/hooks/useWeightRecords';
 import { useGoals } from '@/hooks/useGoals';
 import { StatusCard, SummaryCards, QuickActions, TodayRecords } from '@/components/home';
 import { AnimatedCard } from '@/components/AnimatedCard';
-import { AnimatedNumber } from '@/components/AnimatedNumber';
 import { EmptyState } from '@/components/EmptyState';
+import { logger } from '@/utils/logger';
 
 export default function HomeScreen() {
   const { t } = useI18n();
   const [refreshing, setRefreshing] = useState(false);
 
   // 获取数据
-  const { todayRecords: dietRecords, todayCalories, todayNutrition } = useDietRecords();
-  const { todayRecords: exerciseRecords, todayMinutes, todayCaloriesBurned } = useExerciseRecords();
-  const { latestWeight, yesterdayWeight } = useWeightRecords();
-  const { activeGoal } = useGoals();
+  const {
+    todayRecords: dietRecords,
+    todayCalories,
+    todayNutrition,
+    loadToday: loadDietToday,
+  } = useDietRecords();
+  const {
+    todayRecords: exerciseRecords,
+    todayMinutes,
+    todayCaloriesBurned,
+    loadToday: loadExerciseToday,
+  } = useExerciseRecords();
+  const {
+    latestWeight,
+    yesterdayWeight,
+    loadLatest: loadWeightLatest,
+  } = useWeightRecords();
+  const {
+    activeGoal,
+    loadActive: loadGoalActive,
+  } = useGoals();
+
+  // 刷新所有数据
+  const refreshData = useCallback(async () => {
+    try {
+      await Promise.all([
+        loadDietToday(),
+        loadExerciseToday(),
+        loadWeightLatest(),
+        loadGoalActive('target_weight'),
+      ]);
+    } catch (err) {
+      logger.error('[Home] refreshData 失败:', err);
+    }
+  }, [loadDietToday, loadExerciseToday, loadWeightLatest, loadGoalActive]);
+
+  // 每次获得焦点时刷新数据
+  useFocusEffect(
+    useCallback(() => {
+      refreshData();
+    }, [refreshData])
+  );
 
   // 计算今日状态评分
   const calculateScore = useCallback(() => {
@@ -101,9 +140,9 @@ export default function HomeScreen() {
   // 下拉刷新
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    // 数据会通过 hooks 自动刷新
-    setTimeout(() => setRefreshing(false), 500);
-  }, []);
+    await refreshData();
+    setRefreshing(false);
+  }, [refreshData]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -131,7 +170,7 @@ export default function HomeScreen() {
             <SummaryCards
               weight={latestWeight?.weight}
               weightChange={weightChange}
-              targetWeight={activeGoal?.targetWeight}
+              targetWeight={activeGoal?.targetValue}
               mealsCount={dietRecords.length}
               totalCalories={todayCalories}
               exerciseMinutes={todayMinutes}
