@@ -1,7 +1,7 @@
 // services/ai.ts
 // AI 服务基类
 
-import * as FileSystem from 'expo-file-system';
+import { File } from 'expo-file-system';
 import { aiConfigQueries } from '@/database/queries/aiConfig';
 
 export interface AiConfig {
@@ -223,9 +223,9 @@ export class AiService {
    */
   async imageToBase64(uri: string): Promise<string> {
     try {
-      const base64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
-      });
+      // 使用新的 File API 读取文件
+      const file = new File(uri);
+      const base64 = await file.base64();
       return base64;
     } catch (error) {
       console.error('图片转 Base64 失败:', error);
