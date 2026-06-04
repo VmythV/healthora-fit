@@ -20,6 +20,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { useWeightRecords } from '@/hooks/useWeightRecords';
 import { useGoals } from '@/hooks/useGoals';
 import { WeightInput } from './WeightInput';
+import { showNotification, showConfirm } from '@/components/ui';
 
 interface WeightRecordFormProps {
   initialWeight?: number;
@@ -51,7 +52,7 @@ export function WeightRecordForm({
   // 保存
   const handleSave = async () => {
     if (weight < 20 || weight > 300) {
-      Alert.alert(t('common.error'), t('weight.invalidWeight'));
+      showNotification(t('weight.invalidWeight'), 'error');
       return;
     }
 
@@ -68,7 +69,7 @@ export function WeightRecordForm({
       router.back();
     } catch (error) {
       logger.error('[WeightForm] 保存失败:', error);
-      Alert.alert(t('common.error'), t('error.saveFailed'));
+      showNotification(t('error.saveFailed'), 'error');
     } finally {
       setSaving(false);
     }

@@ -19,6 +19,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { useHealthData } from '@/hooks/useHealthData';
 import { HealthConnectionStatus } from '@/services/health';
 import { Icon, BackIcon, CheckIcon, CloseIcon } from '@/components/icons';
+import { showNotification, showConfirm } from '@/components/ui';
 
 export default function HealthConnectScreen() {
   const { t } = useI18n();
@@ -55,19 +56,19 @@ export default function HealthConnectScreen() {
       // 检查可用性
       const available = await checkAvailability();
       if (!available) {
-        Alert.alert(t('common.error'), t('settings.health.notAvailable'));
+        showNotification(t('settings.health.notAvailable'), 'error');
         return;
       }
 
       // 请求权限
       const perms = await requestPermissions();
       if (perms.readWeight && perms.readExercise) {
-        Alert.alert(t('common.success'), t('settings.health.connectedSuccess'));
+        showNotification(t('settings.health.connectedSuccess'), 'success');
       } else {
-        Alert.alert(t('common.warning'), t('settings.health.partialPermission'));
+        showNotification(t('settings.health.partialPermission'), 'warning');
       }
     } catch (error) {
-      Alert.alert(t('common.error'), t('settings.health.connectFailed'));
+      showNotification(t('settings.health.connectFailed'), 'error');
     }
   };
 
@@ -78,43 +79,37 @@ export default function HealthConnectScreen() {
       const result = await syncData();
 
       if (result.success) {
-        Alert.alert(
-          t('common.success'),
-          `${t('settings.health.syncSuccess')}\n\n` +
-          `${t('weight.title')}: ${result.counts.weight}\n` +
-          `${t('exercise.title')}: ${result.counts.exercise}`
+        showNotification(
+          `${t('settings.health.syncSuccess')} - ${t('weight.title')}: ${result.counts.weight}, ${t('exercise.title')}: ${result.counts.exercise}`,
+          'success'
         );
       } else {
-        Alert.alert(t('common.error'), result.message);
+        showNotification(result.message, 'error');
       }
     } catch (error) {
-      Alert.alert(t('common.error'), t('settings.health.syncFailed'));
+      showNotification(t('settings.health.syncFailed'), 'error');
     } finally {
       setIsSyncing(false);
     }
   };
 
   // 断开连接
-  const handleDisconnect = () => {
-    Alert.alert(
-      t('settings.health.disconnect'),
-      t('settings.health.disconnectConfirm'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.confirm'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await disconnect();
-              Alert.alert(t('common.success'), t('settings.health.disconnectedSuccess'));
-            } catch (error) {
-              Alert.alert(t('common.error'), t('settings.health.disconnectFailed'));
-            }
-          },
-        },
-      ]
-    );
+  const handleDisconnect = async () => {
+    const ok = await showConfirm({
+      title: t('settings.health.disconnect'),
+      message: t('settings.health.disconnectConfirm'),
+      type: 'danger',
+      confirmText: t('common.confirm'),
+      cancelText: t('common.cancel'),
+    });
+    if (ok) {
+      try {
+        await disconnect();
+        showNotification(t('settings.health.disconnectedSuccess'), 'success');
+      } catch (error) {
+        showNotification(t('settings.health.disconnectFailed'), 'error');
+      }
+    }
   };
 
   // 获取状态颜色

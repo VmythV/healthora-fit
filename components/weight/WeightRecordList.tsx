@@ -16,6 +16,7 @@ import { useWeightRecords } from '@/hooks/useWeightRecords';
 import { WeightRecord } from '@/types/weight';
 import { Card, Empty } from '@/components/ui';
 import { Icon, TrendUpIcon, TrendDownIcon, TrendFlatIcon } from '@/components/icons';
+import { showNotification, showConfirm } from '@/components/ui';
 
 interface WeightRecordListProps {
   onRecordPress?: (record: WeightRecord) => void;
@@ -68,19 +69,17 @@ export function WeightRecordList({ onRecordPress }: WeightRecordListProps) {
   };
 
   // 删除记录
-  const handleDelete = (id: number) => {
-    Alert.alert(
-      t('confirm.delete.title'),
-      t('confirm.delete.message'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: () => deleteRecord(id),
-        },
-      ]
-    );
+  const handleDelete = async (id: number) => {
+    const ok = await showConfirm({
+      title: t('confirm.delete.title'),
+      message: t('confirm.delete.message'),
+      type: 'danger',
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+    });
+    if (ok) {
+      deleteRecord(id);
+    }
   };
 
   // 渲染记录项

@@ -20,6 +20,7 @@ import { aiService } from '@/services/ai';
 import { DietRecordForm } from '@/components/diet';
 import { FoodItem } from '@/types/diet';
 import { Icon } from '@/components/icons';
+import { showNotification, showConfirm } from '@/components/ui';
 
 export default function DietRecordScreen() {
   const { t } = useI18n();
@@ -39,7 +40,7 @@ export default function DietRecordScreen() {
   const handleTakePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert(t('common.error'), t('error.permission'));
+      showNotification(t('error.permission'), 'error');
       return;
     }
 
@@ -58,7 +59,7 @@ export default function DietRecordScreen() {
   const handlePickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert(t('common.error'), t('error.permission'));
+      showNotification(t('error.permission'), 'error');
       return;
     }
 
@@ -83,17 +84,15 @@ export default function DietRecordScreen() {
     }
     if (!aiService.isConfigured()) {
       logger.warn('[AI] diet/record - 配置加载后仍不可用');
-      Alert.alert(
-        t('settings.ai.title'),
-        t('settings.ai.notConfigured'),
-        [
-          { text: t('common.cancel'), style: 'cancel' },
-          {
-            text: t('common.ok'),
-            onPress: () => router.push('/settings/ai-config'),
-          },
-        ]
-      );
+      const ok = await showConfirm({
+        title: t('settings.ai.title'),
+        message: t('settings.ai.notConfigured'),
+        confirmText: t('common.ok'),
+        cancelText: t('common.cancel'),
+      });
+      if (ok) {
+        router.push('/settings/ai-config');
+      }
       return;
     }
 
@@ -104,7 +103,7 @@ export default function DietRecordScreen() {
       setFoods(result.foods);
     } catch (error) {
       logger.error('[AI] diet/record - 分析失败:', error);
-      Alert.alert(t('common.error'), t('error.aiFailed'));
+      showNotification(t('error.aiFailed'), 'error');
     } finally {
       setAnalyzing(false);
     }

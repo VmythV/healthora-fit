@@ -1,119 +1,134 @@
 // components/ui/Toast.tsx
-// 提示组件
+// 提示通知组件
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Animated,
+  TouchableOpacity,
   Dimensions,
 } from 'react-native';
 import { theme } from '@/constants/theme';
 import { CheckIcon, CloseIcon, WarningIcon, InfoIcon } from '@/components/icons';
 
-type ToastType = 'success' | 'error' | 'warning' | 'info';
+export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
-interface ToastProps {
+export interface ToastItem {
+  id: number;
   message: string;
-  type?: ToastType;
-  duration?: number;
-  onHide?: () => void;
+  type: ToastType;
 }
 
+interface ToastProps {
+  toast: ToastItem;
+  onDismiss: (id: number) => void;
+}
+
+const ICON_MAP = {
+  success: CheckIcon,
+  error: CloseIcon,
+  warning: WarningIcon,
+  info: InfoIcon,
+};
+
 /**
- * 提示组件
- *
- * @example
- * ```tsx
- * <Toast message="保存成功" type="success" />
- * <Toast message="操作失败" type="error" />
- * <Toast message="请注意" type="warning" />
- * <Toast message="提示信息" type="info" />
- * ```
+ * 单个 Toast 通知
  */
-export function Toast({
-  message,
-  type = 'info',
-  duration = 3000,
-  onHide,
-}: ToastProps) {
-  const [visible, setVisible] = useState(true);
-  const fadeAnim = new Animated.Value(0);
+function ToastItemView({ toast, onDismiss }: ToastProps) {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(-20)).current;
 
   useEffect(() => {
-    // 显示动画
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+    ]).start();
 
-    // 自动隐藏
     const timer = setTimeout(() => {
-      hide();
-    }, duration);
+      dismiss();
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, []);
 
-  const hide = () => {
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start(() => {
-      setVisible(false);
-      onHide?.();
+  const dismiss = useCallback(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: -20,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      onDismiss(toast.id);
     });
-  };
+  }, [fadeAnim, slideAnim, onDismiss, toast.id]);
 
-  if (!visible) return null;
+  const Icon = ICON_MAP[toast.type];
 
   return (
     <Animated.View
       style={[
-        styles.container,
-        styles[`container_${type}`],
-        { opacity: fadeAnim },
+        styles.toast,
+        styles[`toast_${toast.type}`],
+        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
       ]}
     >
-      <View style={styles.iconContainer}>
-        {type === 'success' && <CheckIcon size={18} color="#FFFFFF" />}
-        {type === 'error' && <CloseIcon size={18} color="#FFFFFF" />}
-        {type === 'warning' && <WarningIcon size={18} color="#FFFFFF" />}
-        {type === 'info' && <InfoIcon size={18} color="#FFFFFF" />}
-      </View>
-      <Text style={styles.message}>{message}</Text>
+      <TouchableOpacity
+        style={styles.toastInner}
+        onPress={dismiss}
+        activeOpacity={0.9}
+      >
+        <View style={styles.iconContainer}>
+          <Icon size={18} color="#FFFFFF" />
+        </View>
+        <Text style={styles.message} numberOfLines={2}>{toast.message}</Text>
+      </TouchableOpacity>
     </Animated.View>
   );
 }
 
+export { ToastItemView };
+
 const { width } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 60,
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: theme.spacing.base,
+  toast: {
+    marginHorizontal: 20,
+    marginBottom: 8,
     borderRadius: theme.borderRadius.lg,
     ...theme.shadow.md,
   },
-  container_success: {
+  toast_success: {
     backgroundColor: theme.colors.success,
   },
-  container_error: {
+  toast_error: {
     backgroundColor: theme.colors.error,
   },
-  container_warning: {
+  toast_warning: {
     backgroundColor: theme.colors.warning,
   },
-  container_info: {
+  toast_info: {
     backgroundColor: theme.colors.info,
+  },
+  toastInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: theme.spacing.base,
   },
   iconContainer: {
     marginRight: theme.spacing.sm,
@@ -125,13 +140,28 @@ const styles = StyleSheet.create({
   },
 });
 
-// 全局 Toast 管理
-let toastRef: ((message: string, type?: ToastType) => void) | null = null;
+// ===== 全局通知管理 =====
 
-export function setToastRef(ref: (message: string, type?: ToastType) => void) {
-  toastRef = ref;
+type NotificationHandler = (message: string, type: ToastType) => void;
+
+let globalNotify: NotificationHandler | null = null;
+
+/**
+ * 注册全局通知函数（由 NotificationProvider 调用）
+ */
+export function setGlobalNotify(handler: NotificationHandler | null) {
+  globalNotify = handler;
 }
 
-export function showToast(message: string, type: ToastType = 'info') {
-  toastRef?.(message, type);
+/**
+ * 全局通知 API
+ * @example showNotification('保存成功', 'success')
+ */
+export function showNotification(message: string, type: ToastType = 'info') {
+  if (globalNotify) {
+    globalNotify(message, type);
+  } else {
+    // 降级：使用 console
+    console.log(`[Notification] ${type}: ${message}`);
+  }
 }

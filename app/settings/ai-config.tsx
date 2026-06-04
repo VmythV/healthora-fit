@@ -21,6 +21,7 @@ import { aiConfigQueries } from '@/database/queries/aiConfig';
 import { aiService } from '@/services/ai';
 import { AIConfig } from '@/types/ai';
 import { Icon, BackIcon, CheckIcon, EditIcon, DeleteIcon } from '@/components/icons';
+import { showNotification, showConfirm } from '@/components/ui';
 
 export default function AIConfigScreen() {
   const { t } = useI18n();
@@ -118,43 +119,39 @@ export default function AIConfigScreen() {
   };
 
   // 删除配置
-  const handleDelete = (config: AIConfig) => {
-    Alert.alert(
-      t('common.confirm'),
-      t('settings.ai.deleteConfirm'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await aiConfigQueries.delete(config.id);
-              await loadConfigs();
-              await aiService.loadConfig();
-              Alert.alert(t('common.success'), t('settings.ai.deleteSuccess'));
-            } catch (error) {
-              logger.error('[AI Config] Delete failed:', error);
-              Alert.alert(t('common.error'), t('settings.ai.deleteFailed'));
-            }
-          },
-        },
-      ]
-    );
+  const handleDelete = async (config: AIConfig) => {
+    const ok = await showConfirm({
+      title: t('common.confirm'),
+      message: t('settings.ai.deleteConfirm'),
+      type: 'danger',
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+    });
+    if (ok) {
+      try {
+        await aiConfigQueries.delete(config.id);
+        await loadConfigs();
+        await aiService.loadConfig();
+        showNotification(t('settings.ai.deleteSuccess'), 'success');
+      } catch (error) {
+        logger.error('[AI Config] Delete failed:', error);
+        showNotification(t('settings.ai.deleteFailed'), 'error');
+      }
+    }
   };
 
   // 保存配置
   const handleSave = async () => {
     if (!apiEndpoint.trim()) {
-      Alert.alert(t('common.error'), t('settings.ai.endpointRequired'));
+      showNotification(t('settings.ai.endpointRequired'), 'error');
       return;
     }
     if (!apiKey.trim()) {
-      Alert.alert(t('common.error'), t('settings.ai.apiKeyRequired'));
+      showNotification(t('settings.ai.apiKeyRequired'), 'error');
       return;
     }
     if (!modelName.trim()) {
-      Alert.alert(t('common.error'), t('settings.ai.modelRequired'));
+      showNotification(t('settings.ai.modelRequired'), 'error');
       return;
     }
 
@@ -198,10 +195,10 @@ export default function AIConfigScreen() {
       setIsEditing(false);
       setEditingConfig(null);
 
-      Alert.alert(t('common.success'), t('settings.ai.saveSuccess'));
+      showNotification(t('settings.ai.saveSuccess'), 'success');
     } catch (error) {
       logger.error('[AI Config] Save failed:', error);
-      Alert.alert(t('common.error'), t('settings.ai.saveFailed'));
+      showNotification(t('settings.ai.saveFailed'), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -213,12 +210,12 @@ export default function AIConfigScreen() {
       setIsTesting(true);
       const result = await aiConfigQueries.testConnection();
       if (result.success) {
-        Alert.alert(t('common.success'), t('settings.ai.testSuccess'));
+        showNotification(t('settings.ai.testSuccess'), 'success');
       } else {
-        Alert.alert(t('common.error'), result.error || t('settings.ai.testFailed'));
+        showNotification(result.error || t('settings.ai.testFailed'), 'error');
       }
     } catch (error) {
-      Alert.alert(t('common.error'), t('settings.ai.testFailed'));
+      showNotification(t('settings.ai.testFailed'), 'error');
     } finally {
       setIsTesting(false);
     }

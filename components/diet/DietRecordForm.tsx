@@ -24,6 +24,7 @@ import { FoodList } from './FoodList';
 import { NutritionSummary } from './NutritionSummary';
 import { MealTypeSelector } from './MealTypeSelector';
 import { Icon } from '@/components/icons';
+import { showNotification, showConfirm } from '@/components/ui';
 
 interface DietRecordFormProps {
   photoUri?: string;
@@ -119,27 +120,23 @@ export function DietRecordForm({
   };
 
   // 删除食物
-  const handleDeleteFood = (index: number) => {
-    Alert.alert(
-      t('diet.deleteFood'),
-      t('confirm.delete.message'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: () => {
-            setFoods(foods.filter((_, i) => i !== index));
-          },
-        },
-      ]
-    );
+  const handleDeleteFood = async (index: number) => {
+    const ok = await showConfirm({
+      title: t('diet.deleteFood'),
+      message: t('confirm.delete.message'),
+      type: 'danger',
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+    });
+    if (ok) {
+      setFoods(foods.filter((_, i) => i !== index));
+    }
   };
 
   // 保存记录
   const handleSave = async () => {
     if (foods.length === 0) {
-      Alert.alert(t('common.error'), t('diet.noFood'));
+      showNotification(t('diet.noFood'), 'error');
       return;
     }
 
@@ -168,7 +165,7 @@ export function DietRecordForm({
       router.back();
     } catch (error) {
       logger.error('[DietForm] 保存失败:', error);
-      Alert.alert(t('common.error'), t('error.saveFailed'));
+      showNotification(t('error.saveFailed'), 'error');
     } finally {
       setSaving(false);
     }

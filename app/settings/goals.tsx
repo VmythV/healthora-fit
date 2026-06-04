@@ -19,6 +19,7 @@ import { useGoals } from '@/hooks/useGoals';
 import { useWeightRecords } from '@/hooks/useWeightRecords';
 import { ProgressRing } from '@/components/charts/ProgressRing';
 import { Icon, BackIcon } from '@/components/icons';
+import { showNotification, showConfirm } from '@/components/ui';
 
 export default function GoalsScreen() {
   const { t } = useI18n();
@@ -68,7 +69,7 @@ export default function GoalsScreen() {
   const handleSave = async () => {
     const weight = parseFloat(targetWeight);
     if (isNaN(weight) || weight < 20 || weight > 300) {
-      Alert.alert(t('common.error'), t('weight.invalidWeight'));
+      showNotification(t('weight.invalidWeight'), 'error');
       return;
     }
 
@@ -80,9 +81,9 @@ export default function GoalsScreen() {
         startDate: new Date().toISOString().split('T')[0],
       });
       setIsEditing(false);
-      Alert.alert(t('common.success'), t('settings.goals.saveSuccess'));
+      showNotification(t('settings.goals.saveSuccess'), 'success');
     } catch (error) {
-      Alert.alert(t('common.error'), t('settings.goals.saveFailed'));
+      showNotification(t('settings.goals.saveFailed'), 'error');
     }
   };
 

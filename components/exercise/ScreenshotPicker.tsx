@@ -20,6 +20,7 @@ import { Icon } from '@/components/icons';
 import { ExerciseAnalysisResult } from '@/types/exercise';
 import { exerciseAnalysisService } from '@/services/exerciseAnalysis';
 import { aiService } from '@/services/ai';
+import { showNotification, showConfirm } from '@/components/ui';
 
 interface ScreenshotPickerProps {
   onAnalysisComplete: (result: ExerciseAnalysisResult, imageUri: string) => void;
@@ -56,7 +57,7 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
       // 请求权限
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert(t('common.error'), t('exercise.permissionRequired'));
+        showNotification(t('exercise.permissionRequired'), 'error');
         return;
       }
 
@@ -76,7 +77,7 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
       }
     } catch (err) {
       logger.error('[AI] 选择图片失败:', err);
-      Alert.alert(t('common.error'), t('exercise.imagePickFailed'));
+      showNotification(t('exercise.imagePickFailed'), 'error');
     }
   };
 
@@ -86,7 +87,7 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
       // 请求权限
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert(t('common.error'), t('exercise.permissionRequired'));
+        showNotification(t('exercise.permissionRequired'), 'error');
         return;
       }
 
@@ -105,7 +106,7 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
       }
     } catch (err) {
       logger.error('[AI] 拍照失败:', err);
-      Alert.alert(t('common.error'), t('exercise.cameraFailed'));
+      showNotification(t('exercise.cameraFailed'), 'error');
     }
   };
 

@@ -25,6 +25,7 @@ import { ScreenshotPicker } from './ScreenshotPicker';
 import { Card } from '@/components/ui';
 import { Icon } from '@/components/icons';
 import { ExerciseAnalysisResult } from '@/types/exercise';
+import { showNotification, showConfirm } from '@/components/ui';
 
 interface ExerciseRecordFormProps {
   initialType?: string;
@@ -147,7 +148,7 @@ export function ExerciseRecordForm({
   // 保存
   const handleSave = async () => {
     if (duration <= 0) {
-      Alert.alert(t('common.error'), t('exercise.invalidDuration'));
+      showNotification(t('exercise.invalidDuration'), 'error');
       return;
     }
 
@@ -175,7 +176,7 @@ export function ExerciseRecordForm({
       router.back();
     } catch (error) {
       logger.error('[ExerciseForm] 保存失败:', error);
-      Alert.alert(t('common.error'), t('error.saveFailed'));
+      showNotification(t('error.saveFailed'), 'error');
     } finally {
       setSaving(false);
     }

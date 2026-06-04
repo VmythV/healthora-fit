@@ -2,7 +2,7 @@
 // 统一错误处理工具
 
 import { logger } from '@/utils/logger';
-import { Alert } from 'react-native';
+import { showNotification, showConfirm } from '@/components/ui';
 
 export type ErrorCode =
   | 'NETWORK_ERROR'
@@ -98,18 +98,19 @@ export function handleUnknownError(error: unknown): AppError {
  * 显示错误提示
  */
 export function showErrorAlert(error: AppError, onRetry?: () => void): void {
-  const buttons = [
-    { text: '确定', style: 'cancel' as const },
-  ];
-
   if (onRetry) {
-    buttons.push({
-      text: '重试',
-      onPress: onRetry,
+    showConfirm({
+      title: '错误',
+      message: error.message,
+      type: 'danger',
+      confirmText: '重试',
+      cancelText: '确定',
+    }).then((ok) => {
+      if (ok) onRetry();
     });
+  } else {
+    showNotification(error.message, 'error');
   }
-
-  Alert.alert('错误', error.message, buttons);
 }
 
 /**

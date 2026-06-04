@@ -23,6 +23,7 @@ import { aiConfigQueries } from '@/database/queries/aiConfig';
 import { Icon, ArrowRightIcon, CheckIcon } from '@/components/icons';
 import { useWeekStartDay, WEEK_START_OPTIONS } from '@/hooks/useWeekStartDay';
 import { logger } from '@/utils/logger';
+import { showNotification, showConfirm } from '@/components/ui';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -56,45 +57,39 @@ export default function SettingsScreen() {
     }
   };
 
-  const handleLanguageChange = (newLocale: Locale) => {
+  const handleLanguageChange = async (newLocale: Locale) => {
     if (newLocale === locale) return;
 
-    Alert.alert(
-      t('settings.language.title'),
-      `${t('settings.language.current')}: ${supportedLocales.find(l => l.code === newLocale)?.nativeName}`,
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.confirm'),
-          onPress: () => setLocale(newLocale),
-        },
-      ]
-    );
+    const ok = await showConfirm({
+      title: t('settings.language.title'),
+      message: `${t('settings.language.current')}: ${supportedLocales.find(l => l.code === newLocale)?.nativeName}`,
+      confirmText: t('common.confirm'),
+      cancelText: t('common.cancel'),
+    });
+    if (ok) {
+      setLocale(newLocale);
+    }
   };
 
   // 导出数据
   const handleExport = async () => {
-    Alert.alert(
-      t('settings.data.export'),
-      t('settings.data.exportConfirm'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.confirm'),
-          onPress: async () => {
-            try {
-              setIsExporting(true);
-              await dataTransferService.exportData();
-              Alert.alert(t('common.success'), t('settings.data.exportSuccess'));
-            } catch (error) {
-              Alert.alert(t('common.error'), t('settings.data.exportFailed'));
-            } finally {
-              setIsExporting(false);
-            }
-          },
-        },
-      ]
-    );
+    const ok = await showConfirm({
+      title: t('settings.data.export'),
+      message: t('settings.data.exportConfirm'),
+      confirmText: t('common.confirm'),
+      cancelText: t('common.cancel'),
+    });
+    if (!ok) return;
+
+    try {
+      setIsExporting(true);
+      await dataTransferService.exportData();
+      showNotification(t('settings.data.exportSuccess'), 'success');
+    } catch (error) {
+      showNotification(t('settings.data.exportFailed'), 'error');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   // 切换调试模式
@@ -105,34 +100,27 @@ export default function SettingsScreen() {
 
   // 导入数据
   const handleImport = async () => {
-    Alert.alert(
-      t('settings.data.import'),
-      t('settings.data.importConfirm'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.confirm'),
-          onPress: async () => {
-            try {
-              setIsImporting(true);
-              const result = await dataTransferService.importData();
-              Alert.alert(
-                t('common.success'),
-                `${t('settings.data.importSuccess')}\n\n` +
-                `${t('diet.title')}: ${result.counts.dietRecords}\n` +
-                `${t('exercise.title')}: ${result.counts.exerciseRecords}\n` +
-                `${t('weight.title')}: ${result.counts.weightRecords}`
-              );
-            } catch (error) {
-              const message = error instanceof Error ? error.message : t('settings.data.importFailed');
-              Alert.alert(t('common.error'), message);
-            } finally {
-              setIsImporting(false);
-            }
-          },
-        },
-      ]
-    );
+    const ok = await showConfirm({
+      title: t('settings.data.import'),
+      message: t('settings.data.importConfirm'),
+      confirmText: t('common.confirm'),
+      cancelText: t('common.cancel'),
+    });
+    if (!ok) return;
+
+    try {
+      setIsImporting(true);
+      const result = await dataTransferService.importData();
+      showNotification(
+        `${t('settings.data.importSuccess')} - ${t('diet.title')}: ${result.counts.dietRecords}, ${t('exercise.title')}: ${result.counts.exerciseRecords}, ${t('weight.title')}: ${result.counts.weightRecords}`,
+        'success'
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : t('settings.data.importFailed');
+      showNotification(message, 'error');
+    } finally {
+      setIsImporting(false);
+    }
   };
 
   return (

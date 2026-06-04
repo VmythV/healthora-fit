@@ -19,6 +19,7 @@ import { DietRecord, FoodItem, ParsedDietRecord } from '@/types/diet';
 import { NutritionSummary } from './NutritionSummary';
 import { Card } from '@/components/ui';
 import { Icon } from '@/components/icons';
+import { showNotification, showConfirm } from '@/components/ui';
 
 interface DietRecordDetailProps {
   record: DietRecord;
@@ -77,26 +78,22 @@ export function DietRecordDetail({ record, onDelete }: DietRecordDetailProps) {
   };
 
   // 删除
-  const handleDelete = () => {
-    Alert.alert(
-      t('confirm.delete.title'),
-      t('confirm.delete.message'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteRecord(record.id);
-              onDelete?.();
-            } catch (error) {
-              Alert.alert(t('common.error'), t('error.saveFailed'));
-            }
-          },
-        },
-      ]
-    );
+  const handleDelete = async () => {
+    const ok = await showConfirm({
+      title: t('confirm.delete.title'),
+      message: t('confirm.delete.message'),
+      type: 'danger',
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+    });
+    if (!ok) return;
+
+    try {
+      await deleteRecord(record.id);
+      onDelete?.();
+    } catch (error) {
+      showNotification(t('error.saveFailed'), 'error');
+    }
   };
 
   return (

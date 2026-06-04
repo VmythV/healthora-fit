@@ -18,6 +18,7 @@ import { ExerciseRecord } from '@/types/exercise';
 import { Card, Empty } from '@/components/ui';
 import { Icon } from '@/components/icons';
 import { IconName } from '@/components/icons/Icon';
+import { showNotification, showConfirm } from '@/components/ui';
 
 interface ExerciseRecordListProps {
   date?: string;
@@ -54,19 +55,17 @@ export function ExerciseRecordList({ date, onRecordPress }: ExerciseRecordListPr
   };
 
   // 删除记录
-  const handleDelete = (id: number) => {
-    Alert.alert(
-      t('confirm.delete.title'),
-      t('confirm.delete.message'),
-      [
-        { text: t('common.cancel'), style: 'cancel' },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: () => deleteRecord(id),
-        },
-      ]
-    );
+  const handleDelete = async (id: number) => {
+    const ok = await showConfirm({
+      title: t('confirm.delete.title'),
+      message: t('confirm.delete.message'),
+      type: 'danger',
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+    });
+    if (ok) {
+      deleteRecord(id);
+    }
   };
 
   // 渲染记录项
