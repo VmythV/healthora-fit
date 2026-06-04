@@ -11,7 +11,21 @@ export const exerciseQueries = {
   async getByDate(date: string): Promise<ExerciseRecord[]> {
     const db = database.getDatabase();
     return db.getAllAsync<ExerciseRecord>(
-      `SELECT * FROM exercise_records
+      `SELECT
+        id,
+        timestamp,
+        exercise_type AS "exerciseType",
+        duration_minutes AS "durationMinutes",
+        calories_burned AS "caloriesBurned",
+        distance_km AS "distanceKm",
+        heart_rate_avg AS "heartRateAvg",
+        source,
+        screenshot_uri AS "screenshotUri",
+        raw_data AS "rawData",
+        note,
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM exercise_records
        WHERE date(timestamp) = ?
        ORDER BY timestamp ASC`,
       [date]
@@ -24,7 +38,21 @@ export const exerciseQueries = {
   async getByDateRange(startDate: string, endDate: string): Promise<ExerciseRecord[]> {
     const db = database.getDatabase();
     return db.getAllAsync<ExerciseRecord>(
-      `SELECT * FROM exercise_records
+      `SELECT
+        id,
+        timestamp,
+        exercise_type AS "exerciseType",
+        duration_minutes AS "durationMinutes",
+        calories_burned AS "caloriesBurned",
+        distance_km AS "distanceKm",
+        heart_rate_avg AS "heartRateAvg",
+        source,
+        screenshot_uri AS "screenshotUri",
+        raw_data AS "rawData",
+        note,
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM exercise_records
        WHERE date(timestamp) BETWEEN ? AND ?
        ORDER BY timestamp ASC`,
       [startDate, endDate]
@@ -38,7 +66,21 @@ export const exerciseQueries = {
     const db = database.getDatabase();
     const today = new Date().toISOString().split('T')[0];
     return db.getAllAsync<ExerciseRecord>(
-      `SELECT * FROM exercise_records
+      `SELECT
+        id,
+        timestamp,
+        exercise_type AS "exerciseType",
+        duration_minutes AS "durationMinutes",
+        calories_burned AS "caloriesBurned",
+        distance_km AS "distanceKm",
+        heart_rate_avg AS "heartRateAvg",
+        source,
+        screenshot_uri AS "screenshotUri",
+        raw_data AS "rawData",
+        note,
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM exercise_records
        WHERE date(timestamp) = ?
        ORDER BY timestamp ASC`,
       [today]
@@ -178,7 +220,21 @@ export const exerciseQueries = {
   async getById(id: number): Promise<ExerciseRecord | null> {
     const db = database.getDatabase();
     return db.getFirstAsync<ExerciseRecord>(
-      'SELECT * FROM exercise_records WHERE id = ?',
+      `SELECT
+        id,
+        timestamp,
+        exercise_type AS "exerciseType",
+        duration_minutes AS "durationMinutes",
+        calories_burned AS "caloriesBurned",
+        distance_km AS "distanceKm",
+        heart_rate_avg AS "heartRateAvg",
+        source,
+        screenshot_uri AS "screenshotUri",
+        raw_data AS "rawData",
+        note,
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM exercise_records WHERE id = ?`,
       [id]
     );
   },
@@ -292,5 +348,20 @@ export const exerciseQueries = {
       'SELECT COUNT(*) as count FROM exercise_records'
     );
     return result?.count || 0;
+  },
+
+  /**
+   * 获取日期范围内有记录的日期列表（用于月视图标记）
+   */
+  async getDatesWithRecords(startDate: string, endDate: string): Promise<string[]> {
+    const db = database.getDatabase();
+    const rows = await db.getAllAsync<{ date: string }>(
+      `SELECT DISTINCT date(timestamp) as date
+       FROM exercise_records
+       WHERE date(timestamp) BETWEEN ? AND ?
+       ORDER BY date ASC`,
+      [startDate, endDate]
+    );
+    return rows.map(r => r.date);
   },
 };

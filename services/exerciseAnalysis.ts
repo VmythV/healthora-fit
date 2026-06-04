@@ -2,16 +2,7 @@
 // 运动截图分析服务
 
 import { aiService } from './ai';
-
-export interface ExerciseAnalysisResult {
-  exerciseType: string;
-  durationMinutes: number;
-  caloriesBurned: number;
-  distanceKm?: number;
-  heartRate?: number;
-  confidence: 'high' | 'medium' | 'low';
-  rawText?: string;
-}
+import { ExerciseAnalysisResult } from '@/types/exercise';
 
 // 运动类型映射
 const EXERCISE_TYPE_MAP: Record<string, string> = {
@@ -70,7 +61,8 @@ export class ExerciseAnalysisService {
   "durationMinutes": 运动时长（分钟）,
   "caloriesBurned": 消耗卡路里,
   "distanceKm": 距离（公里，如果没有则为 null）,
-  "heartRate": 平均心率（如果没有则为 null）,
+  "heartRateAvg": 平均心率（如果没有则为 null）,
+  "timestamp": "截图中显示的运动时间（ISO 8601 格式，如截图中有时钟或时间信息则提取，否则为 null）",
   "confidence": "识别置信度（high/medium/low）"
 }
 
@@ -79,7 +71,8 @@ export class ExerciseAnalysisService {
 2. 如果无法识别具体运动类型，请使用 "other"
 3. 时长必须是数字（分钟）
 4. 卡路里必须是数字
-5. 只返回 JSON，不要有其他文字`;
+5. timestamp 是截图中显示的运动开始时间，不是截图时间。如果截图中没有时间信息，则设为 null
+6. 只返回 JSON，不要有其他文字`;
 
       const config = aiService.getConfig()!;
       const apiEndpoint = aiService.getApiEndpoint();
@@ -180,7 +173,8 @@ export class ExerciseAnalysisService {
         durationMinutes: Math.round(result.durationMinutes || 0),
         caloriesBurned: Math.round(result.caloriesBurned || 0),
         distanceKm: result.distanceKm ? Number(result.distanceKm) : undefined,
-        heartRate: result.heartRate ? Math.round(result.heartRate) : undefined,
+        heartRateAvg: result.heartRateAvg ? Math.round(result.heartRateAvg) : undefined,
+        timestamp: result.timestamp || undefined,
         confidence: result.confidence || 'medium',
         rawText: content,
       };

@@ -16,11 +16,12 @@ import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { Card } from '@/components/ui';
 import { Icon } from '@/components/icons';
-import { ExerciseAnalysisResult, exerciseAnalysisService } from '@/services/exerciseAnalysis';
+import { ExerciseAnalysisResult } from '@/types/exercise';
+import { exerciseAnalysisService } from '@/services/exerciseAnalysis';
 import { aiService } from '@/services/ai';
 
 interface ScreenshotPickerProps {
-  onAnalysisComplete: (result: ExerciseAnalysisResult) => void;
+  onAnalysisComplete: (result: ExerciseAnalysisResult, imageUri: string) => void;
   onError?: (error: string) => void;
 }
 
@@ -62,7 +63,7 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
         mediaTypes: 'images',
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 0.8,
+        quality: 1.0,
       });
 
       if (!result.canceled && result.assets[0]) {
@@ -91,7 +92,7 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
       const result = await ImagePicker.launchCameraAsync({
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 0.8,
+        quality: 1.0,
       });
 
       if (!result.canceled && result.assets[0]) {
@@ -122,7 +123,7 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
       }
 
       const result = await exerciseAnalysisService.analyzeScreenshot(uri);
-      onAnalysisComplete(result);
+      onAnalysisComplete(result, uri);
     } catch (err) {
       const message = err instanceof Error ? err.message : t('exercise.analysisFailed');
       setError(message);
@@ -181,12 +182,12 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
       {/* 操作按钮 */}
       <View style={styles.actions}>
         <TouchableOpacity style={styles.actionButton} onPress={pickImage}>
-          <Icon name="food" size={20} color={theme.colors.primary.main} />
+          <Icon name="food" size={20} color="#FFFFFF" />
           <Text style={styles.actionText}>{t('exercise.fromGallery')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.actionButton} onPress={takePhoto}>
-          <Icon name="camera" size={20} color={theme.colors.primary.main} />
+          <Icon name="camera" size={20} color="#FFFFFF" />
           <Text style={styles.actionText}>{t('exercise.takePhoto')}</Text>
         </TouchableOpacity>
       </View>
@@ -268,7 +269,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.lg,
     padding: theme.spacing.base,
     backgroundColor: theme.colors.error + '10',
-    borderRadius: theme.borderRadius.base,
+    borderRadius: theme.borderRadius.lg,
   },
   errorText: {
     fontSize: theme.fontSize.bodySm,
@@ -285,13 +286,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: theme.spacing.sm,
-    paddingVertical: theme.spacing.base,
-    backgroundColor: theme.colors.background.secondary,
+    paddingVertical: theme.spacing.md,
+    backgroundColor: theme.colors.primary.main,
     borderRadius: theme.borderRadius.lg,
+    ...theme.shadow.sm,
   },
   actionText: {
     fontSize: theme.fontSize.body,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.primary.main,
+    fontWeight: theme.fontWeight.semibold,
+    color: '#FFFFFF',
   },
 });

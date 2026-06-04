@@ -27,6 +27,7 @@ export interface ExerciseAnalysisResult {
   heartRateAvg?: number;
   timestamp?: string;
   confidence: 'high' | 'medium' | 'low';
+  rawText?: string;
 }
 
 // 创建记录的输入类型

@@ -16,7 +16,10 @@
     "yesterday": "Yesterday",
     "tomorrow": "Tomorrow",
     "noData": "No data",
-    "comingSoon": "Coming soon..."
+    "comingSoon": "Coming soon...",
+    "date": "Date",
+    "time": "Time",
+    "now": "Now"
   },
   "tabs": {
     "home": "Home",
@@ -143,7 +146,12 @@
     "confidenceLow": "Low Confidence",
     "retry": "Retry",
     "acceptResult": "Use Result",
-    "aiNotConfigured": "AI service not configured, please configure in settings first"
+    "aiNotConfigured": "AI service not configured, please configure in settings first",
+    "recordTime": "Record Time",
+    "aiRecognitionSuccess": "AI recognition successful, data auto-filled",
+    "aiNoTimestamp": "No time detected, using current time",
+    "selectDateTime": "Select Date & Time",
+    "noScreenshotHint": "Select a screenshot for auto-recognition"
   },
   "weight": {
     "title": "Record Weight",
@@ -363,5 +371,9 @@
       "title": "Discard Changes",
       "message": "Current changes will not be saved"
     }
+  },
+  "timeline": {
+    "dietDetail": "Diet Details",
+    "exerciseDetail": "Exercise Details"
   }
 }

@@ -26,8 +26,8 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   // 获取数据
-  const { records: dietRecords, todayCalories, todayNutrition } = useDietRecords();
-  const { records: exerciseRecords, todayMinutes, todayCaloriesBurned } = useExerciseRecords();
+  const { todayRecords: dietRecords, todayCalories, todayNutrition } = useDietRecords();
+  const { todayRecords: exerciseRecords, todayMinutes, todayCaloriesBurned } = useExerciseRecords();
   const { latestWeight, yesterdayWeight } = useWeightRecords();
   const { activeGoal } = useGoals();
 

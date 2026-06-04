@@ -1,13 +1,13 @@
 // components/calendar/DayView.tsx
-// 日视图组件
+// 日视图组件 - 时间轴形式
 
-import React, { useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, {
@@ -16,39 +16,37 @@ import Animated, {
   withSpring,
   runOnJS,
 } from 'react-native-reanimated';
-import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { useDietRecords } from '@/hooks/useDietRecords';
 import { useExerciseRecords } from '@/hooks/useExerciseRecords';
-import { useWeightRecords } from '@/hooks/useWeightRecords';
-import { Card, Empty } from '@/components/ui';
-import { Icon } from '@/components/icons';
-import { IconName } from '@/components/icons/Icon';
+import { Card, Modal } from '@/components/ui';
+import { DietRecordDetail } from '@/components/diet/DietRecordDetail';
+import { ExerciseRecordDetail } from '@/components/exercise/ExerciseRecordDetail';
+import { DietRecord } from '@/types/diet';
+import { ExerciseRecord } from '@/types/exercise';
+import { Timeline } from './Timeline';
+import { TimelineItemData } from './TimelineItem';
 
 interface DayViewProps {
   date: string; // YYYY-MM-DD
-  maxDate?: string; // YYYY-MM-DD，最大可选日期
+  maxDate?: string; // YYYY-MM-DD
   onDateChange?: (date: string) => void;
 }
 
-// 记录类型图标
-const RECORD_ICONS: Record<string, IconName> = {
-  diet: 'bowl',
-  exercise: 'running',
-  weight: 'weight',
-};
-
 /**
  * 日视图组件
+ * 日期导航 + 统计行 + 时间轴记录列表 + 详情弹窗
  */
 export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
   const { t } = useI18n();
-  const router = useRouter();
 
   // 动画值
   const translateX = useSharedValue(0);
   const isGestureActive = useSharedValue(false);
+
+  // 详情弹窗
+  const [selectedItem, setSelectedItem] = useState<TimelineItemData | null>(null);
 
   // 判断是否可以跳转到下一天
   const canGoNextDay = useCallback(() => {
@@ -80,7 +78,6 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
       isGestureActive.value = true;
     })
     .onUpdate((event) => {
-      // 限制滑动幅度，最大为 30px
       const maxTranslation = 30;
       const clampedTranslation = Math.max(
         -maxTranslation,
@@ -92,13 +89,10 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
       isGestureActive.value = false;
       const threshold = 20;
       if (event.translationX < -threshold) {
-        // 向左滑动，切换到下一天
         runOnJS(handleNextDay)();
       } else if (event.translationX > threshold) {
-        // 向右滑动，切换到上一天
         runOnJS(handlePrevDay)();
       }
-      // 平滑回弹动画
       translateX.value = withSpring(0, {
         damping: 20,
         stiffness: 200,
@@ -114,15 +108,6 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
   // 获取指定日期的数据
   const { records: dietRecords } = useDietRecords(date);
   const { records: exerciseRecords } = useExerciseRecords(date);
-
-  // 格式化时间
-  const formatTime = (timestamp: string) => {
-    const d = new Date(timestamp);
-    return d.toLocaleTimeString('zh-CN', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
 
   // 格式化日期显示
   const formatDateDisplay = (dateStr: string) => {
@@ -144,28 +129,19 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
     });
   };
 
-  // 合并所有记录并按时间排序
-  const allRecords = [
-    ...dietRecords.map(r => ({
-      id: r.id,
-      type: 'diet' as const,
-      time: r.timestamp,
-      title: r.mealType ? t(`mealType.${r.mealType}`) : t('record.diet.title'),
-      detail: `${r.totalCalories || 0} ${t('home.kcal')}`,
-      onPress: () => {}, // TODO: 跳转详情
-    })),
-    ...exerciseRecords.map(r => ({
-      id: r.id,
-      type: 'exercise' as const,
-      time: r.timestamp,
-      title: t(`exerciseType.${r.exerciseType}`),
-      detail: `${r.durationMinutes} ${t('home.minutes')}`,
-      onPress: () => {}, // TODO: 跳转详情
-    })),
-  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+  // 点击时间轴项
+  const handleItemPress = useCallback((item: TimelineItemData) => {
+    setSelectedItem(item);
+  }, []);
+
+  // 删除记录后的回调
+  const handleDetailDelete = useCallback(() => {
+    setSelectedItem(null);
+  }, []);
 
   // 计算今日统计
   const totalCalories = dietRecords.reduce((sum, r) => sum + (r.totalCalories || 0), 0);
+  const totalExerciseCalories = exerciseRecords.reduce((sum, r) => sum + (r.caloriesBurned || 0), 0);
   const totalMinutes = exerciseRecords.reduce((sum, r) => sum + r.durationMinutes, 0);
 
   return (
@@ -189,7 +165,7 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
         {/* 今日统计 */}
         <View style={styles.statsRow}>
           <Card style={styles.statCard}>
-            <Text style={styles.statValue}>{totalCalories}</Text>
+            <Text style={styles.statValue}>{totalCalories + totalExerciseCalories}</Text>
             <Text style={styles.statLabel}>{t('home.kcal')}</Text>
           </Card>
           <Card style={styles.statCard}>
@@ -197,44 +173,45 @@ export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
             <Text style={styles.statLabel}>{t('home.minutes')}</Text>
           </Card>
           <Card style={styles.statCard}>
-            <Text style={styles.statValue}>{allRecords.length}</Text>
+            <Text style={styles.statValue}>
+              {dietRecords.length + exerciseRecords.length}
+            </Text>
             <Text style={styles.statLabel}>{t('calendar.status')}</Text>
           </Card>
         </View>
 
-        {/* 记录列表 */}
-        <ScrollView style={styles.recordList}>
-          {allRecords.length === 0 ? (
-            <Empty
-              icon="note"
-              title={t('common.noData')}
-              description={t('common.comingSoon')}
-            />
-          ) : (
-            allRecords.map((record) => (
-              <TouchableOpacity
-                key={`${record.type}-${record.id}`}
-                onPress={record.onPress}
-                activeOpacity={0.7}
-              >
-                <Card style={styles.recordCard}>
-                  <View style={styles.recordRow}>
-                    <View style={styles.recordIconContainer}>
-                      <Icon name={RECORD_ICONS[record.type]} size={24} color={theme.colors.primary.main} />
-                    </View>
-                    <View style={styles.recordInfo}>
-                      <Text style={styles.recordTitle}>{record.title}</Text>
-                      <Text style={styles.recordDetail}>{record.detail}</Text>
-                    </View>
-                    <Text style={styles.recordTime}>
-                      {formatTime(record.time)}
-                    </Text>
-                  </View>
-                </Card>
-              </TouchableOpacity>
-            ))
-          )}
-        </ScrollView>
+        {/* 时间轴 */}
+        <Timeline
+          dietRecords={dietRecords}
+          exerciseRecords={exerciseRecords}
+          onItemPress={handleItemPress}
+        />
+
+        {/* 详情 Modal */}
+        <Modal
+          visible={!!selectedItem}
+          onClose={() => setSelectedItem(null)}
+          type="bottom"
+          title={
+            selectedItem?.type === 'diet'
+              ? t('timeline.dietDetail')
+              : t('timeline.exerciseDetail')
+          }
+        >
+          <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+            {selectedItem?.type === 'diet' ? (
+              <DietRecordDetail
+                record={selectedItem.record as DietRecord}
+                onDelete={handleDetailDelete}
+              />
+            ) : selectedItem?.type === 'exercise' ? (
+              <ExerciseRecordDetail
+                record={selectedItem.record as ExerciseRecord}
+                onDelete={handleDetailDelete}
+              />
+            ) : null}
+          </ScrollView>
+        </Modal>
       </Animated.View>
     </GestureDetector>
   );
@@ -268,7 +245,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: theme.spacing.xl,
     gap: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
   },
   statCard: {
     flex: 1,
@@ -285,46 +262,13 @@ const styles = StyleSheet.create({
     color: theme.colors.text.tertiary,
     marginTop: theme.spacing.xs,
   },
-  recordList: {
-    flex: 1,
-    paddingHorizontal: theme.spacing.xl,
-  },
-  recordCard: {
-    padding: theme.spacing.base,
-    marginBottom: theme.spacing.sm,
-  },
-  recordRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.md,
-  },
-  recordIconContainer: {
-    width: 24,
-    height: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  recordInfo: {
-    flex: 1,
-  },
-  recordTitle: {
-    fontSize: theme.fontSize.body,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.text.primary,
-  },
-  recordDetail: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.text.tertiary,
-    marginTop: 2,
-  },
-  recordTime: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.text.tertiary,
-  },
   navButtonDisabled: {
     opacity: 0.3,
   },
   navTextDisabled: {
     color: theme.colors.text.tertiary,
+  },
+  modalContent: {
+    maxHeight: 400,
   },
 });

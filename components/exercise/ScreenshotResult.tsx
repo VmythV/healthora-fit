@@ -12,7 +12,7 @@ import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { Card } from '@/components/ui';
 import { Icon } from '@/components/icons';
-import { ExerciseAnalysisResult } from '@/services/exerciseAnalysis';
+import { ExerciseAnalysisResult } from '@/types/exercise';
 
 interface ScreenshotResultProps {
   result: ExerciseAnalysisResult;
@@ -135,13 +135,13 @@ export function ScreenshotResult({ result, onAccept, onRetry }: ScreenshotResult
       )}
 
       {/* 心率（如果有） */}
-      {result.heartRate && (
+      {result.heartRateAvg && (
         <View style={styles.row}>
           <View style={styles.labelContainer}>
             <Icon name="fire" size={16} color={theme.colors.text.secondary} />
             <Text style={styles.label}>{t('exercise.heartRate')}</Text>
           </View>
-          <Text style={styles.value}>{result.heartRate} bpm</Text>
+          <Text style={styles.value}>{result.heartRateAvg} bpm</Text>
         </View>
       )}
 

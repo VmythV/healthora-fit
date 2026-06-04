@@ -11,7 +11,21 @@ export const dietQueries = {
   async getByDate(date: string): Promise<DietRecord[]> {
     const db = database.getDatabase();
     return db.getAllAsync<DietRecord>(
-      `SELECT * FROM diet_records
+      `SELECT
+        id,
+        timestamp,
+        photo_uri AS "photoUri",
+        foods_json AS "foodsJson",
+        total_calories AS "totalCalories",
+        total_protein AS "totalProtein",
+        total_carbs AS "totalCarbs",
+        total_fat AS "totalFat",
+        meal_type AS "mealType",
+        note,
+        is_edited AS "isEdited",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM diet_records
        WHERE date(timestamp) = ?
        ORDER BY timestamp ASC`,
       [date]
@@ -24,7 +38,21 @@ export const dietQueries = {
   async getByDateRange(startDate: string, endDate: string): Promise<DietRecord[]> {
     const db = database.getDatabase();
     return db.getAllAsync<DietRecord>(
-      `SELECT * FROM diet_records
+      `SELECT
+        id,
+        timestamp,
+        photo_uri AS "photoUri",
+        foods_json AS "foodsJson",
+        total_calories AS "totalCalories",
+        total_protein AS "totalProtein",
+        total_carbs AS "totalCarbs",
+        total_fat AS "totalFat",
+        meal_type AS "mealType",
+        note,
+        is_edited AS "isEdited",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM diet_records
        WHERE date(timestamp) BETWEEN ? AND ?
        ORDER BY timestamp ASC`,
       [startDate, endDate]
@@ -37,7 +65,21 @@ export const dietQueries = {
   async getRecent(limit: number = 10): Promise<DietRecord[]> {
     const db = database.getDatabase();
     return db.getAllAsync<DietRecord>(
-      `SELECT * FROM diet_records
+      `SELECT
+        id,
+        timestamp,
+        photo_uri AS "photoUri",
+        foods_json AS "foodsJson",
+        total_calories AS "totalCalories",
+        total_protein AS "totalProtein",
+        total_carbs AS "totalCarbs",
+        total_fat AS "totalFat",
+        meal_type AS "mealType",
+        note,
+        is_edited AS "isEdited",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM diet_records
        ORDER BY timestamp DESC
        LIMIT ?`,
       [limit]
@@ -51,7 +93,21 @@ export const dietQueries = {
     const db = database.getDatabase();
     const today = new Date().toISOString().split('T')[0];
     return db.getAllAsync<DietRecord>(
-      `SELECT * FROM diet_records
+      `SELECT
+        id,
+        timestamp,
+        photo_uri AS "photoUri",
+        foods_json AS "foodsJson",
+        total_calories AS "totalCalories",
+        total_protein AS "totalProtein",
+        total_carbs AS "totalCarbs",
+        total_fat AS "totalFat",
+        meal_type AS "mealType",
+        note,
+        is_edited AS "isEdited",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM diet_records
        WHERE date(timestamp) = ?
        ORDER BY timestamp ASC`,
       [today]
@@ -211,7 +267,21 @@ export const dietQueries = {
   async getById(id: number): Promise<DietRecord | null> {
     const db = database.getDatabase();
     return db.getFirstAsync<DietRecord>(
-      'SELECT * FROM diet_records WHERE id = ?',
+      `SELECT
+        id,
+        timestamp,
+        photo_uri AS "photoUri",
+        foods_json AS "foodsJson",
+        total_calories AS "totalCalories",
+        total_protein AS "totalProtein",
+        total_carbs AS "totalCarbs",
+        total_fat AS "totalFat",
+        meal_type AS "mealType",
+        note,
+        is_edited AS "isEdited",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM diet_records WHERE id = ?`,
       [id]
     );
   },
@@ -343,12 +413,41 @@ export const dietQueries = {
   },
 
   /**
+   * 获取日期范围内有记录的日期列表（用于月视图标记）
+   */
+  async getDatesWithRecords(startDate: string, endDate: string): Promise<string[]> {
+    const db = database.getDatabase();
+    const rows = await db.getAllAsync<{ date: string }>(
+      `SELECT DISTINCT date(timestamp) as date
+       FROM diet_records
+       WHERE date(timestamp) BETWEEN ? AND ?
+       ORDER BY date ASC`,
+      [startDate, endDate]
+    );
+    return rows.map(r => r.date);
+  },
+
+  /**
    * 搜索记录（按食物名称）
    */
   async search(keyword: string): Promise<DietRecord[]> {
     const db = database.getDatabase();
     return db.getAllAsync<DietRecord>(
-      `SELECT * FROM diet_records
+      `SELECT
+        id,
+        timestamp,
+        photo_uri AS "photoUri",
+        foods_json AS "foodsJson",
+        total_calories AS "totalCalories",
+        total_protein AS "totalProtein",
+        total_carbs AS "totalCarbs",
+        total_fat AS "totalFat",
+        meal_type AS "mealType",
+        note,
+        is_edited AS "isEdited",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt"
+       FROM diet_records
        WHERE foods_json LIKE ?
        ORDER BY timestamp DESC`,
       [`%${keyword}%`]

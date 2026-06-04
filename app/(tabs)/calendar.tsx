@@ -1,7 +1,7 @@
 // app/(tabs)/calendar.tsx
 // 日历页面
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,8 +11,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
-import { useDietRecords } from '@/hooks/useDietRecords';
-import { useExerciseRecords } from '@/hooks/useExerciseRecords';
+import { dietQueries } from '@/database/queries/diet';
+import { exerciseQueries } from '@/database/queries/exercise';
 import { CalendarGrid, DayView } from '@/components/calendar';
 
 type ViewMode = 'month' | 'day';
@@ -28,15 +28,29 @@ export default function CalendarScreen() {
   const [month, setMonth] = useState(today.getMonth());
   const [selectedDate, setSelectedDate] = useState(todayStr);
 
-  // 获取有记录的日期（简化版，实际应该查询数据库）
-  const { records: dietRecords } = useDietRecords();
-  const { records: exerciseRecords } = useExerciseRecords();
+  // 按月查询有记录的日期
+  const [markedDates, setMarkedDates] = useState<string[]>([]);
 
-  // 提取有记录的日期
-  const markedDates = [
-    ...dietRecords.map(r => r.timestamp.split('T')[0]),
-    ...exerciseRecords.map(r => r.timestamp.split('T')[0]),
-  ].filter((v, i, a) => a.indexOf(v) === i); // 去重
+  useEffect(() => {
+    loadMarkedDates();
+  }, [year, month]);
+
+  const loadMarkedDates = async () => {
+    try {
+      const monthStart = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+      const lastDay = new Date(year, month + 1, 0).getDate();
+      const monthEnd = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+      const [dietDates, exerciseDates] = await Promise.all([
+        dietQueries.getDatesWithRecords(monthStart, monthEnd),
+        exerciseQueries.getDatesWithRecords(monthStart, monthEnd),
+      ]);
+
+      setMarkedDates([...new Set([...dietDates, ...exerciseDates])]);
+    } catch (err) {
+      console.error('加载标记日期失败:', err);
+    }
+  };
 
   // 月份切换
   const handleMonthChange = useCallback((newYear: number, newMonth: number) => {

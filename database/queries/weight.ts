@@ -11,7 +11,16 @@ export const weightQueries = {
   async getLatest(): Promise<WeightRecord | null> {
     const db = database.getDatabase();
     return db.getFirstAsync<WeightRecord>(
-      `SELECT * FROM weight_records
+      `SELECT
+        id,
+        timestamp,
+        weight,
+        body_fat_percentage AS "bodyFatPercentage",
+        muscle_mass AS "muscleMass",
+        source,
+        note,
+        created_at AS "createdAt"
+       FROM weight_records
        ORDER BY timestamp DESC
        LIMIT 1`
     );
@@ -23,7 +32,16 @@ export const weightQueries = {
   async getByDate(date: string): Promise<WeightRecord | null> {
     const db = database.getDatabase();
     return db.getFirstAsync<WeightRecord>(
-      `SELECT * FROM weight_records
+      `SELECT
+        id,
+        timestamp,
+        weight,
+        body_fat_percentage AS "bodyFatPercentage",
+        muscle_mass AS "muscleMass",
+        source,
+        note,
+        created_at AS "createdAt"
+       FROM weight_records
        WHERE date(timestamp) = ?
        ORDER BY timestamp DESC
        LIMIT 1`,
@@ -37,7 +55,16 @@ export const weightQueries = {
   async getByDateRange(startDate: string, endDate: string): Promise<WeightRecord[]> {
     const db = database.getDatabase();
     return db.getAllAsync<WeightRecord>(
-      `SELECT * FROM weight_records
+      `SELECT
+        id,
+        timestamp,
+        weight,
+        body_fat_percentage AS "bodyFatPercentage",
+        muscle_mass AS "muscleMass",
+        source,
+        note,
+        created_at AS "createdAt"
+       FROM weight_records
        WHERE date(timestamp) BETWEEN ? AND ?
        ORDER BY timestamp ASC`,
       [startDate, endDate]
@@ -50,7 +77,16 @@ export const weightQueries = {
   async getRecent(limit: number = 30): Promise<WeightRecord[]> {
     const db = database.getDatabase();
     return db.getAllAsync<WeightRecord>(
-      `SELECT * FROM weight_records
+      `SELECT
+        id,
+        timestamp,
+        weight,
+        body_fat_percentage AS "bodyFatPercentage",
+        muscle_mass AS "muscleMass",
+        source,
+        note,
+        created_at AS "createdAt"
+       FROM weight_records
        ORDER BY timestamp DESC
        LIMIT ?`,
       [limit]
@@ -136,7 +172,16 @@ export const weightQueries = {
   async getById(id: number): Promise<WeightRecord | null> {
     const db = database.getDatabase();
     return db.getFirstAsync<WeightRecord>(
-      'SELECT * FROM weight_records WHERE id = ?',
+      `SELECT
+        id,
+        timestamp,
+        weight,
+        body_fat_percentage AS "bodyFatPercentage",
+        muscle_mass AS "muscleMass",
+        source,
+        note,
+        created_at AS "createdAt"
+       FROM weight_records WHERE id = ?`,
       [id]
     );
   },
