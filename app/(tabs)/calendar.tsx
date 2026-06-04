@@ -22,6 +22,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { dietQueries } from '@/database/queries/diet';
 import { exerciseQueries } from '@/database/queries/exercise';
 import { CalendarGrid, DayDetail } from '@/components/calendar';
+import { useWeekStartDay } from '@/hooks/useWeekStartDay';
 
 const COLLAPSE_RANGE = 150; // 过渡区间
 const HEADER_BASE = 56;
@@ -38,6 +39,7 @@ const CAL_HEADER_H = MONTH_NAV_H + WEEKDAY_H + 8;
 
 export default function CalendarScreen() {
   const { t } = useI18n();
+  const { getAdjustedFirstDay } = useWeekStartDay();
 
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
@@ -51,13 +53,13 @@ export default function CalendarScreen() {
   const collapseProgress = useSharedValue(0);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // 选中日期在网格中的行号（0-5）
+  // 选中日期在网格中的行号（0-5），使用与 CalendarGrid 一致的星期开始日
   const selectedRow = useMemo(() => {
     const d = new Date(selectedDate);
     if (d.getFullYear() !== year || d.getMonth() !== month) return 0;
-    const firstDay = new Date(year, month, 1).getDay();
+    const firstDay = getAdjustedFirstDay(year, month);
     return Math.floor((firstDay + d.getDate() - 1) / 7);
-  }, [selectedDate, year, month]);
+  }, [selectedDate, year, month, getAdjustedFirstDay]);
 
   // 测量日历头部实际高度
   const [calHeaderMeasured, setCalHeaderMeasured] = useState(CAL_HEADER_H);
