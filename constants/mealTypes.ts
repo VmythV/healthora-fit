@@ -14,25 +14,25 @@ export const MEAL_TYPES: MealType[] = [
   {
     id: 'breakfast',
     name: '早餐',
-    icon: '🌅',
+    icon: 'sunrise',
     timeRange: { start: 5, end: 10 },
   },
   {
     id: 'lunch',
     name: '午餐',
-    icon: '☀️',
+    icon: 'bowl',
     timeRange: { start: 11, end: 14 },
   },
   {
     id: 'dinner',
     name: '晚餐',
-    icon: '🌙',
+    icon: 'moon',
     timeRange: { start: 17, end: 21 },
   },
   {
     id: 'snack',
     name: '加餐',
-    icon: '🍪',
+    icon: 'cookie',
     timeRange: { start: 0, end: 23 },
   },
 ];

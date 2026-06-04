@@ -14,6 +14,31 @@ import { CameraIcon } from './CameraIcon';
 import { EditIcon } from './EditIcon';
 import { DeleteIcon } from './DeleteIcon';
 import { BackIcon } from './BackIcon';
+import { SunriseIcon } from './SunriseIcon';
+import { MoonIcon } from './MoonIcon';
+import { CookieIcon } from './CookieIcon';
+import { BowlIcon } from './BowlIcon';
+import { PlateIcon } from './PlateIcon';
+import { RunningIcon } from './RunningIcon';
+import { WalkingIcon } from './WalkingIcon';
+import { CyclingIcon } from './CyclingIcon';
+import { SwimmingIcon } from './SwimmingIcon';
+import { StrengthIcon } from './StrengthIcon';
+import { YogaIcon } from './YogaIcon';
+import { HiitIcon } from './HiitIcon';
+import { OtherExerciseIcon } from './OtherExerciseIcon';
+import { NoteIcon } from './NoteIcon';
+import { SearchIcon } from './SearchIcon';
+import { TipsIcon } from './TipsIcon';
+import { HelpIcon } from './HelpIcon';
+import { AiIcon } from './AiIcon';
+import { ChartBarIcon } from './ChartBarIcon';
+import { FireIcon } from './FireIcon';
+import { ConnectedIcon } from './ConnectedIcon';
+import { DisconnectedIcon } from './DisconnectedIcon';
+import { TrendUpIcon } from './TrendUpIcon';
+import { TrendDownIcon } from './TrendDownIcon';
+import { TrendFlatIcon } from './TrendFlatIcon';
 
 export type IconName =
   | 'home'
@@ -27,7 +52,32 @@ export type IconName =
   | 'camera'
   | 'edit'
   | 'delete'
-  | 'back';
+  | 'back'
+  | 'sunrise'
+  | 'moon'
+  | 'cookie'
+  | 'bowl'
+  | 'plate'
+  | 'running'
+  | 'walking'
+  | 'cycling'
+  | 'swimming'
+  | 'strength'
+  | 'yoga'
+  | 'hiit'
+  | 'other-exercise'
+  | 'note'
+  | 'search'
+  | 'tips'
+  | 'help'
+  | 'ai'
+  | 'chart-bar'
+  | 'fire'
+  | 'connected'
+  | 'disconnected'
+  | 'trend-up'
+  | 'trend-down'
+  | 'trend-flat';
 
 interface IconProps {
   name: IconName;
@@ -73,6 +123,56 @@ export function Icon({ name, size = 24, color = '#000000' }: IconProps) {
       return <DeleteIcon {...iconProps} />;
     case 'back':
       return <BackIcon {...iconProps} />;
+    case 'sunrise':
+      return <SunriseIcon {...iconProps} />;
+    case 'moon':
+      return <MoonIcon {...iconProps} />;
+    case 'cookie':
+      return <CookieIcon {...iconProps} />;
+    case 'bowl':
+      return <BowlIcon {...iconProps} />;
+    case 'plate':
+      return <PlateIcon {...iconProps} />;
+    case 'running':
+      return <RunningIcon {...iconProps} />;
+    case 'walking':
+      return <WalkingIcon {...iconProps} />;
+    case 'cycling':
+      return <CyclingIcon {...iconProps} />;
+    case 'swimming':
+      return <SwimmingIcon {...iconProps} />;
+    case 'strength':
+      return <StrengthIcon {...iconProps} />;
+    case 'yoga':
+      return <YogaIcon {...iconProps} />;
+    case 'hiit':
+      return <HiitIcon {...iconProps} />;
+    case 'other-exercise':
+      return <OtherExerciseIcon {...iconProps} />;
+    case 'note':
+      return <NoteIcon {...iconProps} />;
+    case 'search':
+      return <SearchIcon {...iconProps} />;
+    case 'tips':
+      return <TipsIcon {...iconProps} />;
+    case 'help':
+      return <HelpIcon {...iconProps} />;
+    case 'ai':
+      return <AiIcon {...iconProps} />;
+    case 'chart-bar':
+      return <ChartBarIcon {...iconProps} />;
+    case 'fire':
+      return <FireIcon {...iconProps} />;
+    case 'connected':
+      return <ConnectedIcon {...iconProps} />;
+    case 'disconnected':
+      return <DisconnectedIcon {...iconProps} />;
+    case 'trend-up':
+      return <TrendUpIcon {...iconProps} />;
+    case 'trend-down':
+      return <TrendDownIcon {...iconProps} />;
+    case 'trend-flat':
+      return <TrendFlatIcon {...iconProps} />;
     default:
       return null;
   }

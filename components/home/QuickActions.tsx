@@ -6,6 +6,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
+import { Icon } from '@/components/icons';
+import { IconName } from '@/components/icons/Icon';
 
 /**
  * 快捷操作
@@ -14,19 +16,23 @@ export function QuickActions() {
   const { t } = useI18n();
   const router = useRouter();
 
-  const actions = [
+  const actions: Array<{
+    icon: IconName;
+    label: string;
+    onPress: () => void;
+  }> = [
     {
-      icon: '🍚',
+      icon: 'bowl',
       label: t('record.diet.title'),
       onPress: () => router.push('/diet/record'),
     },
     {
-      icon: '🏃',
+      icon: 'exercise',
       label: t('record.exercise.title'),
       onPress: () => router.push('/exercise/record'),
     },
     {
-      icon: '⚖️',
+      icon: 'weight',
       label: t('record.weight.title'),
       onPress: () => router.push('/weight/record'),
     },
@@ -41,7 +47,9 @@ export function QuickActions() {
           onPress={action.onPress}
           activeOpacity={0.7}
         >
-          <Text style={styles.actionIcon}>{action.icon}</Text>
+          <View style={styles.actionIcon}>
+            <Icon name={action.icon} size={32} color={theme.colors.primary} />
+          </View>
           <Text style={styles.actionLabel}>{action.label}</Text>
         </TouchableOpacity>
       ))}
@@ -64,7 +72,6 @@ const styles = StyleSheet.create({
     ...theme.shadow.sm,
   },
   actionIcon: {
-    fontSize: 32,
     marginBottom: theme.spacing.sm,
   },
   actionLabel: {
