@@ -64,7 +64,7 @@ export function DietRecordForm({
 }: DietRecordFormProps) {
   const { t } = useI18n();
   const router = useRouter();
-  const { createRecord, updateRecord } = useDietRecords();
+  const { addRecord, updateRecord } = useDietRecords();
 
   const [mealType, setMealType] = useState<MealType>(
     initialMealType || getDefaultMealType()
@@ -158,7 +158,7 @@ export function DietRecordForm({
       if (recordId) {
         await updateRecord(recordId, recordData);
       } else {
-        await createRecord(recordData);
+        await addRecord(recordData);
       }
 
       onSuccess?.();
