@@ -1,7 +1,7 @@
 // components/calendar/DayView.tsx
 // 日视图组件
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,13 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  runOnJS,
+} from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
@@ -21,6 +28,7 @@ import { IconName } from '@/components/icons/Icon';
 
 interface DayViewProps {
   date: string; // YYYY-MM-DD
+  maxDate?: string; // YYYY-MM-DD，最大可选日期
   onDateChange?: (date: string) => void;
 }
 
@@ -34,9 +42,58 @@ const RECORD_ICONS: Record<string, IconName> = {
 /**
  * 日视图组件
  */
-export function DayView({ date, onDateChange }: DayViewProps) {
+export function DayView({ date, maxDate, onDateChange }: DayViewProps) {
   const { t } = useI18n();
   const router = useRouter();
+
+  // 动画值
+  const translateX = useSharedValue(0);
+
+  // 判断是否可以跳转到下一天
+  const canGoNextDay = useCallback(() => {
+    if (!maxDate) return true;
+    const d = new Date(date);
+    d.setDate(d.getDate() + 1);
+    const nextDayStr = d.toISOString().split('T')[0];
+    return nextDayStr <= maxDate;
+  }, [date, maxDate]);
+
+  // 上一天
+  const handlePrevDay = useCallback(() => {
+    const d = new Date(date);
+    d.setDate(d.getDate() - 1);
+    onDateChange?.(d.toISOString().split('T')[0]);
+  }, [date, onDateChange]);
+
+  // 下一天
+  const handleNextDay = useCallback(() => {
+    if (!canGoNextDay()) return;
+    const d = new Date(date);
+    d.setDate(d.getDate() + 1);
+    onDateChange?.(d.toISOString().split('T')[0]);
+  }, [date, onDateChange, canGoNextDay]);
+
+  // 滑动手势
+  const panGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      translateX.value = event.translationX;
+    })
+    .onEnd((event) => {
+      const threshold = 50;
+      if (event.translationX < -threshold) {
+        // 向左滑动，切换到下一天
+        runOnJS(handleNextDay)();
+      } else if (event.translationX > threshold) {
+        // 向右滑动，切换到上一天
+        runOnJS(handlePrevDay)();
+      }
+      translateX.value = withSpring(0);
+    });
+
+  // 动画样式
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
 
   // 获取指定日期的数据
   const { records: dietRecords } = useDietRecords(date);
@@ -71,20 +128,6 @@ export function DayView({ date, onDateChange }: DayViewProps) {
     });
   };
 
-  // 上一天
-  const handlePrevDay = () => {
-    const d = new Date(date);
-    d.setDate(d.getDate() - 1);
-    onDateChange?.(d.toISOString().split('T')[0]);
-  };
-
-  // 下一天
-  const handleNextDay = () => {
-    const d = new Date(date);
-    d.setDate(d.getDate() + 1);
-    onDateChange?.(d.toISOString().split('T')[0]);
-  };
-
   // 合并所有记录并按时间排序
   const allRecords = [
     ...dietRecords.map(r => ({
@@ -110,68 +153,74 @@ export function DayView({ date, onDateChange }: DayViewProps) {
   const totalMinutes = exerciseRecords.reduce((sum, r) => sum + r.durationMinutes, 0);
 
   return (
-    <View style={styles.container}>
-      {/* 日期导航 */}
-      <View style={styles.dateHeader}>
-        <TouchableOpacity onPress={handlePrevDay} style={styles.navButton}>
-          <Text style={styles.navText}>‹</Text>
-        </TouchableOpacity>
-        <Text style={styles.dateTitle}>{formatDateDisplay(date)}</Text>
-        <TouchableOpacity onPress={handleNextDay} style={styles.navButton}>
-          <Text style={styles.navText}>›</Text>
-        </TouchableOpacity>
-      </View>
+    <GestureDetector gesture={panGesture}>
+      <Animated.View style={[styles.container, animatedStyle]}>
+        {/* 日期导航 */}
+        <View style={styles.dateHeader}>
+          <TouchableOpacity onPress={handlePrevDay} style={styles.navButton}>
+            <Text style={styles.navText}>‹</Text>
+          </TouchableOpacity>
+          <Text style={styles.dateTitle}>{formatDateDisplay(date)}</Text>
+          <TouchableOpacity
+            onPress={handleNextDay}
+            style={[styles.navButton, !canGoNextDay() && styles.navButtonDisabled]}
+            disabled={!canGoNextDay()}
+          >
+            <Text style={[styles.navText, !canGoNextDay() && styles.navTextDisabled]}>›</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* 今日统计 */}
-      <View style={styles.statsRow}>
-        <Card style={styles.statCard}>
-          <Text style={styles.statValue}>{totalCalories}</Text>
-          <Text style={styles.statLabel}>{t('home.kcal')}</Text>
-        </Card>
-        <Card style={styles.statCard}>
-          <Text style={styles.statValue}>{totalMinutes}</Text>
-          <Text style={styles.statLabel}>{t('home.minutes')}</Text>
-        </Card>
-        <Card style={styles.statCard}>
-          <Text style={styles.statValue}>{allRecords.length}</Text>
-          <Text style={styles.statLabel}>{t('calendar.status')}</Text>
-        </Card>
-      </View>
+        {/* 今日统计 */}
+        <View style={styles.statsRow}>
+          <Card style={styles.statCard}>
+            <Text style={styles.statValue}>{totalCalories}</Text>
+            <Text style={styles.statLabel}>{t('home.kcal')}</Text>
+          </Card>
+          <Card style={styles.statCard}>
+            <Text style={styles.statValue}>{totalMinutes}</Text>
+            <Text style={styles.statLabel}>{t('home.minutes')}</Text>
+          </Card>
+          <Card style={styles.statCard}>
+            <Text style={styles.statValue}>{allRecords.length}</Text>
+            <Text style={styles.statLabel}>{t('calendar.status')}</Text>
+          </Card>
+        </View>
 
-      {/* 记录列表 */}
-      <ScrollView style={styles.recordList}>
-        {allRecords.length === 0 ? (
-          <Empty
-            icon="note"
-            title={t('common.noData')}
-            description={t('common.comingSoon')}
-          />
-        ) : (
-          allRecords.map((record) => (
-            <TouchableOpacity
-              key={`${record.type}-${record.id}`}
-              onPress={record.onPress}
-              activeOpacity={0.7}
-            >
-              <Card style={styles.recordCard}>
-                <View style={styles.recordRow}>
-                  <View style={styles.recordIconContainer}>
-                    <Icon name={RECORD_ICONS[record.type]} size={24} color={theme.colors.primary.main} />
+        {/* 记录列表 */}
+        <ScrollView style={styles.recordList}>
+          {allRecords.length === 0 ? (
+            <Empty
+              icon="note"
+              title={t('common.noData')}
+              description={t('common.comingSoon')}
+            />
+          ) : (
+            allRecords.map((record) => (
+              <TouchableOpacity
+                key={`${record.type}-${record.id}`}
+                onPress={record.onPress}
+                activeOpacity={0.7}
+              >
+                <Card style={styles.recordCard}>
+                  <View style={styles.recordRow}>
+                    <View style={styles.recordIconContainer}>
+                      <Icon name={RECORD_ICONS[record.type]} size={24} color={theme.colors.primary.main} />
+                    </View>
+                    <View style={styles.recordInfo}>
+                      <Text style={styles.recordTitle}>{record.title}</Text>
+                      <Text style={styles.recordDetail}>{record.detail}</Text>
+                    </View>
+                    <Text style={styles.recordTime}>
+                      {formatTime(record.time)}
+                    </Text>
                   </View>
-                  <View style={styles.recordInfo}>
-                    <Text style={styles.recordTitle}>{record.title}</Text>
-                    <Text style={styles.recordDetail}>{record.detail}</Text>
-                  </View>
-                  <Text style={styles.recordTime}>
-                    {formatTime(record.time)}
-                  </Text>
-                </View>
-              </Card>
-            </TouchableOpacity>
-          ))
-        )}
-      </ScrollView>
-    </View>
+                </Card>
+              </TouchableOpacity>
+            ))
+          )}
+        </ScrollView>
+      </Animated.View>
+    </GestureDetector>
   );
 }
 
@@ -254,6 +303,12 @@ const styles = StyleSheet.create({
   },
   recordTime: {
     fontSize: theme.fontSize.caption,
+    color: theme.colors.text.tertiary,
+  },
+  navButtonDisabled: {
+    opacity: 0.3,
+  },
+  navTextDisabled: {
     color: theme.colors.text.tertiary,
   },
 });

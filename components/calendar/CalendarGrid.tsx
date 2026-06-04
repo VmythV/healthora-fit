@@ -1,13 +1,20 @@
 // components/calendar/CalendarGrid.tsx
 // 日历网格组件
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  runOnJS,
+} from 'react-native-reanimated';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 
@@ -36,6 +43,50 @@ export function CalendarGrid({
   onMonthChange,
 }: CalendarGridProps) {
   const { t } = useI18n();
+
+  // 动画值
+  const translateX = useSharedValue(0);
+
+  // 上个月
+  const handlePrevMonth = useCallback(() => {
+    if (month === 0) {
+      onMonthChange?.(year - 1, 11);
+    } else {
+      onMonthChange?.(year, month - 1);
+    }
+  }, [year, month, onMonthChange]);
+
+  // 下个月
+  const handleNextMonth = useCallback(() => {
+    if (!canGoNextMonth()) return;
+    if (month === 11) {
+      onMonthChange?.(year + 1, 0);
+    } else {
+      onMonthChange?.(year, month + 1);
+    }
+  }, [year, month, onMonthChange, canGoNextMonth]);
+
+  // 滑动手势
+  const panGesture = Gesture.Pan()
+    .onUpdate((event) => {
+      translateX.value = event.translationX;
+    })
+    .onEnd((event) => {
+      const threshold = 50;
+      if (event.translationX < -threshold) {
+        // 向左滑动，切换到下个月
+        runOnJS(handleNextMonth)();
+      } else if (event.translationX > threshold) {
+        // 向右滑动，切换到上个月
+        runOnJS(handlePrevMonth)();
+      }
+      translateX.value = withSpring(0);
+    });
+
+  // 动画样式
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
 
   // 获取月份天数
   const getDaysInMonth = (y: number, m: number) => {
@@ -80,33 +131,14 @@ export function CalendarGrid({
   };
 
   // 判断是否可以跳转到下个月
-  const canGoNextMonth = () => {
+  const canGoNextMonth = useCallback(() => {
     if (!maxDate) return true;
     const maxDateObj = new Date(maxDate);
     const nextMonth = new Date(year, month + 1, 1);
     return nextMonth.getFullYear() < maxDateObj.getFullYear() ||
            (nextMonth.getFullYear() === maxDateObj.getFullYear() &&
             nextMonth.getMonth() <= maxDateObj.getMonth());
-  };
-
-  // 上个月
-  const handlePrevMonth = () => {
-    if (month === 0) {
-      onMonthChange?.(year - 1, 11);
-    } else {
-      onMonthChange?.(year, month - 1);
-    }
-  };
-
-  // 下个月
-  const handleNextMonth = () => {
-    if (!canGoNextMonth()) return;
-    if (month === 11) {
-      onMonthChange?.(year + 1, 0);
-    } else {
-      onMonthChange?.(year, month + 1);
-    }
-  };
+  }, [year, month, maxDate]);
 
   // 渲染日历网格
   const renderCalendarDays = () => {
@@ -169,43 +201,45 @@ export function CalendarGrid({
   ];
 
   return (
-    <View style={styles.container}>
-      {/* 月份导航 */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handlePrevMonth} style={styles.navButton}>
-          <Text style={styles.navText}>‹</Text>
-        </TouchableOpacity>
-        <Text style={styles.monthTitle}>
-          {year}年{monthNames[month]}
-        </Text>
-        <TouchableOpacity
-          onPress={handleNextMonth}
-          style={[styles.navButton, !canGoNextMonth() && styles.navButtonDisabled]}
-          disabled={!canGoNextMonth()}
-        >
-          <Text style={[styles.navText, !canGoNextMonth() && styles.navTextDisabled]}>›</Text>
-        </TouchableOpacity>
-      </View>
+    <GestureDetector gesture={panGesture}>
+      <Animated.View style={[styles.container, animatedStyle]}>
+        {/* 月份导航 */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={handlePrevMonth} style={styles.navButton}>
+            <Text style={styles.navText}>‹</Text>
+          </TouchableOpacity>
+          <Text style={styles.monthTitle}>
+            {year}年{monthNames[month]}
+          </Text>
+          <TouchableOpacity
+            onPress={handleNextMonth}
+            style={[styles.navButton, !canGoNextMonth() && styles.navButtonDisabled]}
+            disabled={!canGoNextMonth()}
+          >
+            <Text style={[styles.navText, !canGoNextMonth() && styles.navTextDisabled]}>›</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* 星期标题 */}
-      <View style={styles.weekdayRow}>
-        {WEEKDAYS.map((day, index) => (
-          <View key={index} style={styles.weekdayCell}>
-            <Text
-              style={[
-                styles.weekdayText,
-                (index === 0 || index === 6) && styles.weekendText,
-              ]}
-            >
-              {day}
-            </Text>
-          </View>
-        ))}
-      </View>
+        {/* 星期标题 */}
+        <View style={styles.weekdayRow}>
+          {WEEKDAYS.map((day, index) => (
+            <View key={index} style={styles.weekdayCell}>
+              <Text
+                style={[
+                  styles.weekdayText,
+                  (index === 0 || index === 6) && styles.weekendText,
+                ]}
+              >
+                {day}
+              </Text>
+            </View>
+          ))}
+        </View>
 
-      {/* 日期网格 */}
-      <View style={styles.daysGrid}>{renderCalendarDays()}</View>
-    </View>
+        {/* 日期网格 */}
+        <View style={styles.daysGrid}>{renderCalendarDays()}</View>
+      </Animated.View>
+    </GestureDetector>
   );
 }
 

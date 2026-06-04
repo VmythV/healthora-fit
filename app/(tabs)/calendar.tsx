@@ -113,6 +113,7 @@ export default function CalendarScreen() {
         ) : (
           <DayView
             date={selectedDate}
+            maxDate={todayStr}
             onDateChange={handleDateChange}
           />
         )}
