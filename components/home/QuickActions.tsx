@@ -48,7 +48,7 @@ export function QuickActions() {
           activeOpacity={0.7}
         >
           <View style={styles.actionIcon}>
-            <Icon name={action.icon} size={32} color={theme.colors.primary} />
+            <Icon name={action.icon} size={32} color={theme.colors.primary.main} />
           </View>
           <Text style={styles.actionLabel}>{action.label}</Text>
         </TouchableOpacity>
