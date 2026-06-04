@@ -18,6 +18,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { useGoals } from '@/hooks/useGoals';
 import { Locale } from '@/constants/i18n';
 import { dataTransferService } from '@/services/dataTransfer';
+import { Icon } from '@/components/icons';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -117,7 +118,10 @@ export default function SettingsScreen() {
             style={styles.menuItem}
             onPress={() => router.push('/settings/goals')}
           >
-            <Text style={styles.menuLabel}>{t('settings.goals.targetWeight')}</Text>
+            <View style={styles.menuLeft}>
+              <Icon name="weight" size={20} color={theme.colors.primary.main} />
+              <Text style={styles.menuLabel}>{t('settings.goals.targetWeight')}</Text>
+            </View>
             <View style={styles.menuRight}>
               <Text style={styles.menuValue}>
                 {activeGoal ? `${activeGoal.targetValue} kg` : t('settings.goals.notSet')}
@@ -134,7 +138,10 @@ export default function SettingsScreen() {
             style={styles.menuItem}
             onPress={() => router.push('/settings/ai-config')}
           >
-            <Text style={styles.menuLabel}>{t('settings.ai.config')}</Text>
+            <View style={styles.menuLeft}>
+              <Icon name="ai" size={20} color={theme.colors.primary.main} />
+              <Text style={styles.menuLabel}>{t('settings.ai.config')}</Text>
+            </View>
             <Text style={styles.menuArrow}>→</Text>
           </TouchableOpacity>
         </View>
@@ -146,7 +153,10 @@ export default function SettingsScreen() {
             style={styles.menuItem}
             onPress={() => router.push('/settings/health-connect')}
           >
-            <Text style={styles.menuLabel}>{t('settings.health.healthConnect')}</Text>
+            <View style={styles.menuLeft}>
+              <Icon name="connected" size={20} color={theme.colors.primary.main} />
+              <Text style={styles.menuLabel}>{t('settings.health.healthConnect')}</Text>
+            </View>
             <Text style={styles.menuArrow}>→</Text>
           </TouchableOpacity>
         </View>
@@ -160,7 +170,10 @@ export default function SettingsScreen() {
               style={styles.menuItem}
               onPress={() => handleLanguageChange(loc.code)}
             >
-              <Text style={styles.menuLabel}>{loc.nativeName}</Text>
+              <View style={styles.menuLeft}>
+                <Icon name="settings" size={20} color={theme.colors.primary.main} />
+                <Text style={styles.menuLabel}>{loc.nativeName}</Text>
+              </View>
               {locale === loc.code && (
                 <Text style={styles.checkmark}>✓</Text>
               )}
@@ -176,7 +189,10 @@ export default function SettingsScreen() {
             onPress={handleExport}
             disabled={isExporting}
           >
-            <Text style={styles.menuLabel}>{t('settings.data.export')}</Text>
+            <View style={styles.menuLeft}>
+              <Icon name="chart-bar" size={20} color={theme.colors.primary.main} />
+              <Text style={styles.menuLabel}>{t('settings.data.export')}</Text>
+            </View>
             {isExporting ? (
               <ActivityIndicator size="small" color={theme.colors.primary.main} />
             ) : (
@@ -188,7 +204,10 @@ export default function SettingsScreen() {
             onPress={handleImport}
             disabled={isImporting}
           >
-            <Text style={styles.menuLabel}>{t('settings.data.import')}</Text>
+            <View style={styles.menuLeft}>
+              <Icon name="chart-bar" size={20} color={theme.colors.primary.main} />
+              <Text style={styles.menuLabel}>{t('settings.data.import')}</Text>
+            </View>
             {isImporting ? (
               <ActivityIndicator size="small" color={theme.colors.primary.main} />
             ) : (
@@ -204,7 +223,10 @@ export default function SettingsScreen() {
             style={styles.menuItem}
             onPress={() => router.push('/settings/about')}
           >
-            <Text style={styles.menuLabel}>{t('settings.about.version')}</Text>
+            <View style={styles.menuLeft}>
+              <Icon name="help" size={20} color={theme.colors.primary.main} />
+              <Text style={styles.menuLabel}>{t('settings.about.version')}</Text>
+            </View>
             <View style={styles.menuRight}>
               <Text style={styles.menuValue}>1.0.0</Text>
               <Text style={styles.menuArrow}>→</Text>
@@ -253,6 +275,11 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.base,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border.light,
+  },
+  menuLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
   },
   menuLabel: {
     fontSize: theme.fontSize.body,
