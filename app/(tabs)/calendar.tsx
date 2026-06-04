@@ -2,30 +2,26 @@
 // 日志页面 - 可折叠月历 + 日详情
 
 import { logger } from '@/utils/logger';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
+  ScrollView,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+  LayoutAnimation,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Animated, {
-  useAnimatedScrollHandler,
-  useSharedValue,
-  useAnimatedStyle,
-  interpolate,
-  Extrapolation,
-  runOnJS,
-} from 'react-native-reanimated';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { dietQueries } from '@/database/queries/diet';
 import { exerciseQueries } from '@/database/queries/exercise';
 import { CalendarGrid, DayDetail } from '@/components/calendar';
 
-const COLLAPSE_THRESHOLD = 120; // 滑动多少 px 后完全折叠
-const FULL_HEIGHT = 340;  // 月历展开高度
-const COLLAPSED_HEIGHT = 82; // 折叠后仅显示星期标题的高度
+const COLLAPSE_THRESHOLD = 60;
+const CALENDAR_FULL_HEIGHT = 340;
+const CALENDAR_COLLAPSED_HEIGHT = 82;
 
 export default function CalendarScreen() {
   const { t } = useI18n();
@@ -37,9 +33,9 @@ export default function CalendarScreen() {
   const [month, setMonth] = useState(today.getMonth());
   const [selectedDate, setSelectedDate] = useState(todayStr);
   const [markedDates, setMarkedDates] = useState<string[]>([]);
-
-  // 折叠状态（由滚动位置计算）
   const [calendarCollapsed, setCalendarCollapsed] = useState(false);
+
+  const scrollYRef = useRef(0);
 
   useEffect(() => {
     loadMarkedDates();
@@ -71,47 +67,18 @@ export default function CalendarScreen() {
     setSelectedDate(date);
   }, []);
 
-  // 滚动驱动折叠
-  const scrollY = useSharedValue(0);
+  // 滚动时检测折叠状态
+  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const y = e.nativeEvent.contentOffset.y;
+    scrollYRef.current = y;
+    const shouldCollapse = y > COLLAPSE_THRESHOLD;
+    if (shouldCollapse !== calendarCollapsed) {
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setCalendarCollapsed(shouldCollapse);
+    }
+  }, [calendarCollapsed]);
 
-  const updateCollapsed = useCallback((v: boolean) => {
-    setCalendarCollapsed(v);
-  }, []);
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-      runOnJS(updateCollapsed)(event.contentOffset.y > COLLAPSE_THRESHOLD);
-    },
-  });
-
-  // 日历容器动画样式
-  const calendarAnimatedStyle = useAnimatedStyle(() => {
-    const height = interpolate(
-      scrollY.value,
-      [0, COLLAPSE_THRESHOLD],
-      [FULL_HEIGHT, COLLAPSED_HEIGHT],
-      Extrapolation.CLAMP
-    );
-    const opacity = interpolate(
-      scrollY.value,
-      [0, COLLAPSE_THRESHOLD],
-      [1, 0.95],
-      Extrapolation.CLAMP
-    );
-    return { height, opacity };
-  });
-
-  // 日期导航动画（折叠时显示）
-  const collapsedHeaderStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollY.value,
-      [0, COLLAPSE_THRESHOLD / 2],
-      [0, 1],
-      Extrapolation.CLAMP
-    );
-    return { opacity };
-  });
+  const calendarHeight = calendarCollapsed ? CALENDAR_COLLAPSED_HEIGHT : CALENDAR_FULL_HEIGHT;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -119,8 +86,11 @@ export default function CalendarScreen() {
         <Text style={styles.title}>{t('calendar.title')}</Text>
       </View>
 
-      {/* 月历 - 随滚动折叠 */}
-      <Animated.View style={[styles.calendarWrapper, calendarAnimatedStyle]}>
+      {/* 月历 - 绝对定位浮在 ScrollView 上方 */}
+      <View
+        style={[styles.calendarFloat, { height: calendarHeight }]}
+        pointerEvents="box-none"
+      >
         <CalendarGrid
           year={year}
           month={month}
@@ -131,32 +101,22 @@ export default function CalendarScreen() {
           onMonthChange={handleMonthChange}
           collapsed={calendarCollapsed}
         />
-      </Animated.View>
+      </View>
 
-      {/* 折叠后悬浮的选中日期 */}
-      <Animated.View style={[styles.collapsedBar, collapsedHeaderStyle]} pointerEvents="none">
-        <Text style={styles.collapsedDate} numberOfLines={1}>
-          {(() => {
-            const d = new Date(selectedDate);
-            const today = new Date();
-            if (d.toDateString() === today.toDateString()) return t('common.today');
-            return `${d.getMonth() + 1}月${d.getDate()}日`;
-          })()}
-        </Text>
-      </Animated.View>
-
-      {/* 日详情 - 可滚动 */}
-      <Animated.ScrollView
+      {/* 内容区 - paddingTop 固定为月历全高，避免布局跳变 */}
+      <ScrollView
         style={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-        onScroll={scrollHandler}
+        onScroll={handleScroll}
         scrollEventThrottle={16}
+        contentContainerStyle={{ paddingTop: CALENDAR_FULL_HEIGHT + 12 }}
       >
         <DayDetail
           date={selectedDate}
           maxDate={todayStr}
         />
-      </Animated.ScrollView>
+        <View style={{ height: 40 }} />
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -170,26 +130,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.xl,
     paddingVertical: theme.spacing.base,
     backgroundColor: theme.colors.background.primary,
+    zIndex: 20,
   },
-  title: {
-    fontSize: theme.fontSize.h2,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text.primary,
-  },
-  calendarWrapper: {
+  calendarFloat: {
+    position: 'absolute',
+    top: 56,
+    left: 12,
+    right: 12,
+    zIndex: 10,
     overflow: 'hidden',
-    marginHorizontal: theme.spacing.md,
-    marginTop: theme.spacing.md,
-  },
-  collapsedBar: {
-    paddingHorizontal: theme.spacing.xl,
-    paddingVertical: 4,
-    backgroundColor: theme.colors.background.secondary,
-  },
-  collapsedDate: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.text.tertiary,
-    textAlign: 'center',
   },
   scrollContent: {
     flex: 1,
