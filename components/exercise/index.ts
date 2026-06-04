@@ -6,3 +6,5 @@ export { DurationInput } from './DurationInput';
 export { ExerciseRecordForm } from './ExerciseRecordForm';
 export { ExerciseRecordDetail } from './ExerciseRecordDetail';
 export { ExerciseRecordList } from './ExerciseRecordList';
+export { ScreenshotPicker } from './ScreenshotPicker';
+export { ScreenshotResult } from './ScreenshotResult';

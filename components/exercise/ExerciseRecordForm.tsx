@@ -19,8 +19,11 @@ import { useI18n } from '@/hooks/useI18n';
 import { useExerciseRecords } from '@/hooks/useExerciseRecords';
 import { ExerciseTypeSelector } from './ExerciseTypeSelector';
 import { DurationInput } from './DurationInput';
+import { ScreenshotPicker } from './ScreenshotPicker';
+import { ScreenshotResult } from './ScreenshotResult';
 import { Card } from '@/components/ui';
 import { Icon } from '@/components/icons';
+import { ExerciseAnalysisResult } from '@/services/exerciseAnalysis';
 
 interface ExerciseRecordFormProps {
   initialType?: string;
@@ -68,6 +71,8 @@ export function ExerciseRecordForm({
   const [distance, setDistance] = useState(initialDistance || 0);
   const [note, setNote] = useState(initialNote);
   const [saving, setSaving] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<ExerciseAnalysisResult | null>(null);
+  const [showAnalysisResult, setShowAnalysisResult] = useState(false);
 
   // 估算卡路里
   function estimateCalories(type: string, minutes: number): number {
@@ -85,6 +90,31 @@ export function ExerciseRecordForm({
   const handleDurationChange = (minutes: number) => {
     setDuration(minutes);
     setCalories(estimateCalories(exerciseType, minutes));
+  };
+
+  // 截图分析完成
+  const handleAnalysisComplete = (result: ExerciseAnalysisResult) => {
+    setAnalysisResult(result);
+    setShowAnalysisResult(true);
+  };
+
+  // 接受分析结果
+  const handleAcceptResult = () => {
+    if (analysisResult) {
+      setExerciseType(analysisResult.exerciseType);
+      setDuration(analysisResult.durationMinutes);
+      setCalories(analysisResult.caloriesBurned);
+      if (analysisResult.distanceKm) {
+        setDistance(analysisResult.distanceKm);
+      }
+      setShowAnalysisResult(false);
+    }
+  };
+
+  // 重试分析
+  const handleRetryAnalysis = () => {
+    setAnalysisResult(null);
+    setShowAnalysisResult(false);
   };
 
   // 保存
@@ -128,6 +158,22 @@ export function ExerciseRecordForm({
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView style={styles.scrollView}>
+        {/* 截图识别 */}
+        <View style={styles.section}>
+          {showAnalysisResult && analysisResult ? (
+            <ScreenshotResult
+              result={analysisResult}
+              onAccept={handleAcceptResult}
+              onRetry={handleRetryAnalysis}
+            />
+          ) : (
+            <ScreenshotPicker
+              onAnalysisComplete={handleAnalysisComplete}
+              onError={(error) => console.error('截图分析错误:', error)}
+            />
+          )}
+        </View>
+
         {/* 运动类型 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('exercise.exerciseType')}</Text>
