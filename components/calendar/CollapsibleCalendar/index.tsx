@@ -9,7 +9,10 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from 'react-native-reanimated';
-import { GestureDetector, type PanGesture } from 'react-native-gesture-handler';
+import {
+  GestureDetector,
+  type PanGesture,
+} from 'react-native-gesture-handler';
 import { theme } from '@/constants/theme';
 import { CalendarHeader, HEADER_TOTAL_H } from './CalendarHeader';
 import { MonthGrid, MONTH_GRID_H } from './MonthGrid';
@@ -219,7 +222,8 @@ export function CollapsibleCalendar({
         </Animated.View>
       </Animated.View>
 
-      {/* 列表区 */}
+      {/* 列表区 —— listPan 用 manualActivation 精确拦截，
+          只在需要折叠/展开时才接管手势，其它情况让 FlatList native scroll 工作 */}
       <View style={styles.listContainer}>
         <GestureDetector gesture={listPan}>
           <Animated.View style={styles.listInner}>
