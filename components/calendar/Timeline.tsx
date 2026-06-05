@@ -6,8 +6,8 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
 } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { DietRecord } from '@/types/diet';
@@ -20,7 +20,9 @@ interface TimelineProps {
   dietRecords: DietRecord[];
   exerciseRecords: ExerciseRecord[];
   onItemPress: (item: TimelineItemData) => void;
-  onScroll?: (event: any) => void;
+  onScroll?: any;
+  /** 额外底部留白，保证折叠位移期间最后一条仍可滚入可视区 */
+  bottomSpacer?: number;
 }
 
 // 记录类型图标
@@ -33,7 +35,7 @@ const RECORD_ICONS: Record<string, IconName> = {
  * 时间轴组件
  * 左侧时间轴 + 右侧事件卡片，按时间升序排列
  */
-export function Timeline({ dietRecords, exerciseRecords, onItemPress, onScroll }: TimelineProps) {
+export function Timeline({ dietRecords, exerciseRecords, onItemPress, onScroll, bottomSpacer = 0 }: TimelineProps) {
   const { t } = useI18n();
 
   // 格式化时间标签
@@ -142,8 +144,8 @@ export function Timeline({ dietRecords, exerciseRecords, onItemPress, onScroll }
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false} onScroll={onScroll} scrollEventThrottle={16}>
-      <View style={styles.timeline}>
+    <Animated.ScrollView style={styles.container} showsVerticalScrollIndicator={false} onScroll={onScroll} scrollEventThrottle={16}>
+      <View style={[styles.timeline, bottomSpacer ? { paddingBottom: theme.spacing['2xl'] + bottomSpacer } : null]}>
         {timelineItems.map((item, index) => (
           <TimelineItem
             key={item.id}
@@ -154,7 +156,7 @@ export function Timeline({ dietRecords, exerciseRecords, onItemPress, onScroll }
           />
         ))}
       </View>
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }
 

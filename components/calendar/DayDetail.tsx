@@ -23,15 +23,16 @@ import { TimelineItemData } from './TimelineItem';
 interface DayDetailProps {
   date: string;
   maxDate?: string;
-  onScroll?: (event: any) => void;
-  topPadding?: number;
+  onScroll?: any;
+  bottomSpacer?: number;
 }
 
 /**
  * 日详情组件
  * 展示选定日期的统计摘要 + 时间轴记录列表
+ * 顶部留白由父容器提供（随日历折叠动画收缩）
  */
-export function DayDetail({ date, onScroll, topPadding = 360 }: DayDetailProps) {
+export function DayDetail({ date, onScroll, bottomSpacer }: DayDetailProps) {
   const { t } = useI18n();
 
   const [selectedItem, setSelectedItem] = useState<TimelineItemData | null>(null);
@@ -71,7 +72,7 @@ export function DayDetail({ date, onScroll, topPadding = 360 }: DayDetailProps) 
   }, []);
 
   return (
-    <View style={[styles.container, { paddingTop: topPadding }]}>
+    <View style={styles.container}>
       {/* 日期标签 + 统计 */}
       <View style={styles.summarySection}>
         <Text style={styles.dateLabel}>{dateLabel}</Text>
@@ -98,6 +99,7 @@ export function DayDetail({ date, onScroll, topPadding = 360 }: DayDetailProps) 
           exerciseRecords={exerciseRecords}
           onItemPress={handleItemPress}
           onScroll={onScroll}
+          bottomSpacer={bottomSpacer}
         />
       </View>
 

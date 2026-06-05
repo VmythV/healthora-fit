@@ -67,8 +67,18 @@ export function LineChart({
     );
   }
 
+  // 过滤掉无效值，防止 NaN 进入 SVG path
+  const validData = data.filter((d) => Number.isFinite(d.value));
+  if (validData.length === 0) {
+    return (
+      <View style={[styles.container, { width, height }]}>
+        <Text style={styles.noDataText}>暂无数据</Text>
+      </View>
+    );
+  }
+
   // 计算数据范围
-  const values = data.map((d) => d.value);
+  const values = validData.map((d) => d.value);
   const minValue = Math.min(...values, targetLine || Infinity);
   const maxValue = Math.max(...values);
   const valueRange = maxValue - minValue || 1;
@@ -84,8 +94,8 @@ export function LineChart({
   const chartHeight = height - paddingTop - paddingBottom;
 
   // 计算点的位置
-  const points = data.map((d, i) => ({
-    x: paddingLeft + (i / (data.length - 1)) * chartWidth,
+  const points = validData.map((d, i) => ({
+    x: paddingLeft + (validData.length > 1 ? i / (validData.length - 1) : 0.5) * chartWidth,
     y: paddingTop + ((maxValue - d.value) / valueRange) * chartHeight,
   }));
 
@@ -183,9 +193,9 @@ export function LineChart({
 
         {/* X 轴标签 */}
         {showLabels &&
-          data.map((d, i) => {
+          validData.map((d, i) => {
             // 只显示部分标签，避免重叠
-            if (data.length > 7 && i % Math.ceil(data.length / 7) !== 0) {
+            if (validData.length > 7 && i % Math.ceil(validData.length / 7) !== 0) {
               return null;
             }
             return (

@@ -8,7 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from 'react-native';
-import Animated, { FadeInLeft } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { theme } from '@/constants/theme';
 import { Icon } from '@/components/icons';
 import { IconName } from '@/components/icons/Icon';
@@ -39,7 +39,7 @@ interface TimelineItemProps {
 export function TimelineItem({ item, isLast, index, onPress }: TimelineItemProps) {
   return (
     <Animated.View
-      entering={FadeInLeft.delay(index * 80).duration(400).springify()}
+      entering={FadeIn.delay(Math.min(index, 5) * 30).duration(180)}
       style={styles.container}
     >
       {/* 左侧时间轴 */}

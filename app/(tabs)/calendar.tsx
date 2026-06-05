@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
+  useAnimatedScrollHandler,
   interpolate,
   Extrapolation,
 } from 'react-native-reanimated';
@@ -24,6 +25,8 @@ import { useWeekStartDay } from '@/hooks/useWeekStartDay';
 
 const GRID_ROW_H = 44;
 const PADDING = 16;
+const CAL_TOP_GAP = 8;   // 标题栏与日历之间的间距（与 calTop 计算一致）
+const CAL_BODY_GAP = 12; // 日历与概括之间保留的可见间距
 
 export default function CalendarScreen() {
   const { t } = useI18n();
@@ -40,7 +43,6 @@ export default function CalendarScreen() {
   const [calHeaderH, setCalHeaderH] = useState(60);
   const [calTop, setCalTop] = useState(60);
   const fullGridH = 6 * GRID_ROW_H;
-  const fullCalH = calHeaderH + fullGridH + PADDING;
 
   const selectedRow = useMemo(() => {
     const d = new Date(selectedDate);
@@ -81,9 +83,14 @@ export default function CalendarScreen() {
 
   const timelineScrollY = useSharedValue(0);
 
-  const handleTimelineScroll = useCallback((event: any) => {
-    timelineScrollY.value = event.nativeEvent.contentOffset.y;
-  }, [timelineScrollY]);
+  // 滚动驱动 —— 在 UI 线程直接回写 shared value，避免过桥掉帧
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    timelineScrollY.value = event.contentOffset.y;
+  });
+
+  // 折叠位移量：完整网格 → 单周
+  const collapseDelta = fullGridH - GRID_ROW_H;
+  const weekCalH = calHeaderH + GRID_ROW_H + PADDING;
 
   // 日历高度动画
   const calAnimatedStyle = useAnimatedStyle(() => {
@@ -102,13 +109,26 @@ export default function CalendarScreen() {
     return { transform: [{ translateY: -progress * selectedRow * GRID_ROW_H }] };
   });
 
+  // body 位移动画 —— 用 transform 代替 paddingTop，避免每帧 relayout。
+  // 初始下移 collapseDelta（位于完整日历下方），随折叠归零，
+  // 让「概括」贴着日历底部一起上移，折叠到周后停住。
+  const bodyAnimatedStyle = useAnimatedStyle(() => {
+    const ty = interpolate(
+      timelineScrollY.value,
+      [0, fullGridH],
+      [collapseDelta, 0],
+      Extrapolation.CLAMP
+    );
+    return { transform: [{ translateY: ty }] };
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       {/* 标题栏 */}
       <View
         style={styles.header}
         onLayout={(e) => {
-          setCalTop(e.nativeEvent.layout.y + e.nativeEvent.layout.height + 8);
+          setCalTop(e.nativeEvent.layout.y + e.nativeEvent.layout.height + CAL_TOP_GAP);
         }}
       >
         <Text style={styles.title}>{t('calendar.title')}</Text>
@@ -130,15 +150,15 @@ export default function CalendarScreen() {
         </Animated.View>
       </Animated.View>
 
-      {/* 概括 + 时间线（填充剩余空间） */}
-      <View style={styles.bodyContainer}>
+      {/* 概括 + 时间线 —— 固定 paddingTop=单周高度+间距，整体用 transform 下移/归位 */}
+      <Animated.View style={[styles.bodyContainer, { paddingTop: weekCalH + CAL_TOP_GAP + CAL_BODY_GAP }, bodyAnimatedStyle]}>
         <DayDetail
           date={selectedDate}
           maxDate={todayStr}
-          onScroll={handleTimelineScroll}
-          topPadding={fullCalH}
+          onScroll={scrollHandler}
+          bottomSpacer={collapseDelta}
         />
-      </View>
+      </Animated.View>
     </SafeAreaView>
   );
 }

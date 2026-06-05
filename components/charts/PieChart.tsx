@@ -80,8 +80,18 @@ export function PieChart({
     );
   }
 
+  // 过滤掉无效值，防止 NaN 进入 SVG path
+  const validData = data.filter((d) => Number.isFinite(d.value));
+  if (validData.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.noDataText}>暂无数据</Text>
+      </View>
+    );
+  }
+
   // 计算总量
-  const total = data.reduce((sum, d) => sum + d.value, 0);
+  const total = validData.reduce((sum, d) => sum + d.value, 0);
 
   if (total === 0) {
     return (
@@ -98,7 +108,7 @@ export function PieChart({
   // 计算每个扇形的路径
   let currentAngle = -90; // 从顶部开始
 
-  const segments = data.map((d, i) => {
+  const segments = validData.map((d, i) => {
     const percentage = (d.value / total) * 100;
     const angle = (d.value / total) * 360;
     const startAngle = currentAngle;

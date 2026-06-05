@@ -2,7 +2,7 @@
 // 数据导入导出服务
 
 import { logger } from '@/utils/logger';
-import * as FileSystem from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import { database } from '@/database';
@@ -67,25 +67,23 @@ export const dataTransferService = {
       // 转换为 JSON 字符串
       const jsonString = JSON.stringify(exportData, null, 2);
 
-      // 保存到临时文件
+      // 保存到文档目录（expo-file-system 19.x: File API，默认 UTF-8）
       const fileName = `healthora-fit-backup-${new Date().toISOString().split('T')[0]}.json`;
-      const filePath = `${FileSystem.documentDirectory}${fileName}`;
-
-      await FileSystem.writeAsStringAsync(filePath, jsonString, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
+      const file = new File(Paths.document, fileName);
+      file.create({ overwrite: true });
+      file.write(jsonString);
 
       // 分享文件
       const isAvailable = await Sharing.isAvailableAsync();
       if (isAvailable) {
-        await Sharing.shareAsync(filePath, {
+        await Sharing.shareAsync(file.uri, {
           mimeType: 'application/json',
           dialogTitle: '导出 Healthora Fit 数据',
           UTI: 'public.json',
         });
       }
 
-      return filePath;
+      return file.uri;
     } catch (error) {
       logger.error('[DataTransfer] Export failed:', error);
       throw new Error('数据导出失败');
@@ -109,10 +107,8 @@ export const dataTransferService = {
 
       const fileUri = result.assets[0].uri;
 
-      // 读取文件内容
-      const jsonString = await FileSystem.readAsStringAsync(fileUri, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
+      // 读取文件内容（expo-file-system 19.x: File API，默认 UTF-8）
+      const jsonString = await new File(fileUri).text();
 
       // 解析 JSON
       const importData: ExportData = JSON.parse(jsonString);
@@ -136,15 +132,15 @@ export const dataTransferService = {
           try {
             await dietQueries.insert({
               timestamp: record.timestamp,
-              photoUri: record.photo_uri,
-              foodsJson: record.foods_json,
-              totalCalories: record.total_calories,
-              totalProtein: record.total_protein,
-              totalCarbs: record.total_carbs,
-              totalFat: record.total_fat,
-              mealType: record.meal_type,
+              photoUri: record.photoUri,
+              foodsJson: record.foodsJson,
+              totalCalories: record.totalCalories,
+              totalProtein: record.totalProtein,
+              totalCarbs: record.totalCarbs,
+              totalFat: record.totalFat,
+              mealType: record.mealType,
               note: record.note,
-              isEdited: record.is_edited === 1,
+              isEdited: record.isEdited === 1 || record.isEdited === true,
             });
             counts.dietRecords++;
           } catch (e) {
@@ -159,14 +155,14 @@ export const dataTransferService = {
           try {
             await exerciseQueries.insert({
               timestamp: record.timestamp,
-              exerciseType: record.exercise_type,
-              durationMinutes: record.duration_minutes,
-              caloriesBurned: record.calories_burned,
-              distanceKm: record.distance_km,
-              heartRateAvg: record.heart_rate_avg,
+              exerciseType: record.exerciseType,
+              durationMinutes: record.durationMinutes,
+              caloriesBurned: record.caloriesBurned,
+              distanceKm: record.distanceKm,
+              heartRateAvg: record.heartRateAvg,
               source: record.source,
-              screenshotUri: record.screenshot_uri,
-              rawData: record.raw_data,
+              screenshotUri: record.screenshotUri,
+              rawData: record.rawData,
               note: record.note,
             });
             counts.exerciseRecords++;
@@ -183,8 +179,8 @@ export const dataTransferService = {
             await weightQueries.insert({
               timestamp: record.timestamp,
               weight: record.weight,
-              bodyFatPercentage: record.body_fat_percentage,
-              muscleMass: record.muscle_mass,
+              bodyFatPercentage: record.bodyFatPercentage,
+              muscleMass: record.muscleMass,
               source: record.source,
               note: record.note,
             });
@@ -200,11 +196,11 @@ export const dataTransferService = {
         for (const goal of importData.data.goals) {
           try {
             await goalQueries.set({
-              goalType: goal.goal_type,
-              targetValue: goal.target_value,
-              startValue: goal.start_value,
-              startDate: goal.start_date,
-              targetDate: goal.target_date,
+              goalType: goal.goalType,
+              targetValue: goal.targetValue,
+              startValue: goal.startValue,
+              startDate: goal.startDate,
+              targetDate: goal.targetDate,
             });
             counts.goals++;
           } catch (e) {
@@ -218,9 +214,9 @@ export const dataTransferService = {
         for (const config of importData.data.aiConfig) {
           try {
             await aiConfigQueries.save({
-              apiEndpoint: config.api_endpoint,
+              apiEndpoint: config.apiEndpoint,
               apiKey: '', // 不导入 API Key
-              modelName: config.model_name,
+              modelName: config.modelName,
             });
             counts.aiConfig++;
           } catch (e) {
