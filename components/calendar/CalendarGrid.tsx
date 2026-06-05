@@ -1,7 +1,7 @@
 // components/calendar/CalendarGrid.tsx
 // 日历网格组件
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
   runOnJS,
 } from 'react-native-reanimated';
 import { theme } from '@/constants/theme';
@@ -27,7 +28,6 @@ interface CalendarGridProps {
   maxDate?: string; // YYYY-MM-DD，最大可选日期
   onDatePress?: (date: string) => void;
   onMonthChange?: (year: number, month: number) => void;
-  collapsed?: boolean; // 折叠模式：只显示选中日期所在周
   onHeaderLayout?: (height: number) => void; // 回调测量头部高度
 }
 
@@ -44,7 +44,6 @@ export function CalendarGrid({
   maxDate,
   onDatePress,
   onMonthChange,
-  collapsed = false,
   onHeaderLayout,
 }: CalendarGridProps) {
   const { t } = useI18n();
@@ -53,6 +52,19 @@ export function CalendarGrid({
   // 动画值
   const translateX = useSharedValue(0);
   const isGestureActive = useSharedValue(false);
+
+  // 测量容器宽度（用于切月动画的位移幅度）
+  const [containerW, setContainerW] = useState(320);
+
+  // 判断是否可以跳转到下个月（必须在 handleNextMonth 之前定义）
+  const canGoNextMonth = useCallback(() => {
+    if (!maxDate) return true;
+    const maxDateObj = new Date(maxDate);
+    const nextMonth = new Date(year, month + 1, 1);
+    return nextMonth.getFullYear() < maxDateObj.getFullYear() ||
+           (nextMonth.getFullYear() === maxDateObj.getFullYear() &&
+            nextMonth.getMonth() <= maxDateObj.getMonth());
+  }, [year, month, maxDate]);
 
   // 上个月
   const handlePrevMonth = useCallback(() => {
@@ -73,36 +85,73 @@ export function CalendarGrid({
     }
   }, [year, month, onMonthChange, canGoNextMonth]);
 
-  // 滑动手势
+  // 按钮点击切月：复用滑入滑出动画
+  const animateToNextMonth = useCallback(() => {
+    if (!canGoNextMonth()) return;
+    const w = containerW;
+    translateX.value = withTiming(-w, { duration: 180 }, (finished) => {
+      'worklet';
+      if (!finished) return;
+      runOnJS(handleNextMonth)();
+      translateX.value = w;
+      translateX.value = withTiming(0, { duration: 200 });
+    });
+  }, [containerW, handleNextMonth, canGoNextMonth, translateX]);
+
+  const animateToPrevMonth = useCallback(() => {
+    const w = containerW;
+    translateX.value = withTiming(w, { duration: 180 }, (finished) => {
+      'worklet';
+      if (!finished) return;
+      runOnJS(handlePrevMonth)();
+      translateX.value = -w;
+      translateX.value = withTiming(0, { duration: 200 });
+    });
+  }, [containerW, handlePrevMonth, translateX]);
+
+  // 滑动手势 —— 主轴判定避免误触：水平超 10px 才接管，竖向超 10px 直接失败让 ScrollView 接管
   const panGesture = Gesture.Pan()
+    .activeOffsetX([-10, 10])
+    .failOffsetY([-10, 10])
     .onStart(() => {
       isGestureActive.value = true;
     })
     .onUpdate((event) => {
-      // 限制滑动幅度，最大为 30px
-      const maxTranslation = 30;
+      // 阻尼 0.6 跟手感更紧；最大位移 60px
+      const maxTranslation = 60;
       const clampedTranslation = Math.max(
         -maxTranslation,
-        Math.min(maxTranslation, event.translationX * 0.3)
+        Math.min(maxTranslation, event.translationX * 0.6)
       );
       translateX.value = clampedTranslation;
     })
     .onEnd((event) => {
       isGestureActive.value = false;
-      const threshold = 20;
+      const threshold = 60; // 提升阈值降低误触
+      const w = containerW;
       if (event.translationX < -threshold) {
-        // 向左滑动，切换到下个月
-        runOnJS(handleNextMonth)();
+        // 向左滑动 → 切下个月：当前月滑出 → setState → 新月从右侧滑入
+        translateX.value = withTiming(-w, { duration: 180 }, (finished) => {
+          if (!finished) return;
+          runOnJS(handleNextMonth)();
+          translateX.value = w;
+          translateX.value = withTiming(0, { duration: 200 });
+        });
       } else if (event.translationX > threshold) {
-        // 向右滑动，切换到上个月
-        runOnJS(handlePrevMonth)();
+        translateX.value = withTiming(w, { duration: 180 }, (finished) => {
+          if (!finished) return;
+          runOnJS(handlePrevMonth)();
+          translateX.value = -w;
+          translateX.value = withTiming(0, { duration: 200 });
+        });
+      } else {
+        // 未达阈值：平滑回弹
+        translateX.value = withSpring(0, {
+          damping: 20,
+          stiffness: 200,
+          mass: 0.5,
+        });
       }
-      // 平滑回弹动画
-      translateX.value = withSpring(0, {
-        damping: 20,
-        stiffness: 200,
-        mass: 0.5,
-      });
     });
 
   // 动画样式
@@ -152,16 +201,6 @@ export function CalendarGrid({
     return dateStr > maxDate;
   };
 
-  // 判断是否可以跳转到下个月
-  const canGoNextMonth = useCallback(() => {
-    if (!maxDate) return true;
-    const maxDateObj = new Date(maxDate);
-    const nextMonth = new Date(year, month + 1, 1);
-    return nextMonth.getFullYear() < maxDateObj.getFullYear() ||
-           (nextMonth.getFullYear() === maxDateObj.getFullYear() &&
-            nextMonth.getMonth() <= maxDateObj.getMonth());
-  }, [year, month, maxDate]);
-
   // 计算实际行数
   const getActualRows = () => {
     const daysInMonth = getDaysInMonth(year, month);
@@ -169,15 +208,6 @@ export function CalendarGrid({
     const totalCells = firstDay + daysInMonth;
     return Math.ceil(totalCells / 7);
   };
-
-  // 计算选中日期所在行（0-based）
-  const selectedRow = useMemo(() => {
-    if (!selectedDate) return 0;
-    const [y, m, d] = selectedDate.split('-').map(Number);
-    if (y !== year || m !== month + 1) return 0;
-    const firstDay = getFirstDayOfMonth(year, month);
-    return Math.floor((firstDay + d - 1) / 7);
-  }, [selectedDate, year, month]);
 
   // 渲染日历网格（固定 6 行，填充上月/下月日期）- useMemo 优化切换月卡顿
   const calendarDays = useMemo(() => {
@@ -208,10 +238,8 @@ export function CalendarGrid({
           ]}
           onPress={() => {
             if (!future) {
-              // 跳转到上个月
-              handlePrevMonth();
-              // 延迟选中日期
-              setTimeout(() => onDatePress?.(dateStr), 100);
+              // 邻月日期一步到位：父组件会自动同步 year/month
+              onDatePress?.(dateStr);
             }
           }}
           activeOpacity={future ? 1 : 0.7}
@@ -288,10 +316,8 @@ export function CalendarGrid({
           ]}
           onPress={() => {
             if (!future) {
-              // 跳转到下个月
-              handleNextMonth();
-              // 延迟选中日期
-              setTimeout(() => onDatePress?.(dateStr), 100);
+              // 邻月日期一步到位：父组件会自动同步 year/month
+              onDatePress?.(dateStr);
             }
           }}
           activeOpacity={future ? 1 : 0.7}
@@ -321,19 +347,22 @@ export function CalendarGrid({
 
   return (
     <GestureDetector gesture={panGesture}>
-      <Animated.View style={[styles.container, animatedStyle]}>
+      <Animated.View
+        style={[styles.container, animatedStyle]}
+        onLayout={(e) => setContainerW(e.nativeEvent.layout.width)}
+      >
         {/* 月份导航 + 星期标题（测量高度） */}
         <View
           onLayout={(e) => onHeaderLayout?.(e.nativeEvent.layout.height)}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={handlePrevMonth} style={styles.navButton}>
+          <TouchableOpacity onPress={animateToPrevMonth} style={styles.navButton}>
             <Text style={styles.navText}>‹</Text>
           </TouchableOpacity>
           <Text style={styles.monthTitle}>
             {year}年{monthNames[month]}
           </Text>
           <TouchableOpacity
-            onPress={handleNextMonth}
+            onPress={animateToNextMonth}
             style={[styles.navButton, !canGoNextMonth() && styles.navButtonDisabled]}
             disabled={!canGoNextMonth()}
           >
@@ -359,14 +388,8 @@ export function CalendarGrid({
         </View>
 
         {/* 日期网格 */}
-        <View style={[styles.daysGrid, collapsed && { height: 44, overflow: 'hidden' }]}>
-          {collapsed ? (
-            <View style={{ marginTop: -selectedRow * 44 }}>
-              {calendarDays}
-            </View>
-          ) : (
-            calendarDays
-          )}
+        <View style={styles.daysGrid}>
+          {calendarDays}
         </View>
       </Animated.View>
     </GestureDetector>
@@ -428,14 +451,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: theme.spacing.xs,
+    position: 'relative',
   },
   dayText: {
     fontSize: theme.fontSize.body,
     color: theme.colors.text.primary,
   },
   todayCell: {
-    backgroundColor: theme.colors.primary.light,
+    backgroundColor: theme.colors.background.primary,
     borderRadius: theme.borderRadius.full,
+    borderWidth: 1.5,
+    borderColor: theme.colors.primary.main,
   },
   todayText: {
     color: theme.colors.primary.main,
@@ -444,32 +470,36 @@ const styles = StyleSheet.create({
   selectedCell: {
     backgroundColor: theme.colors.primary.main,
     borderRadius: theme.borderRadius.full,
+    borderWidth: 0,
   },
   selectedText: {
     color: '#FFFFFF',
     fontWeight: theme.fontWeight.bold,
   },
+  // 「有记录」角标：右上角小圆点（既不挡数字，也在选中态下清晰可见）
   dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    position: 'absolute',
+    top: 6,
+    right: 10,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
     backgroundColor: theme.colors.primary.main,
-    marginTop: 2,
   },
   dotSelected: {
     backgroundColor: '#FFFFFF',
   },
   disabledCell: {
-    opacity: 0.4,
+    opacity: 0.35,
   },
   disabledText: {
     color: theme.colors.text.tertiary,
   },
   otherMonthDay: {
-    opacity: 0.5,
+    // 邻月使用纯灰文字而不是透明度，与当月低对比明显区分
   },
   otherMonthText: {
-    color: theme.colors.text.tertiary,
+    color: '#9CA3AF', // gray-400，比 text.tertiary 更弱
   },
   navButtonDisabled: {
     opacity: 0.3,

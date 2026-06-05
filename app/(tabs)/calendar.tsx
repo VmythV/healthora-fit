@@ -2,7 +2,7 @@
 // 日志页面 - 三区布局：日历(绝对定位) + 概括 + 时间线
 
 import { logger } from '@/utils/logger';
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,9 +13,14 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   useAnimatedScrollHandler,
+  useAnimatedRef,
   interpolate,
   Extrapolation,
+  scrollTo,
+  withTiming,
+  runOnJS,
 } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { dietQueries } from '@/database/queries/diet';
@@ -79,9 +84,18 @@ export default function CalendarScreen() {
 
   const handleDatePress = useCallback((date: string) => {
     setSelectedDate(date);
-  }, []);
+    // 若日期不在当前显示月内，自动同步 year/month（邻月点击/外部跳转都走这一路）
+    const [y, m] = date.split('-').map(Number);
+    if (y !== year || m - 1 !== month) {
+      setYear(y);
+      setMonth(m - 1);
+    }
+  }, [year, month]);
 
   const timelineScrollY = useSharedValue(0);
+  const listRef = useAnimatedRef<Animated.ScrollView>();
+  // Pan 起始时锁住的 scrollY，避免手势中累加偏差
+  const panStartY = useSharedValue(0);
 
   // 滚动驱动 —— 在 UI 线程直接回写 shared value，避免过桥掉帧
   const scrollHandler = useAnimatedScrollHandler((event) => {
@@ -91,6 +105,47 @@ export default function CalendarScreen() {
   // 折叠位移量：完整网格 → 单周
   const collapseDelta = fullGridH - GRID_ROW_H;
   const weekCalH = calHeaderH + GRID_ROW_H + PADDING;
+
+  // Snap 吸附 —— 手指/惯性结束时，若停在中间态则吸到最近的端点
+  const snapToNearest = useCallback((y: number) => {
+    if (y > 0 && y < fullGridH) {
+      const target = y > fullGridH / 2 ? fullGridH : 0;
+      (listRef.current as any)?.scrollTo({ y: target, animated: true });
+    }
+  }, [fullGridH, listRef]);
+
+  const handleScrollEndDrag = useCallback((e: any) => {
+    snapToNearest(e.nativeEvent.contentOffset.y);
+  }, [snapToNearest]);
+
+  const handleMomentumScrollEnd = useCallback((e: any) => {
+    snapToNearest(e.nativeEvent.contentOffset.y);
+  }, [snapToNearest]);
+
+  // 月历区竖向 Pan：上滑折叠 / 下拉展开（驱动 list 滚动）
+  // 用 worklet scrollTo 直接驱动 UI 线程，不经 JS 桥
+  const calPanGesture = useMemo(() =>
+    Gesture.Pan()
+      .activeOffsetY([-8, 8])
+      .failOffsetX([-15, 15])
+      .onStart(() => {
+        'worklet';
+        panStartY.value = timelineScrollY.value;
+      })
+      .onUpdate((e) => {
+        'worklet';
+        const next = Math.max(0, Math.min(fullGridH, panStartY.value - e.translationY));
+        scrollTo(listRef, 0, next, false);
+      })
+      .onEnd(() => {
+        'worklet';
+        const y = timelineScrollY.value;
+        if (y > 0 && y < fullGridH) {
+          const target = y > fullGridH / 2 ? fullGridH : 0;
+          scrollTo(listRef, 0, target, true);
+        }
+      }),
+  [fullGridH, listRef, panStartY, timelineScrollY]);
 
   // 日历高度动画
   const calAnimatedStyle = useAnimatedStyle(() => {
@@ -134,21 +189,23 @@ export default function CalendarScreen() {
         <Text style={styles.title}>{t('calendar.title')}</Text>
       </View>
 
-      {/* 日历 - 绝对定位，高度变化不干扰布局 */}
-      <Animated.View style={[styles.calFloat, { top: calTop }, calAnimatedStyle]}>
-        <Animated.View style={calInnerStyle}>
-          <CalendarGrid
-            year={year}
-            month={month}
-            selectedDate={selectedDate}
-            markedDates={markedDates}
-            maxDate={todayStr}
-            onDatePress={handleDatePress}
-            onMonthChange={handleMonthChange}
-            onHeaderLayout={setCalHeaderH}
-          />
+      {/* 日历 - 绝对定位，高度变化不干扰布局；外层 Pan 手势可上下拖拽折叠/展开 */}
+      <GestureDetector gesture={calPanGesture}>
+        <Animated.View style={[styles.calFloat, { top: calTop }, calAnimatedStyle]}>
+          <Animated.View style={calInnerStyle}>
+            <CalendarGrid
+              year={year}
+              month={month}
+              selectedDate={selectedDate}
+              markedDates={markedDates}
+              maxDate={todayStr}
+              onDatePress={handleDatePress}
+              onMonthChange={handleMonthChange}
+              onHeaderLayout={setCalHeaderH}
+            />
+          </Animated.View>
         </Animated.View>
-      </Animated.View>
+      </GestureDetector>
 
       {/* 概括 + 时间线 —— 固定 paddingTop=单周高度+间距，整体用 transform 下移/归位 */}
       <Animated.View style={[styles.bodyContainer, { paddingTop: weekCalH + CAL_TOP_GAP + CAL_BODY_GAP }, bodyAnimatedStyle]}>
@@ -157,6 +214,9 @@ export default function CalendarScreen() {
           maxDate={todayStr}
           onScroll={scrollHandler}
           bottomSpacer={collapseDelta}
+          onScrollEndDrag={handleScrollEndDrag}
+          onMomentumScrollEnd={handleMomentumScrollEnd}
+          scrollRef={listRef}
         />
       </Animated.View>
     </SafeAreaView>

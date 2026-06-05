@@ -12,7 +12,7 @@ import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { useDietRecords } from '@/hooks/useDietRecords';
 import { useExerciseRecords } from '@/hooks/useExerciseRecords';
-import { Card, Modal } from '@/components/ui';
+import { Modal } from '@/components/ui';
 import { DietRecordDetail } from '@/components/diet/DietRecordDetail';
 import { ExerciseRecordDetail } from '@/components/exercise/ExerciseRecordDetail';
 import { DietRecord } from '@/types/diet';
@@ -25,6 +25,9 @@ interface DayDetailProps {
   maxDate?: string;
   onScroll?: any;
   bottomSpacer?: number;
+  onScrollEndDrag?: any;
+  onMomentumScrollEnd?: any;
+  scrollRef?: any;
 }
 
 /**
@@ -32,7 +35,14 @@ interface DayDetailProps {
  * 展示选定日期的统计摘要 + 时间轴记录列表
  * 顶部留白由父容器提供（随日历折叠动画收缩）
  */
-export function DayDetail({ date, onScroll, bottomSpacer }: DayDetailProps) {
+export function DayDetail({
+  date,
+  onScroll,
+  bottomSpacer,
+  onScrollEndDrag,
+  onMomentumScrollEnd,
+  scrollRef,
+}: DayDetailProps) {
   const { t } = useI18n();
 
   const [selectedItem, setSelectedItem] = useState<TimelineItemData | null>(null);
@@ -41,13 +51,13 @@ export function DayDetail({ date, onScroll, bottomSpacer }: DayDetailProps) {
   const { records: exerciseRecords } = useExerciseRecords(date);
 
   // 计算统计
-  const { totalCalories, totalExerciseCalories, totalRecords } = useMemo(() => {
+  const { totalCalories, totalExerciseCalories, netCalories } = useMemo(() => {
     const cal = dietRecords.reduce((sum, r) => sum + (r.totalCalories || 0), 0);
     const exerciseCal = exerciseRecords.reduce((sum, r) => sum + (r.caloriesBurned || 0), 0);
     return {
       totalCalories: cal,
       totalExerciseCalories: exerciseCal,
-      totalRecords: dietRecords.length + exerciseRecords.length,
+      netCalories: cal - exerciseCal,
     };
   }, [dietRecords, exerciseRecords]);
 
@@ -77,18 +87,41 @@ export function DayDetail({ date, onScroll, bottomSpacer }: DayDetailProps) {
       <View style={styles.summarySection}>
         <Text style={styles.dateLabel}>{dateLabel}</Text>
         <View style={styles.statsRow}>
-          <Card style={styles.statCard} shadow="none">
-            <Text style={styles.statValue}>{totalCalories}</Text>
+          <View style={[styles.statCard, styles.statCardIn]}>
             <Text style={styles.statLabel}>{t('calendar.caloriesIn')}</Text>
-          </Card>
-          <Card style={styles.statCard} shadow="none">
-            <Text style={styles.statValue}>{totalExerciseCalories}</Text>
+            <View style={styles.statValueRow}>
+              <Text style={[styles.statValue, { color: theme.colors.warning }]}>{totalCalories}</Text>
+              <Text style={styles.statUnit}>{t('home.kcal')}</Text>
+            </View>
+          </View>
+          <View style={[styles.statCard, styles.statCardOut]}>
             <Text style={styles.statLabel}>{t('calendar.caloriesOut')}</Text>
-          </Card>
-          <Card style={styles.statCard} shadow="none">
-            <Text style={styles.statValue}>{totalRecords}</Text>
-            <Text style={styles.statLabel}>{t('calendar.status')}</Text>
-          </Card>
+            <View style={styles.statValueRow}>
+              <Text style={[styles.statValue, { color: theme.colors.primary.main }]}>{totalExerciseCalories}</Text>
+              <Text style={styles.statUnit}>{t('home.kcal')}</Text>
+            </View>
+          </View>
+          <View style={[styles.statCard, styles.statCardNet]}>
+            <Text style={styles.statLabel}>{t('calendar.caloriesNet')}</Text>
+            <View style={styles.statValueRow}>
+              <Text
+                style={[
+                  styles.statValue,
+                  {
+                    color:
+                      netCalories > 0
+                        ? theme.colors.warning
+                        : netCalories < 0
+                        ? theme.colors.primary.main
+                        : theme.colors.text.secondary,
+                  },
+                ]}
+              >
+                {netCalories > 0 ? `+${netCalories}` : netCalories}
+              </Text>
+              <Text style={styles.statUnit}>{t('home.kcal')}</Text>
+            </View>
+          </View>
         </View>
       </View>
 
@@ -100,6 +133,9 @@ export function DayDetail({ date, onScroll, bottomSpacer }: DayDetailProps) {
           onItemPress={handleItemPress}
           onScroll={onScroll}
           bottomSpacer={bottomSpacer}
+          onScrollEndDrag={onScrollEndDrag}
+          onMomentumScrollEnd={onMomentumScrollEnd}
+          scrollRef={scrollRef}
         />
       </View>
 
@@ -156,18 +192,39 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    padding: theme.spacing.sm,
-    alignItems: 'center',
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
+    borderRadius: theme.borderRadius.md,
+    backgroundColor: theme.colors.background.secondary,
+    borderLeftWidth: 3,
   },
-  statValue: {
-    fontSize: theme.fontSize.h4,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.primary.main,
+  statCardIn: {
+    borderLeftColor: theme.colors.warning,
+  },
+  statCardOut: {
+    borderLeftColor: theme.colors.primary.main,
+  },
+  statCardNet: {
+    borderLeftColor: theme.colors.border.main,
   },
   statLabel: {
     fontSize: theme.fontSize.caption,
     color: theme.colors.text.tertiary,
-    marginTop: 2,
+    marginBottom: 2,
+  },
+  statValueRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 3,
+  },
+  statValue: {
+    fontSize: theme.fontSize.h4,
+    fontWeight: theme.fontWeight.bold,
+  },
+  statUnit: {
+    fontSize: theme.fontSize.tiny,
+    color: theme.colors.text.tertiary,
+    fontWeight: theme.fontWeight.medium,
   },
   timelineSection: {
     flex: 1,

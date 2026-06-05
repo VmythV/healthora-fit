@@ -47,6 +47,7 @@ export const COLORS = {
   // 语义色
   success: '#10B981',
   warning: '#F59E0B',
+  warningLight: '#FEF3C7',
   error: '#EF4444',
   info: '#3B82F6',
 };
@@ -95,6 +96,7 @@ export const lightTheme = {
     // 状态色
     success: COLORS.success,
     warning: COLORS.warning,
+    warningLight: COLORS.warningLight,
     error: COLORS.error,
     info: COLORS.info,
 
@@ -153,6 +155,7 @@ export const lightTheme = {
 
   // 字重
   fontWeight: {
+    light: '300' as const,
     regular: '400' as const,
     medium: '500' as const,
     semibold: '600' as const,

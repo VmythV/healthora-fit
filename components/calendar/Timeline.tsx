@@ -6,15 +6,17 @@ import {
   View,
   Text,
   StyleSheet,
+  TouchableOpacity,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
+import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { DietRecord } from '@/types/diet';
 import { ExerciseRecord } from '@/types/exercise';
-import { Empty } from '@/components/ui';
-import { TimelineItem, TimelineItemData } from './TimelineItem';
+import { Icon } from '@/components/icons';
 import { IconName } from '@/components/icons/Icon';
+import { TimelineItem, TimelineItemData } from './TimelineItem';
 
 interface TimelineProps {
   dietRecords: DietRecord[];
@@ -23,6 +25,11 @@ interface TimelineProps {
   onScroll?: any;
   /** 额外底部留白，保证折叠位移期间最后一条仍可滚入可视区 */
   bottomSpacer?: number;
+  /** Snap 处理：滚动结束的事件（用于 #1 防半折叠） */
+  onScrollEndDrag?: any;
+  onMomentumScrollEnd?: any;
+  /** 外部 ref，用于 scrollTo */
+  scrollRef?: any;
 }
 
 // 记录类型图标
@@ -35,8 +42,18 @@ const RECORD_ICONS: Record<string, IconName> = {
  * 时间轴组件
  * 左侧时间轴 + 右侧事件卡片，按时间升序排列
  */
-export function Timeline({ dietRecords, exerciseRecords, onItemPress, onScroll, bottomSpacer = 0 }: TimelineProps) {
+export function Timeline({
+  dietRecords,
+  exerciseRecords,
+  onItemPress,
+  onScroll,
+  bottomSpacer = 0,
+  onScrollEndDrag,
+  onMomentumScrollEnd,
+  scrollRef,
+}: TimelineProps) {
   const { t } = useI18n();
+  const router = useRouter();
 
   // 格式化时间标签
   const formatTimeLabel = (timestamp: string): string => {
@@ -46,47 +63,45 @@ export function Timeline({ dietRecords, exerciseRecords, onItemPress, onScroll, 
     return `${h}:${m}`;
   };
 
-  // 构建饮食记录的详情文本
-  const buildDietDetail = (record: DietRecord): string => {
-    const parts: string[] = [];
-    if (record.totalCalories) {
-      parts.push(`${record.totalCalories} ${t('home.kcal')}`);
-    }
-    if (record.totalProtein) {
-      parts.push(`${t('diet.protein')} ${record.totalProtein}g`);
-    }
-    if (record.note) {
-      parts.push(record.note);
-    }
-    // 尝试解析食物列表
+  // 构建饮食记录字段
+  const buildDietFields = (record: DietRecord): { subtitle?: string; meta?: string } => {
+    let subtitle: string | undefined;
+    // 尝试解析食物列表 → subtitle
     if (record.foodsJson) {
       try {
         const foods = JSON.parse(record.foodsJson);
         if (Array.isArray(foods) && foods.length > 0) {
-          const foodNames = foods.slice(0, 3).map((f: any) => f.name).join(', ');
-          parts.unshift(foodNames);
+          subtitle = foods.slice(0, 3).map((f: any) => f.name).filter(Boolean).join('、');
         }
       } catch {}
     }
-    return parts.join(' · ');
+    // 营养数据 → meta
+    const metaParts: string[] = [];
+    if (record.totalCalories) {
+      metaParts.push(`${record.totalCalories} ${t('home.kcal')}`);
+    }
+    if (record.totalProtein) {
+      metaParts.push(`${t('diet.protein')} ${record.totalProtein}g`);
+    }
+    return { subtitle, meta: metaParts.join(' · ') || undefined };
   };
 
-  // 构建运动记录的详情文本
-  const buildExerciseDetail = (record: ExerciseRecord): string => {
-    const parts: string[] = [];
+  // 构建运动记录字段
+  const buildExerciseFields = (record: ExerciseRecord): { subtitle?: string; meta?: string } => {
+    // 时长 + 距离 → subtitle（核心数据）
+    const subParts: string[] = [];
     if (record.durationMinutes) {
-      parts.push(`${record.durationMinutes} ${t('home.minutes')}`);
-    }
-    if (record.caloriesBurned) {
-      parts.push(`${t('exercise.caloriesBurned')} ${record.caloriesBurned} ${t('home.kcal')}`);
+      subParts.push(`${record.durationMinutes} ${t('home.minutes')}`);
     }
     if (record.distanceKm) {
-      parts.push(`${record.distanceKm} ${t('exercise.km')}`);
+      subParts.push(`${record.distanceKm} ${t('exercise.km')}`);
     }
-    if (record.note) {
-      parts.push(record.note);
+    // 消耗 → meta
+    let meta: string | undefined;
+    if (record.caloriesBurned) {
+      meta = `${t('exercise.caloriesBurned')} ${record.caloriesBurned} ${t('home.kcal')}`;
     }
-    return parts.join(' · ');
+    return { subtitle: subParts.join(' · ') || undefined, meta };
   };
 
   // 合并并排序所有记录
@@ -98,13 +113,16 @@ export function Timeline({ dietRecords, exerciseRecords, onItemPress, onScroll, 
       const mealName = record.mealType
         ? t(`mealType.${record.mealType}`)
         : t('record.diet.title');
+      const { subtitle, meta } = buildDietFields(record);
       items.push({
         id: `diet-${record.id}`,
         type: 'diet',
         time: record.timestamp,
         timeLabel: formatTimeLabel(record.timestamp),
         title: mealName,
-        detail: buildDietDetail(record),
+        subtitle,
+        meta,
+        note: record.note || undefined,
         iconName: RECORD_ICONS.diet,
         record,
       });
@@ -113,13 +131,16 @@ export function Timeline({ dietRecords, exerciseRecords, onItemPress, onScroll, 
     // 添加运动记录
     exerciseRecords.forEach((record) => {
       const typeName = t(`exerciseType.${record.exerciseType}`);
+      const { subtitle, meta } = buildExerciseFields(record);
       items.push({
         id: `exercise-${record.id}`,
         type: 'exercise',
         time: record.timestamp,
         timeLabel: formatTimeLabel(record.timestamp),
         title: typeName,
-        detail: buildExerciseDetail(record),
+        subtitle,
+        meta,
+        note: record.note || undefined,
         iconName: RECORD_ICONS.exercise,
         record,
       });
@@ -135,16 +156,33 @@ export function Timeline({ dietRecords, exerciseRecords, onItemPress, onScroll, 
 
   if (timelineItems.length === 0) {
     return (
-      <Empty
-        icon="note"
-        title={t('common.noData')}
-        description={t('common.comingSoon')}
-      />
+      <View style={styles.emptyContainer}>
+        <View style={styles.emptyIconWrap}>
+          <Icon name="note" size={32} color={theme.colors.text.tertiary} />
+        </View>
+        <Text style={styles.emptyTitle}>{t('timeline.empty.title')}</Text>
+        <TouchableOpacity
+          onPress={() => router.push('/(tabs)/record' as any)}
+          activeOpacity={0.7}
+          style={styles.emptyCta}
+        >
+          <Text style={styles.emptyCtaText}>{t('timeline.empty.cta')}</Text>
+          <Icon name="chevron-right" size={14} color={theme.colors.primary.main} />
+        </TouchableOpacity>
+      </View>
     );
   }
 
   return (
-    <Animated.ScrollView style={styles.container} showsVerticalScrollIndicator={false} onScroll={onScroll} scrollEventThrottle={16}>
+    <Animated.ScrollView
+      ref={scrollRef}
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      onScroll={onScroll}
+      onScrollEndDrag={onScrollEndDrag}
+      onMomentumScrollEnd={onMomentumScrollEnd}
+      scrollEventThrottle={16}
+    >
       <View style={[styles.timeline, bottomSpacer ? { paddingBottom: theme.spacing['2xl'] + bottomSpacer } : null]}>
         {timelineItems.map((item, index) => (
           <TimelineItem
@@ -167,5 +205,40 @@ const styles = StyleSheet.create({
   timeline: {
     paddingTop: theme.spacing.lg,
     paddingBottom: theme.spacing['2xl'],
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: theme.spacing['4xl'],
+  },
+  emptyIconWrap: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: theme.colors.background.tertiary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: theme.spacing.base,
+  },
+  emptyTitle: {
+    fontSize: theme.fontSize.bodyLg,
+    fontWeight: theme.fontWeight.medium,
+    color: theme.colors.text.secondary,
+    marginBottom: theme.spacing.md,
+  },
+  emptyCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    paddingHorizontal: theme.spacing.base,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.borderRadius.full,
+    backgroundColor: theme.colors.primary.light,
+  },
+  emptyCtaText: {
+    fontSize: theme.fontSize.body,
+    fontWeight: theme.fontWeight.semibold,
+    color: theme.colors.primary.main,
   },
 });

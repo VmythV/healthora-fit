@@ -63,3 +63,6 @@ export { CheckIcon } from './CheckIcon';
 export { CloseIcon } from './CloseIcon';
 export { WarningIcon } from './WarningIcon';
 export { InfoIcon } from './InfoIcon';
+export { ChevronRightIcon } from './ChevronRightIcon';
+export { ChevronDownIcon } from './ChevronDownIcon';
+export { ChevronUpIcon } from './ChevronUpIcon';

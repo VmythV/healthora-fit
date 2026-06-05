@@ -48,6 +48,9 @@ import { CheckIcon } from './CheckIcon';
 import { CloseIcon } from './CloseIcon';
 import { WarningIcon } from './WarningIcon';
 import { InfoIcon } from './InfoIcon';
+import { ChevronRightIcon } from './ChevronRightIcon';
+import { ChevronDownIcon } from './ChevronDownIcon';
+import { ChevronUpIcon } from './ChevronUpIcon';
 
 export type IconName =
   | 'home'
@@ -95,7 +98,10 @@ export type IconName =
   | 'check'
   | 'close'
   | 'warning'
-  | 'info';
+  | 'info'
+  | 'chevron-right'
+  | 'chevron-down'
+  | 'chevron-up';
 
 interface IconProps {
   name: IconName;
@@ -209,6 +215,12 @@ export function Icon({ name, size = 24, color = '#000000' }: IconProps) {
       return <WarningIcon {...iconProps} />;
     case 'info':
       return <InfoIcon {...iconProps} />;
+    case 'chevron-right':
+      return <ChevronRightIcon {...iconProps} />;
+    case 'chevron-down':
+      return <ChevronDownIcon {...iconProps} />;
+    case 'chevron-up':
+      return <ChevronUpIcon {...iconProps} />;
     default:
       return null;
   }

@@ -57,6 +57,7 @@
     "status": "状态",
     "caloriesIn": "摄入",
     "caloriesOut": "消耗",
+    "caloriesNet": "净值",
     "viewDetails": "查看详细"
   },
   "record": {
@@ -382,6 +383,10 @@
   },
   "timeline": {
     "dietDetail": "饮食详情",
-    "exerciseDetail": "运动详情"
+    "exerciseDetail": "运动详情",
+    "empty": {
+      "title": "今天还没有记录",
+      "cta": "去添加一条"
+    }
   }
 }

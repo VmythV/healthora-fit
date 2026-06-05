@@ -58,6 +58,7 @@
     "status": "Status",
     "caloriesIn": "Cal In",
     "caloriesOut": "Cal Out",
+    "caloriesNet": "Net",
     "viewDetails": "View Details"
   },
   "record": {
@@ -383,6 +384,10 @@
   },
   "timeline": {
     "dietDetail": "Diet Details",
-    "exerciseDetail": "Exercise Details"
+    "exerciseDetail": "Exercise Details",
+    "empty": {
+      "title": "No records for today",
+      "cta": "Add one now"
+    }
   }
 }
