@@ -1,22 +1,15 @@
 // app/(tabs)/calendar.tsx
-// 日志页面 - 基于 react-native-calendars 的 ExpandableCalendar + AgendaList
-// - 月历可上下拖拽展开/折叠（默认月视图）
-// - 横滑切月、点击切日
-// - 下方时间线（AgendaList = SectionList）独立滚动
-// - 当前选中日期记录显示为单 section
+// 日志页面 - 基于自实现 CollapsibleCalendar + FlatList
+// - 默认月视图；上滑列表/拖月历区都能折叠成单周
+// - 列表滚到顶继续下拉 → 月历展开
+// - 完全使用 Reanimated 4 + GestureHandler v2，Fabric 兼容
 
 import { logger } from '@/utils/logger';
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import {
-  CalendarProvider,
-  ExpandableCalendar,
-  AgendaList,
-  LocaleConfig,
-} from 'react-native-calendars';
-import { Positions } from 'react-native-calendars/src/expandableCalendar';
+import Animated from 'react-native-reanimated';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { useDietRecords } from '@/hooks/useDietRecords';
@@ -24,141 +17,81 @@ import { useExerciseRecords } from '@/hooks/useExerciseRecords';
 import { useWeekStartDay } from '@/hooks/useWeekStartDay';
 import { dietQueries } from '@/database/queries/diet';
 import { exerciseQueries } from '@/database/queries/exercise';
+import { CollapsibleCalendar } from '@/components/calendar/CollapsibleCalendar';
 import { TimelineItem, TimelineItemData } from '@/components/calendar/TimelineItem';
 import { DaySummary } from '@/components/calendar/DaySummary';
 import { Modal } from '@/components/ui';
 import { DietRecordDetail } from '@/components/diet/DietRecordDetail';
 import { ExerciseRecordDetail } from '@/components/exercise/ExerciseRecordDetail';
 import { Icon } from '@/components/icons';
-import { TouchableOpacity } from 'react-native';
 import type { DietRecord } from '@/types/diet';
 import type { ExerciseRecord } from '@/types/exercise';
 import type { IconName } from '@/components/icons/Icon';
 
-// ---------- i18n / 本地化 ----------
-// react-native-calendars 默认是英文，注册中文 locale
-LocaleConfig.locales['zh-CN'] = {
-  monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-  monthNamesShort: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-  dayNames: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
-  dayNamesShort: ['日', '一', '二', '三', '四', '五', '六'],
-  today: '今天',
-};
-LocaleConfig.locales['en'] = LocaleConfig.locales[''];
+const AnimatedFlatList = Animated.FlatList;
 
-// ---------- 类型映射 ----------
 const RECORD_ICONS: Record<string, IconName> = {
   diet: 'bowl',
   exercise: 'running',
 };
 
-// ---------- ExpandableCalendar 主题 ----------
-const buildCalendarTheme = () => ({
-  backgroundColor: theme.colors.background.primary,
-  calendarBackground: theme.colors.background.primary,
-  // 日期色
-  selectedDayBackgroundColor: theme.colors.primary.main,
-  selectedDayTextColor: '#FFFFFF',
-  todayTextColor: theme.colors.primary.main,
-  todayBackgroundColor: 'transparent',
-  dayTextColor: theme.colors.text.primary,
-  textDisabledColor: '#D1D5DB',
-  // 记录标记点
-  dotColor: theme.colors.primary.main,
-  selectedDotColor: '#FFFFFF',
-  // 月份导航箭头
-  arrowColor: theme.colors.text.secondary,
-  disabledArrowColor: theme.colors.text.tertiary,
-  monthTextColor: theme.colors.text.primary,
-  textMonthFontSize: theme.fontSize.bodyLg,
-  textMonthFontWeight: theme.fontWeight.semibold,
-  // 星期标题
-  textSectionTitleColor: theme.colors.text.tertiary,
-  textDayHeaderFontSize: theme.fontSize.caption,
-  textDayHeaderFontWeight: theme.fontWeight.medium,
-  // 日期数字
-  textDayFontSize: theme.fontSize.body,
-  textDayFontWeight: theme.fontWeight.regular,
-});
+const WEEKDAYS_ZH = ['日', '一', '二', '三', '四', '五', '六'];
+const WEEKDAYS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTHS_ZH = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export default function CalendarScreen() {
   const { t, locale } = useI18n();
   const { weekStartDay } = useWeekStartDay();
   const router = useRouter();
 
-  // 配置默认 locale，跟随用户语言
-  useEffect(() => {
-    LocaleConfig.defaultLocale = locale === 'zh-CN' ? 'zh-CN' : 'en';
-  }, [locale]);
-
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
 
   const [selectedDate, setSelectedDate] = useState(todayStr);
-  // 当月有记录的日期集合
   const [monthMarked, setMonthMarked] = useState<Set<string>>(new Set());
   const [selectedItem, setSelectedItem] = useState<TimelineItemData | null>(null);
 
   const { records: dietRecords } = useDietRecords(selectedDate);
   const { records: exerciseRecords } = useExerciseRecords(selectedDate);
 
-  // ---------- 加载某月的标记日期 ----------
+  // 加载某月标记日期
   const loadMarkedDates = useCallback(async (year: number, month0: number) => {
     try {
-      const monthStart = `${year}-${String(month0 + 1).padStart(2, '0')}-01`;
-      const lastDay = new Date(year, month0 + 1, 0).getDate();
-      const monthEnd = `${year}-${String(month0 + 1).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
-      const [dietDates, exerciseDates] = await Promise.all([
-        dietQueries.getDatesWithRecords(monthStart, monthEnd),
-        exerciseQueries.getDatesWithRecords(monthStart, monthEnd),
+      const ms = `${year}-${String(month0 + 1).padStart(2, '0')}-01`;
+      const last = new Date(year, month0 + 1, 0).getDate();
+      const me = `${year}-${String(month0 + 1).padStart(2, '0')}-${String(last).padStart(2, '0')}`;
+      const [dd, ed] = await Promise.all([
+        dietQueries.getDatesWithRecords(ms, me),
+        exerciseQueries.getDatesWithRecords(ms, me),
       ]);
       setMonthMarked((prev) => {
         const next = new Set(prev);
-        // 移除当月旧数据，避免反复切月后膨胀
+        const prefix = `${year}-${String(month0 + 1).padStart(2, '0')}-`;
         for (const d of prev) {
-          if (d.startsWith(`${year}-${String(month0 + 1).padStart(2, '0')}-`)) {
-            next.delete(d);
-          }
+          if (d.startsWith(prefix)) next.delete(d);
         }
-        dietDates.forEach((d) => next.add(d));
-        exerciseDates.forEach((d) => next.add(d));
+        dd.forEach((d) => next.add(d));
+        ed.forEach((d) => next.add(d));
         return next;
       });
     } catch (err) {
-      logger.error('[Calendar] 加载标记日期失败:', err);
+      logger.error('[Calendar] 加载标记失败:', err);
     }
   }, []);
 
-  // 初始加载当月
   useEffect(() => {
     loadMarkedDates(today.getFullYear(), today.getMonth());
   }, []);
 
-  // ExpandableCalendar 切月回调
   const handleMonthChange = useCallback(
-    (m: { year: number; month: number }) => {
-      // m.month 是 1-12
-      loadMarkedDates(m.year, m.month - 1);
+    (y: number, m0: number) => {
+      loadMarkedDates(y, m0);
     },
     [loadMarkedDates]
   );
 
-  // ---------- markedDates（react-native-calendars 格式） ----------
-  const markedDates = useMemo(() => {
-    const map: Record<string, any> = {};
-    monthMarked.forEach((d) => {
-      map[d] = { marked: true, dotColor: theme.colors.primary.main };
-    });
-    map[selectedDate] = {
-      ...(map[selectedDate] || {}),
-      selected: true,
-      selectedColor: theme.colors.primary.main,
-      selectedTextColor: '#FFFFFF',
-    };
-    return map;
-  }, [monthMarked, selectedDate]);
-
-  // ---------- TimelineItem 数据构造 ----------
+  // ---------- 时间线数据 ----------
   const buildDietFields = useCallback(
     (record: DietRecord): { subtitle?: string; meta?: string } => {
       let subtitle: string | undefined;
@@ -166,11 +99,7 @@ export default function CalendarScreen() {
         try {
           const foods = JSON.parse(record.foodsJson);
           if (Array.isArray(foods) && foods.length > 0) {
-            subtitle = foods
-              .slice(0, 3)
-              .map((f: any) => f.name)
-              .filter(Boolean)
-              .join('、');
+            subtitle = foods.slice(0, 3).map((f: any) => f.name).filter(Boolean).join('、');
           }
         } catch {}
       }
@@ -204,9 +133,7 @@ export default function CalendarScreen() {
   const timelineItems = useMemo<TimelineItemData[]>(() => {
     const items: TimelineItemData[] = [];
     dietRecords.forEach((record) => {
-      const mealName = record.mealType
-        ? t(`mealType.${record.mealType}`)
-        : t('record.diet.title');
+      const mealName = record.mealType ? t(`mealType.${record.mealType}`) : t('record.diet.title');
       const { subtitle, meta } = buildDietFields(record);
       items.push({
         id: `diet-${record.id}`,
@@ -241,16 +168,24 @@ export default function CalendarScreen() {
     return items;
   }, [dietRecords, exerciseRecords, buildDietFields, buildExerciseFields, t]);
 
-  // ---------- AgendaList sections ----------
-  // 只显示当前选中日期的一组数据；section.title 必须是 YYYY-MM-DD 格式（AgendaList 要求）
-  // 空数据时返回 [] 触发 ListEmptyComponent
-  const sections = useMemo(() => {
-    if (timelineItems.length === 0) return [];
-    return [{ title: selectedDate, data: timelineItems }];
-  }, [selectedDate, timelineItems]);
+  // FlatList renderItem
+  const renderItem = useCallback(
+    ({ item, index }: { item: TimelineItemData; index: number }) => (
+      <TimelineItem
+        item={item}
+        index={index}
+        isLast={index === timelineItems.length - 1}
+        onPress={setSelectedItem}
+      />
+    ),
+    [timelineItems.length]
+  );
 
-  // ---------- 空状态 ----------
-  const ListEmptyComponent = useMemo(
+  const keyExtractor = useCallback((item: TimelineItemData) => item.id, []);
+
+  const ListHeader = useMemo(() => <DaySummary date={selectedDate} />, [selectedDate]);
+
+  const ListEmpty = useMemo(
     () => (
       <View style={styles.emptyContainer}>
         <View style={styles.emptyIconWrap}>
@@ -270,7 +205,8 @@ export default function CalendarScreen() {
     [t, router]
   );
 
-  const calendarTheme = useMemo(buildCalendarTheme, []);
+  const monthNames = locale === 'zh-CN' ? MONTHS_ZH : MONTHS_EN;
+  const weekDayNames = locale === 'zh-CN' ? WEEKDAYS_ZH : WEEKDAYS_EN;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -279,47 +215,35 @@ export default function CalendarScreen() {
         <Text style={styles.title}>{t('calendar.title')}</Text>
       </View>
 
-      {/* react-native-calendars 三件套 */}
-      <CalendarProvider
-        date={selectedDate}
-        onDateChanged={(d: string) => setSelectedDate(d)}
+      <CollapsibleCalendar
+        selectedDate={selectedDate}
+        onDatePress={setSelectedDate}
         onMonthChange={handleMonthChange}
-        showTodayButton={false}
-        style={styles.providerContainer}
+        markedDates={monthMarked}
+        maxDate={todayStr}
+        firstDay={weekStartDay}
+        monthNames={monthNames}
+        weekDayNames={weekDayNames}
       >
-        <ExpandableCalendar
-          initialPosition={Positions.OPEN}
-          firstDay={weekStartDay}
-          markedDates={markedDates}
-          maxDate={todayStr}
-          closeOnDayPress={false}
-          allowShadow={false}
-          hideKnob={false}
-          theme={calendarTheme}
-          calendarStyle={styles.calendarStyle}
-          style={styles.calendar}
-        />
-
-        <AgendaList
-          sections={sections as any}
-          renderItem={({ item, index, section }: any) => (
-            <TimelineItem
-              item={item}
-              index={index}
-              isLast={index === section.data.length - 1}
-              onPress={setSelectedItem}
-            />
-          )}
-          // 隐藏 section header（我们用 DaySummary 替代）
-          renderSectionHeader={() => null as any}
-          sectionStyle={styles.sectionStyle}
-          ListHeaderComponent={<DaySummary date={selectedDate} />}
-          ListEmptyComponent={ListEmptyComponent}
-          keyExtractor={(item: any) => item.id}
-          contentContainerStyle={styles.agendaContent}
-          showsVerticalScrollIndicator={false}
-        />
-      </CalendarProvider>
+        {({ scrollHandler, scrollRef }) => (
+          <AnimatedFlatList
+            ref={scrollRef}
+            data={timelineItems}
+            renderItem={renderItem as any}
+            keyExtractor={keyExtractor as any}
+            ListHeaderComponent={ListHeader}
+            ListEmptyComponent={ListEmpty}
+            onScroll={scrollHandler}
+            scrollEventThrottle={16}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.listContent}
+            removeClippedSubviews
+            initialNumToRender={10}
+            maxToRenderPerBatch={10}
+            windowSize={7}
+          />
+        )}
+      </CollapsibleCalendar>
 
       {/* 详情 Modal */}
       <Modal
@@ -365,32 +289,18 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.bold,
     color: theme.colors.text.primary,
   },
-  providerContainer: {
-    flex: 1,
-  },
-  calendar: {
-    backgroundColor: theme.colors.background.primary,
-  },
-  calendarStyle: {
-    paddingLeft: 0,
-    paddingRight: 0,
-  },
-  sectionStyle: {
-    // 隐藏 section header 占位
-    height: 0,
-    margin: 0,
-    padding: 0,
-  },
-  agendaContent: {
+  listContent: {
     paddingTop: theme.spacing.md,
     paddingBottom: theme.spacing['2xl'],
+    flexGrow: 1, // 让 ListEmptyComponent 撑开
   },
   // 空状态
   emptyContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: theme.spacing['4xl'],
     paddingHorizontal: theme.spacing.xl,
+    paddingVertical: theme.spacing['4xl'],
   },
   emptyIconWrap: {
     width: 64,

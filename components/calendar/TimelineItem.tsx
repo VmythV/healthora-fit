@@ -49,8 +49,10 @@ const CARD_PAD_V = 12;
 
 /**
  * 时间轴单项
+ * React.memo —— 避免 SectionList 父组件 re-render 时整个列表重渲染
+ * 比较 item.id + isLast，其他变化（如 onPress 引用变化）不触发重渲染
  */
-export function TimelineItem({ item, isLast, index, onPress }: TimelineItemProps) {
+function TimelineItemComponent({ item, isLast, index, onPress }: TimelineItemProps) {
   const color = TYPE_COLORS[item.type];
 
   return (
@@ -110,6 +112,14 @@ export function TimelineItem({ item, isLast, index, onPress }: TimelineItemProps
     </Animated.View>
   );
 }
+
+export const TimelineItem = React.memo(
+  TimelineItemComponent,
+  (prev, next) =>
+    prev.item.id === next.item.id &&
+    prev.isLast === next.isLast &&
+    prev.index === next.index
+);
 
 const styles = StyleSheet.create({
   container: {
