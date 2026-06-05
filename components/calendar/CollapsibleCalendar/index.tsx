@@ -132,6 +132,17 @@ export function CollapsibleCalendar({
     ),
   }));
 
+  // gridClip 自己也跟随高度动画：折叠时只露一行（44），展开时全部 6 行（264）
+  // 这样下方 Knob 在折叠态依然可见
+  const gridClipHeightStyle = useAnimatedStyle(() => ({
+    height: interpolate(
+      expansion.value,
+      [0, 1],
+      [DAY_CELL_H, MONTH_GRID_H],
+      Extrapolation.CLAMP
+    ),
+  }));
+
   // MonthGrid 整体上下平移：折叠态把选中周拉到第一行位置
   const gridTranslateStyle = useAnimatedStyle(() => ({
     transform: [
@@ -144,16 +155,6 @@ export function CollapsibleCalendar({
         ),
       },
     ],
-  }));
-
-  // 其他周淡出（折叠态只显示选中周）
-  const otherWeeksOpacityStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      expansion.value,
-      [0, 0.6],
-      [0, 1],
-      Extrapolation.CLAMP
-    ),
   }));
 
   // Knob 颜色淡化暗示可拖
@@ -193,29 +194,23 @@ export function CollapsibleCalendar({
           onNext={() => canGoNext && handleMonthChange(month0 === 11 ? year + 1 : year, month0 === 11 ? 0 : month0 + 1)}
         />
 
-        {/* MonthGrid clip 区 + Pan 手势 */}
+        {/* MonthGrid clip 区 + Pan 手势 —— clip 高度动画，
+            内部 translateY 把选中周拉到顶；折叠态视觉上只看到那一行 */}
         <GestureDetector gesture={calendarPan}>
-          <View style={styles.gridClip}>
+          <Animated.View style={[styles.gridClip, gridClipHeightStyle]}>
             <Animated.View style={[styles.gridInner, gridTranslateStyle]}>
-              {/* MonthGrid 整体；选中行被 translateY 拉到顶；其他周由 otherWeeksOpacityStyle 淡入淡出 */}
-              <Animated.View style={otherWeeksOpacityStyle}>
-                <MonthGrid
-                  year={year}
-                  month0={month0}
-                  selectedDate={selectedDate}
-                  markedDates={markedSet}
-                  maxDate={maxDate}
-                  firstDay={firstDay}
-                  onDatePress={handleDatePress}
-                  onMonthChange={handleMonthChange}
-                />
-              </Animated.View>
-              {/* 选中行始终可见（不受 otherWeeksOpacity 影响）：用 absolute 覆盖在选中行位置 */}
-              {/* —— 简化：让选中行的 opacity 永远是 1，通过把选中 cell 单独高 z-index 渲染太复杂；
-                  当前方案 otherWeeksOpacity 影响整个 grid，但折叠时 grid 只露第一行（即选中周），
-                  视觉上其它周已被 clip 看不到，所以 opacity 改变也无害。 */}
+              <MonthGrid
+                year={year}
+                month0={month0}
+                selectedDate={selectedDate}
+                markedDates={markedSet}
+                maxDate={maxDate}
+                firstDay={firstDay}
+                onDatePress={handleDatePress}
+                onMonthChange={handleMonthChange}
+              />
             </Animated.View>
-          </View>
+          </Animated.View>
         </GestureDetector>
 
         {/* Knob 把手 */}
@@ -246,7 +241,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   gridClip: {
-    height: MONTH_GRID_H,
+    // height 由 gridClipHeightStyle 动画提供
     overflow: 'hidden',
   },
   gridInner: {
