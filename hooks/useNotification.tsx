@@ -1,7 +1,7 @@
 // hooks/useNotification.tsx
 // 通知系统 Provider + Hook
 
-import React, { createContext, useContext, useCallback, useState, useRef } from 'react';
+import React, { createContext, useContext, useCallback, useMemo, useState, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ToastItem, ToastType, ToastItemView, setGlobalNotify } from '@/components/ui/Toast';
@@ -80,8 +80,14 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     };
   }, [showNotification, showConfirm]);
 
+  // P1-11：value useMemo 稳定引用，避免 Provider 重渲染时所有 context 消费者跟随重渲染
+  const value = useMemo<NotificationContextType>(
+    () => ({ showNotification, showConfirm }),
+    [showNotification, showConfirm]
+  );
+
   return (
-    <NotificationContext.Provider value={{ showNotification, showConfirm }}>
+    <NotificationContext.Provider value={value}>
       {children}
 
       {/* Toast 通知层 */}

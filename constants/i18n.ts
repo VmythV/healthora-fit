@@ -1,5 +1,10 @@
 // constants/i18n.ts
 // 国际化配置
+//
+// P1-13：加 subscribe / getSnapshot / getServerSnapshot 通知机制
+// 让 useI18n 用 useSyncExternalStore 实现跨实例同步：
+// - 切语言时所有调用方同步 re-render
+// - 不依赖被动 re-render
 
 import * as Localization from 'expo-localization';
 import { I18n } from 'i18n-js';
@@ -36,14 +41,42 @@ export const SUPPORTED_LOCALES = [
 
 export type Locale = typeof SUPPORTED_LOCALES[number]['code'];
 
+// P1-13：订阅机制 —— 切语言时通知所有 useSyncExternalStore 订阅者
+type Subscriber = () => void;
+const subscribers = new Set<Subscriber>();
+
+function notify(): void {
+  subscribers.forEach((fn) => fn());
+}
+
+/** 订阅 locale 变化（用于 useSyncExternalStore） */
+export function subscribe(fn: Subscriber): () => void {
+  subscribers.add(fn);
+  return () => {
+    subscribers.delete(fn);
+  };
+}
+
+/** 当前 locale 的快照（用于 useSyncExternalStore） */
+export function getSnapshot(): Locale {
+  return i18n.locale as Locale;
+}
+
+/** SSR 快照（用于 useSyncExternalStore，hydration 时使用） */
+export function getServerSnapshot(): Locale {
+  return 'zh-CN';
+}
+
 // 获取当前语言
 export function getCurrentLocale(): Locale {
   return i18n.locale as Locale;
 }
 
-// 设置语言
+// 设置语言：写 i18n 全局 + 通知订阅者
 export function setLocale(locale: Locale): void {
+  if (i18n.locale === locale) return;  // 防重复通知
   i18n.locale = locale;
+  notify();
 }
 
 // 翻译函数

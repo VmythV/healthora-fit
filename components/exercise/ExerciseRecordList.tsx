@@ -1,16 +1,20 @@
 // components/exercise/ExerciseRecordList.tsx
 // 运动记录列表
+//
+// P1-8 优化：
+// - 模块顶层 helper（formatTime、EXERCISE_ICONS）
+// - 行级 ExerciseRow 提取为 React.memo 组件
+// - renderItem / keyExtractor / handleDelete 改 useCallback
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Alert,
+  ListRenderItem,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { useExerciseRecords } from '@/hooks/useExerciseRecords';
@@ -18,14 +22,13 @@ import { ExerciseRecord } from '@/types/exercise';
 import { Card, Empty } from '@/components/ui';
 import { Icon } from '@/components/icons';
 import { IconName } from '@/components/icons/Icon';
-import { showNotification, showConfirm } from '@/components/ui';
+import { showConfirm } from '@/components/ui';
 
 interface ExerciseRecordListProps {
   date?: string;
   onRecordPress?: (record: ExerciseRecord) => void;
 }
 
-// 运动类型图标
 const EXERCISE_ICONS: Record<string, IconName> = {
   running: 'running',
   walking: 'walking',
@@ -37,92 +40,122 @@ const EXERCISE_ICONS: Record<string, IconName> = {
   other: 'other-exercise',
 };
 
-/**
- * 运动记录列表
- */
-export function ExerciseRecordList({ date, onRecordPress }: ExerciseRecordListProps) {
-  const { t } = useI18n();
-  const router = useRouter();
-  const { records, loading, deleteRecord } = useExerciseRecords(date);
+// 模块级 helper
+function formatTime(timestamp: string): string {
+  const d = new Date(timestamp);
+  return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+}
 
-  // 格式化时间
-  const formatTime = (timestamp: string) => {
-    const d = new Date(timestamp);
-    return d.toLocaleTimeString('zh-CN', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+function getExerciseIcon(type: string): IconName {
+  return EXERCISE_ICONS[type] || 'other-exercise';
+}
 
-  // 删除记录
-  const handleDelete = async (id: number) => {
-    const ok = await showConfirm({
-      title: t('confirm.delete.title'),
-      message: t('confirm.delete.message'),
-      type: 'danger',
-      confirmText: t('common.delete'),
-      cancelText: t('common.cancel'),
-    });
-    if (ok) {
-      deleteRecord(id);
-    }
-  };
+// 行级组件 —— React.memo 防止同 props 重复渲染
+interface ExerciseRowProps {
+  item: ExerciseRecord;
+  minutesLabel: string;
+  kcalLabel: string;
+  kmLabel: string;
+  exerciseTypeName: string;
+  onPress?: (record: ExerciseRecord) => void;
+  onDelete: (id: number) => void;
+}
 
-  // 渲染记录项
-  const renderItem = ({ item }: { item: ExerciseRecord }) => (
-    <TouchableOpacity
-      onPress={() => onRecordPress?.(item)}
-      activeOpacity={0.7}
-    >
+const ExerciseRow = React.memo(function ExerciseRow({
+  item,
+  minutesLabel,
+  kcalLabel,
+  kmLabel,
+  exerciseTypeName,
+  onPress,
+  onDelete,
+}: ExerciseRowProps) {
+  const handlePress = useCallback(() => onPress?.(item), [item, onPress]);
+  const handleDelete = useCallback(() => onDelete(item.id), [item.id, onDelete]);
+
+  return (
+    <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
       <Card style={styles.recordCard}>
         <View style={styles.recordHeader}>
           <View style={styles.recordInfo}>
             <View style={styles.typeRow}>
               <View style={styles.typeIconContainer}>
-                <Icon name={EXERCISE_ICONS[item.exerciseType] || 'other-exercise'} size={24} color={theme.colors.primary.main} />
+                <Icon
+                  name={getExerciseIcon(item.exerciseType)}
+                  size={24}
+                  color={theme.colors.primary.main}
+                />
               </View>
-              <Text style={styles.typeName}>
-                {t(`exerciseType.${item.exerciseType}`)}
-              </Text>
+              <Text style={styles.typeName}>{exerciseTypeName}</Text>
               <Text style={styles.time}>{formatTime(item.timestamp)}</Text>
             </View>
           </View>
           <View style={styles.recordStats}>
             <Text style={styles.durationValue}>{item.durationMinutes}</Text>
-            <Text style={styles.durationUnit}>{t('exercise.minutes')}</Text>
+            <Text style={styles.durationUnit}>{minutesLabel}</Text>
           </View>
         </View>
 
-        {/* 详细数据 */}
         <View style={styles.detailRow}>
           <View style={styles.detailItem}>
             <Icon name="fire" size={14} color={theme.colors.text.secondary} />
             <Text style={styles.detailText}>
-              {' '}{item.caloriesBurned || 0} {t('home.kcal')}
+              {' '}{item.caloriesBurned || 0} {kcalLabel}
             </Text>
           </View>
           {item.distanceKm ? (
             <View style={styles.detailItem}>
               <Icon name="chart-bar" size={14} color={theme.colors.text.secondary} />
               <Text style={styles.detailText}>
-                {' '}{item.distanceKm} {t('exercise.km')}
+                {' '}{item.distanceKm} {kmLabel}
               </Text>
             </View>
           ) : null}
         </View>
 
-        {/* 删除按钮 */}
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => handleDelete(item.id)}
-        >
+        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
           <Icon name="delete" size={16} color={theme.colors.text.tertiary} />
         </TouchableOpacity>
       </Card>
     </TouchableOpacity>
   );
+});
 
-  // 空状态
+export function ExerciseRecordList({ date, onRecordPress }: ExerciseRecordListProps) {
+  const { t } = useI18n();
+  const { records, loading, deleteRecord } = useExerciseRecords(date);
+
+  const handleDelete = useCallback(
+    async (id: number) => {
+      const ok = await showConfirm({
+        title: t('confirm.delete.title'),
+        message: t('confirm.delete.message'),
+        type: 'danger',
+        confirmText: t('common.delete'),
+        cancelText: t('common.cancel'),
+      });
+      if (ok) deleteRecord(id);
+    },
+    [t, deleteRecord]
+  );
+
+  const renderItem: ListRenderItem<ExerciseRecord> = useCallback(
+    ({ item }) => (
+      <ExerciseRow
+        item={item}
+        minutesLabel={t('exercise.minutes')}
+        kcalLabel={t('home.kcal')}
+        kmLabel={t('exercise.km')}
+        exerciseTypeName={t(`exerciseType.${item.exerciseType}`)}
+        onPress={onRecordPress}
+        onDelete={handleDelete}
+      />
+    ),
+    [t, onRecordPress, handleDelete]
+  );
+
+  const keyExtractor = useCallback((item: ExerciseRecord) => item.id.toString(), []);
+
   if (!loading && records.length === 0) {
     return (
       <Empty
@@ -137,7 +170,7 @@ export function ExerciseRecordList({ date, onRecordPress }: ExerciseRecordListPr
     <FlatList
       data={records}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={keyExtractor}
       contentContainerStyle={styles.list}
       showsVerticalScrollIndicator={false}
     />

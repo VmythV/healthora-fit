@@ -1,16 +1,20 @@
 // components/diet/DietRecordList.tsx
 // 饮食记录列表
+//
+// P1-8 优化：
+// - 模块顶层 helper（formatTime / getMealIcon / getFoodSummary），避免每次 render 重建
+// - 行级 DietRow 提取为 React.memo 组件
+// - renderItem / keyExtractor / handleDelete 改 useCallback
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
   TouchableOpacity,
-  Alert,
+  ListRenderItem,
 } from 'react-native';
-import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { useDietRecords } from '@/hooks/useDietRecords';
@@ -18,122 +22,147 @@ import { DietRecord, FoodItem } from '@/types/diet';
 import { Card, Empty } from '@/components/ui';
 import { Icon } from '@/components/icons';
 import { IconName } from '@/components/icons/Icon';
-import { showNotification, showConfirm } from '@/components/ui';
+import { showConfirm } from '@/components/ui';
 
 interface DietRecordListProps {
-  date?: string; // 筛选日期，格式 YYYY-MM-DD
+  date?: string;
   onRecordPress?: (record: DietRecord) => void;
 }
 
-/**
- * 饮食记录列表
- */
-export function DietRecordList({ date, onRecordPress }: DietRecordListProps) {
-  const { t } = useI18n();
-  const router = useRouter();
-  const { records, loading, deleteRecord } = useDietRecords(date);
+// 模块级 helper —— 避免每次 render 重建
+function formatTime(timestamp: string): string {
+  const d = new Date(timestamp);
+  return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+}
 
-  // 格式化时间
-  const formatTime = (timestamp: string) => {
-    const d = new Date(timestamp);
-    return d.toLocaleTimeString('zh-CN', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+const MEAL_ICONS: Record<string, IconName> = {
+  breakfast: 'sunrise',
+  lunch: 'plate',
+  dinner: 'moon',
+  snack: 'cookie',
+};
 
-  // 获取餐次图标
-  const getMealIcon = (mealType?: string): IconName => {
-    switch (mealType) {
-      case 'breakfast':
-        return 'sunrise';
-      case 'lunch':
-        return 'plate';
-      case 'dinner':
-        return 'moon';
-      case 'snack':
-        return 'cookie';
-      default:
-        return 'plate';
-    }
-  };
+function getMealIcon(mealType?: string): IconName {
+  return MEAL_ICONS[mealType || ''] || 'plate';
+}
 
-  // 获取食物摘要
-  const getFoodSummary = (record: DietRecord) => {
-    const foods: FoodItem[] = record.foodsJson
-      ? JSON.parse(record.foodsJson)
-      : [];
-    if (foods.length === 0) return t('diet.noFood');
-    return foods.map((f) => f.name).join('、');
-  };
+function getFoodSummary(record: DietRecord, noFoodLabel: string): string {
+  const foods: FoodItem[] = record.foodsJson ? JSON.parse(record.foodsJson) : [];
+  if (foods.length === 0) return noFoodLabel;
+  return foods.map((f) => f.name).join('、');
+}
 
-  // 删除记录
-  const handleDelete = async (id: number) => {
-    const ok = await showConfirm({
-      title: t('confirm.delete.title'),
-      message: t('confirm.delete.message'),
-      type: 'danger',
-      confirmText: t('common.delete'),
-      cancelText: t('common.cancel'),
-    });
-    if (ok) {
-      deleteRecord(id);
-    }
-  };
+// 行级组件 —— 接收所有 props，React.memo 防止同 props 重复渲染
+interface DietRowProps {
+  item: DietRecord;
+  noFoodLabel: string;
+  caloriesLabel: string;
+  proteinLabel: string;
+  carbsLabel: string;
+  fatLabel: string;
+  deleteLabel: string;
+  onPress?: (record: DietRecord) => void;
+  onDelete: (id: number) => void;
+}
 
-  // 渲染记录项
-  const renderItem = ({ item }: { item: DietRecord }) => (
-    <TouchableOpacity
-      onPress={() => onRecordPress?.(item)}
-      activeOpacity={0.7}
-    >
+const DietRow = React.memo(function DietRow({
+  item,
+  noFoodLabel,
+  caloriesLabel,
+  proteinLabel,
+  carbsLabel,
+  fatLabel,
+  onPress,
+  onDelete,
+}: DietRowProps) {
+  const handlePress = useCallback(() => onPress?.(item), [item, onPress]);
+  const handleDelete = useCallback(() => onDelete(item.id), [item.id, onDelete]);
+
+  return (
+    <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
       <Card style={styles.recordCard}>
         <View style={styles.recordHeader}>
           <View style={styles.recordInfo}>
             <View style={styles.mealRow}>
               <View style={styles.mealIconContainer}>
-                <Icon name={getMealIcon(item.mealType)} size={20} color={theme.colors.primary.main} />
+                <Icon
+                  name={getMealIcon(item.mealType)}
+                  size={20}
+                  color={theme.colors.primary.main}
+                />
               </View>
               <Text style={styles.mealType}>
-                {item.mealType ? t(`mealType.${item.mealType}`) : ''}
+                {item.mealType ? MEAL_ICONS[item.mealType] || '' : ''}
               </Text>
               <Text style={styles.time}>{formatTime(item.timestamp)}</Text>
             </View>
             <Text style={styles.foodSummary} numberOfLines={1}>
-              {getFoodSummary(item)}
+              {getFoodSummary(item, noFoodLabel)}
             </Text>
           </View>
           <View style={styles.recordCalories}>
             <Text style={styles.caloriesValue}>{item.totalCalories || 0}</Text>
-            <Text style={styles.caloriesUnit}>{t('diet.calories')}</Text>
+            <Text style={styles.caloriesUnit}>{caloriesLabel}</Text>
           </View>
         </View>
 
-        {/* 营养成分 */}
         <View style={styles.nutritionRow}>
           <Text style={styles.nutritionText}>
-            {t('diet.protein')}: {item.totalProtein || 0}g
+            {proteinLabel}: {item.totalProtein || 0}g
           </Text>
           <Text style={styles.nutritionText}>
-            {t('diet.carbs')}: {item.totalCarbs || 0}g
+            {carbsLabel}: {item.totalCarbs || 0}g
           </Text>
           <Text style={styles.nutritionText}>
-            {t('diet.fat')}: {item.totalFat || 0}g
+            {fatLabel}: {item.totalFat || 0}g
           </Text>
         </View>
 
-        {/* 删除按钮 */}
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => handleDelete(item.id)}
-        >
+        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
           <Icon name="delete" size={16} color={theme.colors.text.tertiary} />
         </TouchableOpacity>
       </Card>
     </TouchableOpacity>
   );
+});
 
-  // 空状态
+export function DietRecordList({ date, onRecordPress }: DietRecordListProps) {
+  const { t } = useI18n();
+  const { records, loading, deleteRecord } = useDietRecords(date);
+
+  const handleDelete = useCallback(
+    async (id: number) => {
+      const ok = await showConfirm({
+        title: t('confirm.delete.title'),
+        message: t('confirm.delete.message'),
+        type: 'danger',
+        confirmText: t('common.delete'),
+        cancelText: t('common.cancel'),
+      });
+      if (ok) deleteRecord(id);
+    },
+    [t, deleteRecord]
+  );
+
+  const renderItem: ListRenderItem<DietRecord> = useCallback(
+    ({ item }) => (
+      <DietRow
+        item={item}
+        noFoodLabel={t('diet.noFood')}
+        caloriesLabel={t('diet.calories')}
+        proteinLabel={t('diet.protein')}
+        carbsLabel={t('diet.carbs')}
+        fatLabel={t('diet.fat')}
+        deleteLabel={t('common.delete')}
+        onPress={onRecordPress}
+        onDelete={handleDelete}
+      />
+    ),
+    [t, onRecordPress, handleDelete]
+  );
+
+  const keyExtractor = useCallback((item: DietRecord) => item.id.toString(), []);
+
   if (!loading && records.length === 0) {
     return (
       <Empty
@@ -148,7 +177,7 @@ export function DietRecordList({ date, onRecordPress }: DietRecordListProps) {
     <FlatList
       data={records}
       renderItem={renderItem}
-      keyExtractor={(item) => item.id.toString()}
+      keyExtractor={keyExtractor}
       contentContainerStyle={styles.list}
       showsVerticalScrollIndicator={false}
     />

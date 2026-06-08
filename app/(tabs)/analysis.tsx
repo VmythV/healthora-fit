@@ -1,5 +1,10 @@
 // app/(tabs)/analysis.tsx
 // 分析页面
+//
+// P1-12：
+// - 7 个 useState 合并为单个 analysisData 对象
+// - useEffect 依赖补 currentRange + loadData（修 stale closure）
+// - 加 useFocusEffect 切回 tab 自动刷新
 
 import { logger } from '@/utils/logger';
 import React, { useState, useEffect, useCallback } from 'react';
@@ -12,6 +17,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
 import { useDatabase } from '@/hooks/useDatabase';
@@ -49,6 +55,26 @@ interface ExerciseTypeData {
   total_duration: number;
 }
 
+interface AnalysisData {
+  weightData: WeightData[];
+  weightStats: any;
+  dietData: DietData[];
+  dietTotal: any;
+  exerciseData: ExerciseData[];
+  exerciseTypeData: ExerciseTypeData[];
+  exerciseTotal: any;
+}
+
+const EMPTY_DATA: AnalysisData = {
+  weightData: [],
+  weightStats: null,
+  dietData: [],
+  dietTotal: null,
+  exerciseData: [],
+  exerciseTypeData: [],
+  exerciseTotal: null,
+};
+
 export default function AnalysisScreen() {
   const { t } = useI18n();
   const { isReady } = useDatabase();
@@ -56,21 +82,15 @@ export default function AnalysisScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [currentRange, setCurrentRange] = useState<DateRange | null>(null);
 
-  // 数据状态
-  const [weightData, setWeightData] = useState<WeightData[]>([]);
-  const [weightStats, setWeightStats] = useState<any>(null);
-  const [dietData, setDietData] = useState<DietData[]>([]);
-  const [dietTotal, setDietTotal] = useState<any>(null);
-  const [exerciseData, setExerciseData] = useState<ExerciseData[]>([]);
-  const [exerciseTypeData, setExerciseTypeData] = useState<ExerciseTypeData[]>([]);
-  const [exerciseTotal, setExerciseTotal] = useState<any>(null);
+  // P1-12：合并 7 个 useState → 1 个 analysisData
+  const [data, setData] = useState<AnalysisData>(EMPTY_DATA);
+  const { weightData, weightStats, dietData, dietTotal, exerciseData, exerciseTypeData, exerciseTotal } = data;
 
   // 加载数据
   const loadData = useCallback(async (range: DateRange) => {
     if (!isReady) return;
 
     try {
-      // 并行加载所有数据
       const [
         weights,
         weightStatistics,
@@ -89,24 +109,36 @@ export default function AnalysisScreen() {
         exerciseQueries.getTotalStats(range.startDate, range.endDate),
       ]);
 
-      setWeightData(weights || []);
-      setWeightStats(weightStatistics);
-      setDietData(dailyNutrition || []);
-      setDietTotal(totalNutrition);
-      setExerciseData(dailyExercise || []);
-      setExerciseTypeData(typeStats || []);
-      setExerciseTotal(totalExercise);
+      // P1-12：单次 setData 合并 7 个 setXxx
+      setData({
+        weightData: weights || [],
+        weightStats: weightStatistics,
+        dietData: dailyNutrition || [],
+        dietTotal: totalNutrition,
+        exerciseData: dailyExercise || [],
+        exerciseTypeData: typeStats || [],
+        exerciseTotal: totalExercise,
+      });
     } catch (error) {
       logger.error('[Analysis] Failed to load analysis data:', error);
     }
   }, [isReady]);
 
-  // 数据库就绪后加载数据（修复首次进入无数据的竞态问题）
+  // P1-12 修：依赖补 currentRange + loadData（修 stale closure）
   useEffect(() => {
     if (isReady && currentRange) {
       loadData(currentRange);
     }
-  }, [isReady]);
+  }, [isReady, currentRange, loadData]);
+
+  // P1-12：切回 tab 自动刷新
+  useFocusEffect(
+    useCallback(() => {
+      if (currentRange) {
+        loadData(currentRange);
+      }
+    }, [currentRange, loadData])
+  );
 
   // 处理时间范围变化
   const handleRangeChange = useCallback((range: DateRange) => {

@@ -1,8 +1,10 @@
 // stores/appStore.ts
 // 应用全局状态
+//
+// P1-13：删除 locale 字段和 setLocale action（死代码 + 与 P1-13 i18n useSyncExternalStore 重叠）
+// 已有 grep 验证 useAppStore 0 消费方，删除安全。
 
 import { create } from 'zustand';
-import { Locale } from '@/constants/i18n';
 
 interface AppState {
   // 加载状态
@@ -15,9 +17,6 @@ interface AppState {
   // 主题
   theme: 'light' | 'dark' | 'system';
 
-  // 语言
-  locale: Locale;
-
   // 首次启动
   isFirstLaunch: boolean;
 
@@ -25,23 +24,11 @@ interface AppState {
   setLoading: (isLoading: boolean, message?: string) => void;
   setCurrentTab: (tab: string) => void;
   setTheme: (theme: 'light' | 'dark' | 'system') => void;
-  setLocale: (locale: Locale) => void;
   setFirstLaunch: (isFirst: boolean) => void;
 }
 
 /**
  * 应用全局状态 Store
- *
- * @example
- * ```tsx
- * const { isLoading, setLoading, currentTab, setCurrentTab } = useAppStore();
- *
- * // 显示加载
- * setLoading(true, '加载中...');
- *
- * // 切换 Tab
- * setCurrentTab('home');
- * ```
  */
 export const useAppStore = create<AppState>((set) => ({
   // 初始状态
@@ -49,7 +36,6 @@ export const useAppStore = create<AppState>((set) => ({
   loadingMessage: null,
   currentTab: 'home',
   theme: 'system',
-  locale: 'zh-CN',
   isFirstLaunch: true,
 
   // Actions
@@ -61,9 +47,6 @@ export const useAppStore = create<AppState>((set) => ({
 
   setTheme: (theme) =>
     set({ theme }),
-
-  setLocale: (locale) =>
-    set({ locale }),
 
   setFirstLaunch: (isFirstLaunch) =>
     set({ isFirstLaunch }),

@@ -170,6 +170,14 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
       // 刷新今日记录
       await loadToday();
 
+      // P1-9 修复：同步刷 records
+      const targetDate = date ?? new Date().toISOString().slice(0, 10);
+      const newDateStr = record.timestamp.slice(0, 10);
+      if (!date || newDateStr === targetDate) {
+        const fresh = await exerciseQueries.getByDate(targetDate);
+        setRecords(fresh);
+      }
+
       return id;
     } catch (err) {
       const message = err instanceof Error ? err.message : '添加记录失败';
@@ -179,7 +187,7 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [loadToday]);
+  }, [date, loadToday]);
 
   const updateRecord = useCallback(async (id: number, updates: Partial<ExerciseRecord>) => {
     try {
@@ -190,6 +198,13 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
 
       // 刷新今日记录
       await loadToday();
+
+      // P1-9 修复：同步刷 records（date 不传时）
+      if (!date) {
+        const targetDate = new Date().toISOString().slice(0, 10);
+        const fresh = await exerciseQueries.getByDate(targetDate);
+        setRecords(fresh);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : '更新记录失败';
       setError(message);
@@ -198,7 +213,7 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
     } finally {
       setIsLoading(false);
     }
-  }, [loadToday]);
+  }, [date, loadToday]);
 
   const deleteRecord = useCallback(async (id: number) => {
     try {
@@ -209,6 +224,13 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
 
       // 刷新今日记录
       await loadToday();
+
+      // P1-9 修复：同步刷 records（date 不传时）
+      if (!date) {
+        const targetDate = new Date().toISOString().slice(0, 10);
+        const fresh = await exerciseQueries.getByDate(targetDate);
+        setRecords(fresh);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : '删除记录失败';
       setError(message);

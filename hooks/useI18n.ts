@@ -1,10 +1,22 @@
 // hooks/useI18n.ts
 // 国际化 Hook
+//
+// P1-13：用 useSyncExternalStore 替换 useState(getCurrentLocale())
+// 让 34 个 useI18n 调用方共享同一份 locale 状态，
+// 切语言时所有组件同步 re-render，不依赖被动 re-render
 
 import { logger } from '@/utils/logger';
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useSyncExternalStore } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { t, setLocale, getCurrentLocale, Locale, SUPPORTED_LOCALES } from '@/constants/i18n';
+import {
+  t,
+  setLocale,
+  subscribe,
+  getSnapshot,
+  getServerSnapshot,
+  Locale,
+  SUPPORTED_LOCALES,
+} from '@/constants/i18n';
 
 const LANGUAGE_STORAGE_KEY = '@healthora_language';
 
@@ -17,21 +29,10 @@ interface UseI18nReturn {
 
 /**
  * 国际化 Hook
- *
- * @example
- * ```tsx
- * const { t, locale, setLocale, supportedLocales } = useI18n();
- *
- * return (
- *   <View>
- *     <Text>{t('home.title')}</Text>
- *     <Button onPress={() => setLocale('en')}>English</Button>
- *   </View>
- * );
- * ```
  */
 export function useI18n(): UseI18nReturn {
-  const [locale, setCurrentLocale] = useState<Locale>(getCurrentLocale());
+  // P1-13：用 useSyncExternalStore 订阅 i18n 全局 locale
+  const locale = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   // 初始化：从存储加载语言设置
   useEffect(() => {
@@ -43,7 +44,6 @@ export function useI18n(): UseI18nReturn {
       const savedLocale = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
       if (savedLocale && isSupportedLocale(savedLocale)) {
         setLocale(savedLocale);
-        setCurrentLocale(savedLocale);
       }
     } catch (error) {
       logger.error('[useI18n] 加载语言设置失败:', error);
@@ -56,14 +56,8 @@ export function useI18n(): UseI18nReturn {
 
   const handleSetLocale = useCallback(async (newLocale: Locale) => {
     try {
-      // 保存到存储
       await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, newLocale);
-
-      // 更新 i18n
       setLocale(newLocale);
-
-      // 更新状态
-      setCurrentLocale(newLocale);
     } catch (error) {
       logger.error('[useI18n] 保存语言设置失败:', error);
     }

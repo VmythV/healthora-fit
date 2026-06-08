@@ -173,6 +173,8 @@ export default function CalendarScreen() {
   }, [dietRecords, exerciseRecords, buildDietFields, buildExerciseFields, t]);
 
   // FlatList renderItem
+  // P1-8 修正：依赖改 [timelineItems] 而非 [timelineItems.length]
+  // 原因：原依赖只在数组长度变化时重建回调，导致中段删除后 isLast 不更新
   const renderItem = useCallback(
     ({ item, index }: { item: TimelineItemData; index: number }) => (
       <TimelineItem
@@ -182,7 +184,7 @@ export default function CalendarScreen() {
         onPress={setSelectedItem}
       />
     ),
-    [timelineItems.length]
+    [timelineItems, setSelectedItem]
   );
 
   const keyExtractor = useCallback((item: TimelineItemData) => item.id, []);

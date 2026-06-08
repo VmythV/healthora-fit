@@ -1,5 +1,10 @@
 // components/icons/Icon.tsx
 // 统一图标组件
+//
+// P1-7 重构：
+// - 49 个 case switch 改为查表（ICONS map），O(1) 查询
+// - 用 React.memo 包裹，props 相等时跳过重渲染
+// - 公开 API 完全不变：IconName 类型、Icon 组件 props、default size/color
 
 import React from 'react';
 import { HomeIcon } from './HomeIcon';
@@ -109,119 +114,72 @@ interface IconProps {
   color?: string;
 }
 
-/**
- * 统一图标组件
- *
- * @example
- * ```tsx
- * <Icon name="home" size={24} color="#10B981" />
- * <Icon name="calendar" size={20} color="#6B7280" />
- * <Icon name="add" size={32} color="#FFFFFF" />
- * ```
- */
-export function Icon({ name, size = 24, color = '#000000' }: IconProps) {
-  const iconProps = { size, color };
+type IconComponent = React.FC<{ size?: number; color?: string }>;
 
-  switch (name) {
-    case 'home':
-      return <HomeIcon {...iconProps} />;
-    case 'calendar':
-      return <CalendarIcon {...iconProps} />;
-    case 'add':
-      return <AddIcon {...iconProps} />;
-    case 'chart':
-      return <ChartIcon {...iconProps} />;
-    case 'settings':
-      return <SettingsIcon {...iconProps} />;
-    case 'food':
-      return <FoodIcon {...iconProps} />;
-    case 'exercise':
-      return <ExerciseIcon {...iconProps} />;
-    case 'weight':
-      return <WeightIcon {...iconProps} />;
-    case 'camera':
-      return <CameraIcon {...iconProps} />;
-    case 'edit':
-      return <EditIcon {...iconProps} />;
-    case 'delete':
-      return <DeleteIcon {...iconProps} />;
-    case 'back':
-      return <BackIcon {...iconProps} />;
-    case 'sunrise':
-      return <SunriseIcon {...iconProps} />;
-    case 'moon':
-      return <MoonIcon {...iconProps} />;
-    case 'cookie':
-      return <CookieIcon {...iconProps} />;
-    case 'bowl':
-      return <BowlIcon {...iconProps} />;
-    case 'plate':
-      return <PlateIcon {...iconProps} />;
-    case 'running':
-      return <RunningIcon {...iconProps} />;
-    case 'walking':
-      return <WalkingIcon {...iconProps} />;
-    case 'cycling':
-      return <CyclingIcon {...iconProps} />;
-    case 'swimming':
-      return <SwimmingIcon {...iconProps} />;
-    case 'strength':
-      return <StrengthIcon {...iconProps} />;
-    case 'yoga':
-      return <YogaIcon {...iconProps} />;
-    case 'hiit':
-      return <HiitIcon {...iconProps} />;
-    case 'other-exercise':
-      return <OtherExerciseIcon {...iconProps} />;
-    case 'note':
-      return <NoteIcon {...iconProps} />;
-    case 'search':
-      return <SearchIcon {...iconProps} />;
-    case 'tips':
-      return <TipsIcon {...iconProps} />;
-    case 'help':
-      return <HelpIcon {...iconProps} />;
-    case 'ai':
-      return <AiIcon {...iconProps} />;
-    case 'chart-bar':
-      return <ChartBarIcon {...iconProps} />;
-    case 'fire':
-      return <FireIcon {...iconProps} />;
-    case 'connected':
-      return <ConnectedIcon {...iconProps} />;
-    case 'disconnected':
-      return <DisconnectedIcon {...iconProps} />;
-    case 'trend-up':
-      return <TrendUpIcon {...iconProps} />;
-    case 'trend-down':
-      return <TrendDownIcon {...iconProps} />;
-    case 'trend-flat':
-      return <TrendFlatIcon {...iconProps} />;
-    case 'eye':
-      return <EyeIcon {...iconProps} />;
-    case 'eye-off':
-      return <EyeOffIcon {...iconProps} />;
-    case 'arrow-right':
-      return <ArrowRightIcon {...iconProps} />;
-    case 'star':
-      return <StarIcon {...iconProps} />;
-    case 'star-outline':
-      return <StarOutlineIcon {...iconProps} />;
-    case 'check':
-      return <CheckIcon {...iconProps} />;
-    case 'close':
-      return <CloseIcon {...iconProps} />;
-    case 'warning':
-      return <WarningIcon {...iconProps} />;
-    case 'info':
-      return <InfoIcon {...iconProps} />;
-    case 'chevron-right':
-      return <ChevronRightIcon {...iconProps} />;
-    case 'chevron-down':
-      return <ChevronDownIcon {...iconProps} />;
-    case 'chevron-up':
-      return <ChevronUpIcon {...iconProps} />;
-    default:
-      return null;
-  }
+/**
+ * Icon 查表 —— O(1) 替代 49 个 case switch
+ *
+ * 类型与运行时都安全：name 是 IconName 字面量联合，查表返回 IconComponent。
+ */
+const ICONS: Record<IconName, IconComponent> = {
+  home: HomeIcon,
+  calendar: CalendarIcon,
+  add: AddIcon,
+  chart: ChartIcon,
+  settings: SettingsIcon,
+  food: FoodIcon,
+  exercise: ExerciseIcon,
+  weight: WeightIcon,
+  camera: CameraIcon,
+  edit: EditIcon,
+  delete: DeleteIcon,
+  back: BackIcon,
+  sunrise: SunriseIcon,
+  moon: MoonIcon,
+  cookie: CookieIcon,
+  bowl: BowlIcon,
+  plate: PlateIcon,
+  running: RunningIcon,
+  walking: WalkingIcon,
+  cycling: CyclingIcon,
+  swimming: SwimmingIcon,
+  strength: StrengthIcon,
+  yoga: YogaIcon,
+  hiit: HiitIcon,
+  'other-exercise': OtherExerciseIcon,
+  note: NoteIcon,
+  search: SearchIcon,
+  tips: TipsIcon,
+  help: HelpIcon,
+  ai: AiIcon,
+  'chart-bar': ChartBarIcon,
+  fire: FireIcon,
+  connected: ConnectedIcon,
+  disconnected: DisconnectedIcon,
+  'trend-up': TrendUpIcon,
+  'trend-down': TrendDownIcon,
+  'trend-flat': TrendFlatIcon,
+  eye: EyeIcon,
+  'eye-off': EyeOffIcon,
+  'arrow-right': ArrowRightIcon,
+  star: StarIcon,
+  'star-outline': StarOutlineIcon,
+  check: CheckIcon,
+  close: CloseIcon,
+  warning: WarningIcon,
+  info: InfoIcon,
+  'chevron-right': ChevronRightIcon,
+  'chevron-down': ChevronDownIcon,
+  'chevron-up': ChevronUpIcon,
+};
+
+function IconImpl({ name, size = 24, color = '#000000' }: IconProps) {
+  const Cmp = ICONS[name];
+  if (!Cmp) return null;
+  return <Cmp size={size} color={color} />;
 }
+
+/**
+ * 统一图标组件（React.memo 包裹，props 浅相等时跳过重渲染）
+ */
+export const Icon = React.memo(IconImpl);

@@ -1,9 +1,13 @@
 // services/exerciseAnalysis.ts
 // 运动截图分析服务
+//
+// P1-6：复用 services/vision/baseVisionClient 的 imageToBase64 + callVisionApi
+// 减少与 services/ai.ts 的代码重复
 
 import { logger } from '@/utils/logger';
 import { aiService } from './ai';
 import { ExerciseAnalysisResult } from '@/types/exercise';
+import { imageToBase64, callVisionApi } from './vision/baseVisionClient';
 
 // 运动类型映射
 const EXERCISE_TYPE_MAP: Record<string, string> = {
@@ -55,11 +59,9 @@ export class ExerciseAnalysisService {
     }
 
     try {
-      // 转换图片为 Base64
-      const base64 = await aiService.imageToBase64(imageUri);
+      const base64 = await imageToBase64(imageUri);
       logger.log('[AI] 图片 Base64 长度:', base64.length, '字符');
 
-      // 构建请求
       const prompt = `请分析这张运动截图，提取运动数据。这可能是运动 App 的截图、智能手表的运动记录、或者运动设备的显示屏。
 
 请以 JSON 格式返回，格式如下：
@@ -86,107 +88,18 @@ export class ExerciseAnalysisService {
       logger.log('[AI] 请求端点:', apiEndpoint);
       logger.log('[AI] API 类型:', config.apiType);
       logger.log('[AI] 模型:', config.model);
-      let response: Response;
 
-      if (config.apiType === 'responses') {
-        // Responses API 格式
-        logger.log('[AI] 使用 Responses API 发送请求...');
-        response = await fetch(apiEndpoint, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${config.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: config.model,
-            input: [
-              {
-                role: 'user',
-                content: [
-                  {
-                    type: 'input_text',
-                    text: prompt,
-                  },
-                  {
-                    type: 'input_image',
-                    image_url: `data:image/jpeg;base64,${base64}`,
-                  },
-                ],
-              },
-            ],
-            max_output_tokens: 500,
-          }),
-        });
-      } else {
-        // Chat Completions API 格式
-        logger.log('[AI] 使用 Chat Completions API 发送请求...');
-        response = await fetch(apiEndpoint, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${config.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: config.model,
-            messages: [
-              {
-                role: 'user',
-                content: [
-                  { type: 'text', text: prompt },
-                  {
-                    type: 'image_url',
-                    image_url: {
-                      url: `data:image/jpeg;base64,${base64}`,
-                    },
-                  },
-                ],
-              },
-            ],
-            max_tokens: 500,
-          }),
-        });
-      }
+      const jsonText = await callVisionApi({
+        apiType: config.apiType || 'chat-completions',
+        endpoint: apiEndpoint,
+        apiKey: config.apiKey,
+        model: config.model,
+        base64,
+        prompt,
+        maxTokens: 500,
+      });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        logger.error('[AI] HTTP 状态:', response.status);
-        logger.error('[AI] 响应错误:', errorText);
-        throw new Error('AI 识别失败，请重试');
-      }
-
-      logger.log('[AI] HTTP 状态:', response.status, 'OK');
-      const data = await response.json();
-      logger.log('[AI] 原始响应:', JSON.stringify(data).substring(0, 500));
-
-      // 根据 API 类型解析响应
-      let content: string | undefined;
-      if (config.apiType === 'responses') {
-        // Responses API 格式
-        content = data.output?.[0]?.content?.[0]?.text || data.choices?.[0]?.message?.content;
-      } else {
-        // Chat Completions API 格式
-        content = data.choices?.[0]?.message?.content;
-      }
-
-      logger.log('[AI] 解析出的内容:', content ? content.substring(0, 300) : '(空)');
-
-      if (!content) {
-        logger.error('[AI] 返回内容为空，完整响应:', JSON.stringify(data));
-        throw new Error('AI 返回内容为空');
-      }
-
-      // 解析 JSON
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) {
-        logger.error('[AI] 未找到 JSON，原始内容:', content);
-        throw new Error('AI 返回格式错误');
-      }
-
-      logger.log('[AI] JSON 匹配:', jsonMatch[0].substring(0, 300));
-      const result = JSON.parse(jsonMatch[0]);
-      logger.log('[AI] 解析结果:', JSON.stringify(result));
-
-      // 映射运动类型
+      const result = JSON.parse(jsonText);
       const exerciseType = this.mapExerciseType(result.exerciseType);
 
       logger.log('[AI] 分析完成:',
@@ -204,7 +117,7 @@ export class ExerciseAnalysisService {
         heartRateAvg: result.heartRateAvg ? Math.round(result.heartRateAvg) : undefined,
         timestamp: result.timestamp || undefined,
         confidence: result.confidence || 'medium',
-        rawText: content,
+        rawText: jsonText,
       };
     } catch (error) {
       logger.error('[AI] 运动截图分析失败:', error);
