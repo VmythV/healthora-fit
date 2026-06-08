@@ -39,13 +39,19 @@ An intelligent health tracking app that helps you effortlessly track diet, exerc
 
 </div>
 
-<div align="center">
+### 🛠️ Project Activity
 
-![Profile Views](https://komarev.com/ghpvc/?username=VmythV&label=Profile%20Views&color=0e75b6&style=flat)
+[![Total Commits](https://img.shields.io/github/commit-count/total/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/commits/main)
+[![Commits This Year](https://img.shields.io/github/commit-activity/y/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/commits/main)
+[![Code Size](https://img.shields.io/github/languages/code-size/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit)
+[![Repo Size](https://img.shields.io/github/repo-size/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit)
+[![Closed Issues](https://img.shields.io/github/issues-closed-raw/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/issues?q=is%3Aissue+is%3Aclosed)
+[![Closed PRs](https://img.shields.io/github/issues-pr-closed/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/pulls?q=is%3Apr+is%3Aclosed)
+[![Top Language](https://img.shields.io/github/languages/top/VmythV/healthora-fit?style=flat&logo=typescript)](https://github.com/VmythV/healthora-fit)
+[![Languages Count](https://img.shields.io/github/languages/count/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit)
+[![Created](https://img.shields.io/github/created-at/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit)
 
-</div>
-
-> 💡 仓库的 stars / forks / issues / 最近提交等已通过顶部 shields.io 徽章实时展示。`github-readme-stats.vercel.app` 公共实例因 GitHub API 限流经常返回 `Error Fetching Resource`，`github-readme-streak-stats.cyclic.app` 也因 Cyclic 平台关停而失效。本节统一改用 `ghchart.rshah.org`（贡献图，轻量 VPS 无限流）+ `komarev.com`（访问计数）这两个稳定服务。
+📜 [View all commits →](https://github.com/VmythV/healthora-fit/commits/main) &nbsp;•&nbsp; 📈 [Repo Insights →](https://github.com/VmythV/healthora-fit/pulse)
 
 ## ✨ Features
 

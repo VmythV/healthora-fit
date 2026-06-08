@@ -39,6 +39,20 @@
 
 </div>
 
+### 🛠️ 项目活跃度
+
+[![Total Commits](https://img.shields.io/github/commit-count/total/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/commits/main)
+[![Commits This Year](https://img.shields.io/github/commit-activity/y/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/commits/main)
+[![Code Size](https://img.shields.io/github/languages/code-size/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit)
+[![Repo Size](https://img.shields.io/github/repo-size/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit)
+[![Closed Issues](https://img.shields.io/github/issues-closed-raw/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/issues?q=is%3Aissue+is%3Aclosed)
+[![Closed PRs](https://img.shields.io/github/issues-pr-closed/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/pulls?q=is%3Apr+is%3Aclosed)
+[![Top Language](https://img.shields.io/github/languages/top/VmythV/healthora-fit?style=flat&logo=typescript)](https://github.com/VmythV/healthora-fit)
+[![Languages Count](https://img.shields.io/github/languages/count/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit)
+[![Created](https://img.shields.io/github/created-at/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit)
+
+📜 [查看所有提交 →](https://github.com/VmythV/healthora-fit/commits/main) &nbsp;•&nbsp; 📈 [仓库 Insights →](https://github.com/VmythV/healthora-fit/pulse)
+
 <div align="center">
 
 ![Profile Views](https://komarev.com/ghpvc/?username=VmythV&label=Profile%20Views&color=0e75b6&style=flat)
