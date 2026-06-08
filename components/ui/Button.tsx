@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { theme } from '@/constants/theme';
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps {
@@ -30,11 +30,14 @@ interface ButtonProps {
 /**
  * 按钮组件
  *
+ * P2-22：新增 `danger` variant（红色，危险操作用）
+ *
  * @example
  * ```tsx
  * <Button title="保存" onPress={handleSave} />
  * <Button title="取消" onPress={handleCancel} variant="secondary" />
  * <Button title="删除" onPress={handleDelete} variant="ghost" />
+ * <Button title="永久删除" onPress={handleDelete} variant="danger" />
  * <Button title="加载中" onPress={() => {}} loading />
  * <Button title="禁用" onPress={() => {}} disabled />
  * ```
@@ -67,7 +70,7 @@ export function Button({
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'primary' ? '#FFFFFF' : theme.colors.primary.main}
+          color={(variant === 'primary' || variant === 'danger') ? '#FFFFFF' : theme.colors.primary.main}
           size="small"
         />
       ) : (
@@ -107,6 +110,9 @@ const styles = StyleSheet.create({
   ghost: {
     backgroundColor: 'transparent',
   },
+  danger: {
+    backgroundColor: theme.colors.error,
+  },
   // Sizes
   size_sm: {
     height: 32,
@@ -136,6 +142,9 @@ const styles = StyleSheet.create({
   },
   text_ghost: {
     color: theme.colors.primary.main,
+  },
+  text_danger: {
+    color: '#FFFFFF',
   },
   // Text Sizes
   textSize_sm: {

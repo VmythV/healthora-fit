@@ -1,8 +1,10 @@
 // components/charts/BarChart.tsx
 // 柱状图组件
+//
+// P2-29：默认 width 用 useWindowDimensions 响应屏幕旋转/分屏
 
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Animated, useWindowDimensions } from 'react-native';
 import Svg, { Rect, Line, Text as SvgText } from 'react-native-svg';
 import { theme } from '@/constants/theme';
 
@@ -65,7 +67,7 @@ interface BarChartProps {
  */
 export function BarChart({
   data,
-  width = Dimensions.get('window').width - 48,
+  width: widthProp,
   height = 200,
   color = theme.colors.primary.main,
   showValues = true,
@@ -79,6 +81,8 @@ export function BarChart({
   barRadius = 4,
   barWidth,
 }: BarChartProps) {
+  const { width: screenWidth } = useWindowDimensions();
+  const width = widthProp ?? screenWidth - 48;
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   if (!data || data.length === 0) {

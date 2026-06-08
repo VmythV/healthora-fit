@@ -413,6 +413,86 @@ export const dietQueries = {
   },
 
   /**
+   * P2-36：根据 timestamp 查单条（用于去重）
+   */
+  async findByTimestamp(timestamp: string): Promise<DietRecord | null> {
+    const db = database.getDatabase();
+    return db.getFirstAsync<DietRecord>(
+      'SELECT * FROM diet_records WHERE timestamp = ? LIMIT 1',
+      [timestamp]
+    );
+  },
+
+  /**
+   * P2-18：批量插入（多值 INSERT 单 SQL）
+   *
+   * 内部按 500/批分片，避免单条 SQL 参数过多。
+   * 已存在 timestamp 的会被跳过（依赖 P2-36 findByTimestamp）。
+   * 返回 { inserted, skipped }
+   */
+  async insertMany(
+    records: Array<{
+      timestamp: string;
+      photoUri?: string;
+      foodsJson?: string;
+      totalCalories?: number;
+      totalProtein?: number;
+      totalCarbs?: number;
+      totalFat?: number;
+      mealType?: string;
+      note?: string;
+      isEdited?: boolean;
+    }>
+  ): Promise<{ inserted: number; skipped: number }> {
+    if (records.length === 0) return { inserted: 0, skipped: 0 };
+    const db = database.getDatabase();
+    let inserted = 0;
+    let skipped = 0;
+
+    const CHUNK = 500;
+    for (let i = 0; i < records.length; i += CHUNK) {
+      const chunk = records.slice(i, i + CHUNK);
+      // 先查重
+      const existingTs = new Set<string>();
+      for (const r of chunk) existingTs.add(r.timestamp);
+      const existingRows = await db.getAllAsync<{ timestamp: string }>(
+        `SELECT timestamp FROM diet_records WHERE timestamp IN (${Array.from(existingTs).map(() => '?').join(',')})`,
+        Array.from(existingTs)
+      );
+      const existingSet = new Set(existingRows.map((r) => r.timestamp));
+
+      const toInsert = chunk.filter((r) => !existingSet.has(r.timestamp));
+      skipped += chunk.length - toInsert.length;
+      if (toInsert.length === 0) continue;
+
+      // 构造多值 INSERT
+      const cols = 10; // timestamp, photo_uri, foods_json, total_calories, total_protein, total_carbs, total_fat, meal_type, note, is_edited
+      const placeholders = toInsert.map(() => `(${Array(cols).fill('?').join(',')})`).join(',');
+      const flatParams: any[] = [];
+      for (const r of toInsert) {
+        flatParams.push(
+          r.timestamp,
+          r.photoUri || null,
+          r.foodsJson || null,
+          r.totalCalories || null,
+          r.totalProtein || null,
+          r.totalCarbs || null,
+          r.totalFat || null,
+          r.mealType || null,
+          r.note || null,
+          r.isEdited ? 1 : 0
+        );
+      }
+      await db.runAsync(
+        `INSERT INTO diet_records (timestamp, photo_uri, foods_json, total_calories, total_protein, total_carbs, total_fat, meal_type, note, is_edited) VALUES ${placeholders}`,
+        flatParams
+      );
+      inserted += toInsert.length;
+    }
+    return { inserted, skipped };
+  },
+
+  /**
    * 获取日期范围内有记录的日期列表（用于月视图标记）
    */
   async getDatesWithRecords(startDate: string, endDate: string): Promise<string[]> {

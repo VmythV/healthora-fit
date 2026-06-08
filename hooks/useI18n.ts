@@ -37,9 +37,10 @@ export function useI18n(): UseI18nReturn {
   // 初始化：从存储加载语言设置
   useEffect(() => {
     loadSavedLanguage();
-  }, []);
+  }, [loadSavedLanguage]);
 
-  const loadSavedLanguage = async () => {
+  // P2-28：useCallback 稳定引用
+  const loadSavedLanguage = useCallback(async () => {
     try {
       const savedLocale = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
       if (savedLocale && isSupportedLocale(savedLocale)) {
@@ -48,7 +49,7 @@ export function useI18n(): UseI18nReturn {
     } catch (error) {
       logger.error('[useI18n] 加载语言设置失败:', error);
     }
-  };
+  }, []);
 
   const isSupportedLocale = (locale: string): locale is Locale => {
     return SUPPORTED_LOCALES.some((l) => l.code === locale);

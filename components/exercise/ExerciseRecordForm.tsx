@@ -1,5 +1,7 @@
 // components/exercise/ExerciseRecordForm.tsx
 // 运动记录表单
+//
+// P2-21：用 DateTimeStepper 替换内嵌 100+ 行 RNModal 时间选择器
 
 import { logger } from '@/utils/logger';
 import React, { useState, useEffect } from 'react';
@@ -10,10 +12,8 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
   KeyboardAvoidingView,
   Platform,
-  Modal as RNModal,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
@@ -22,10 +22,11 @@ import { useExerciseRecords } from '@/hooks/useExerciseRecords';
 import { ExerciseTypeSelector } from './ExerciseTypeSelector';
 import { DurationInput } from './DurationInput';
 import { ScreenshotPicker } from './ScreenshotPicker';
+import { DateTimeStepper } from './DateTimeStepper';
 import { Card } from '@/components/ui';
 import { Icon } from '@/components/icons';
 import { ExerciseAnalysisResult } from '@/types/exercise';
-import { showNotification, showConfirm } from '@/components/ui';
+import { showNotification } from '@/components/ui';
 
 interface ExerciseRecordFormProps {
   initialType?: string;
@@ -77,7 +78,6 @@ export function ExerciseRecordForm({
   const [aiSuccessMessage, setAiSuccessMessage] = useState<string | null>(null);
   const [screenshotUri, setScreenshotUri] = useState<string | null>(null);
   const [recordTimestamp, setRecordTimestamp] = useState(new Date());
-  const [showTimePicker, setShowTimePicker] = useState(false);
 
   // AI 识别成功消息自动消失
   useEffect(() => {
@@ -120,29 +120,6 @@ export function ExerciseRecordForm({
       setRecordTimestamp(new Date(result.timestamp));
     }
     setAiSuccessMessage(t('exercise.aiRecognitionSuccess'));
-  };
-
-  // 格式化日期时间
-  const formatDateTime = (date: Date): string => {
-    const y = date.getFullYear();
-    const M = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    const h = String(date.getHours()).padStart(2, '0');
-    const m = String(date.getMinutes()).padStart(2, '0');
-    return `${y}-${M}-${d} ${h}:${m}`;
-  };
-
-  // 时间选择辅助函数
-  const adjustTime = (field: 'year' | 'month' | 'day' | 'hour' | 'minute', delta: number) => {
-    const newDate = new Date(recordTimestamp);
-    switch (field) {
-      case 'year': newDate.setFullYear(newDate.getFullYear() + delta); break;
-      case 'month': newDate.setMonth(newDate.getMonth() + delta); break;
-      case 'day': newDate.setDate(newDate.getDate() + delta); break;
-      case 'hour': newDate.setHours(newDate.getHours() + delta); break;
-      case 'minute': newDate.setMinutes(newDate.getMinutes() + delta); break;
-    }
-    setRecordTimestamp(newDate);
   };
 
   // 保存
@@ -207,16 +184,13 @@ export function ExerciseRecordForm({
           />
         </View>
 
-        {/* 运动时间 */}
+        {/* 运动时间 —— 用 DateTimeStepper 替代内嵌 RNModal */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('exercise.recordTime')}</Text>
-          <TouchableOpacity onPress={() => setShowTimePicker(true)} activeOpacity={0.7}>
-            <Card style={styles.timeCard}>
-              <Icon name="calendar" size={20} color={theme.colors.primary.main} />
-              <Text style={styles.timeText}>{formatDateTime(recordTimestamp)}</Text>
-              <Icon name="edit" size={16} color={theme.colors.text.tertiary} />
-            </Card>
-          </TouchableOpacity>
+          <DateTimeStepper
+            value={recordTimestamp}
+            onChange={setRecordTimestamp}
+          />
         </View>
 
         {/* 运动类型 */}
@@ -308,90 +282,6 @@ export function ExerciseRecordForm({
           </Text>
         </TouchableOpacity>
       </View>
-
-      {/* 时间选择器 Modal */}
-      <RNModal
-        visible={showTimePicker}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowTimePicker(false)}
-      >
-        <TouchableOpacity
-          style={styles.timePickerOverlay}
-          activeOpacity={1}
-          onPress={() => setShowTimePicker(false)}
-        >
-          <TouchableOpacity
-            style={styles.timePickerContainer}
-            activeOpacity={1}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <Text style={styles.timePickerTitle}>{t('exercise.selectDateTime')}</Text>
-
-            {/* 日期调整 */}
-            <View style={styles.timePickerRow}>
-              <Text style={styles.timePickerLabel}>{t('common.date')}</Text>
-              <View style={styles.timePickerAdjust}>
-                <TouchableOpacity
-                  style={styles.timePickerBtn}
-                  onPress={() => adjustTime('day', -1)}
-                >
-                  <Text style={styles.timePickerBtnText}>-</Text>
-                </TouchableOpacity>
-                <Text style={styles.timePickerValue}>
-                  {`${recordTimestamp.getFullYear()}-${String(recordTimestamp.getMonth() + 1).padStart(2, '0')}-${String(recordTimestamp.getDate()).padStart(2, '0')}`}
-                </Text>
-                <TouchableOpacity
-                  style={styles.timePickerBtn}
-                  onPress={() => adjustTime('day', 1)}
-                >
-                  <Text style={styles.timePickerBtnText}>+</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* 时间调整 */}
-            <View style={styles.timePickerRow}>
-              <Text style={styles.timePickerLabel}>{t('common.time')}</Text>
-              <View style={styles.timePickerAdjust}>
-                <TouchableOpacity
-                  style={styles.timePickerBtn}
-                  onPress={() => adjustTime('minute', -5)}
-                >
-                  <Text style={styles.timePickerBtnText}>-5m</Text>
-                </TouchableOpacity>
-                <Text style={styles.timePickerValue}>
-                  {`${String(recordTimestamp.getHours()).padStart(2, '0')}:${String(recordTimestamp.getMinutes()).padStart(2, '0')}`}
-                </Text>
-                <TouchableOpacity
-                  style={styles.timePickerBtn}
-                  onPress={() => adjustTime('minute', 5)}
-                >
-                  <Text style={styles.timePickerBtnText}>+5m</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* 快捷设置 */}
-            <View style={styles.timePickerQuickRow}>
-              <TouchableOpacity
-                style={styles.timePickerQuickBtn}
-                onPress={() => setRecordTimestamp(new Date())}
-              >
-                <Text style={styles.timePickerQuickText}>{t('common.now')}</Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* 确定按钮 */}
-            <TouchableOpacity
-              style={styles.timePickerConfirmBtn}
-              onPress={() => setShowTimePicker(false)}
-            >
-              <Text style={styles.timePickerConfirmText}>{t('common.ok')}</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </RNModal>
     </KeyboardAvoidingView>
   );
 }
@@ -515,106 +405,6 @@ const styles = StyleSheet.create({
   successBannerText: {
     fontSize: theme.fontSize.bodySm,
     fontWeight: theme.fontWeight.medium,
-    color: '#FFFFFF',
-  },
-  // 时间选择卡片
-  timeCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.md,
-    padding: theme.spacing.base,
-  },
-  timeText: {
-    flex: 1,
-    fontSize: theme.fontSize.body,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.text.primary,
-  },
-  // 时间选择器 Modal
-  timePickerOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  timePickerContainer: {
-    width: '85%',
-    backgroundColor: theme.colors.background.primary,
-    borderRadius: theme.borderRadius.xl,
-    padding: theme.spacing.xl,
-    ...theme.shadow.lg,
-  },
-  timePickerTitle: {
-    fontSize: theme.fontSize.h4,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text.primary,
-    textAlign: 'center',
-    marginBottom: theme.spacing.xl,
-  },
-  timePickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing.lg,
-  },
-  timePickerLabel: {
-    fontSize: theme.fontSize.body,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.text.secondary,
-    width: 50,
-  },
-  timePickerAdjust: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.md,
-  },
-  timePickerBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: theme.colors.background.tertiary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  timePickerBtnText: {
-    fontSize: theme.fontSize.bodyLg,
-    fontWeight: theme.fontWeight.bold,
-    color: theme.colors.text.primary,
-  },
-  timePickerValue: {
-    fontSize: theme.fontSize.bodyLg,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.primary.main,
-    minWidth: 130,
-    textAlign: 'center',
-  },
-  timePickerQuickRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: theme.spacing.xl,
-  },
-  timePickerQuickBtn: {
-    paddingHorizontal: theme.spacing.xl,
-    paddingVertical: theme.spacing.sm,
-    backgroundColor: theme.colors.background.secondary,
-    borderRadius: theme.borderRadius.full,
-  },
-  timePickerQuickText: {
-    fontSize: theme.fontSize.bodySm,
-    fontWeight: theme.fontWeight.medium,
-    color: theme.colors.primary.main,
-  },
-  timePickerConfirmBtn: {
-    backgroundColor: theme.colors.primary.main,
-    borderRadius: theme.borderRadius.lg,
-    paddingVertical: theme.spacing.md,
-    alignItems: 'center',
-  },
-  timePickerConfirmText: {
-    fontSize: theme.fontSize.bodyLg,
-    fontWeight: theme.fontWeight.semibold,
     color: '#FFFFFF',
   },
 });

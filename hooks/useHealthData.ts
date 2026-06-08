@@ -49,7 +49,13 @@ interface UseHealthDataReturn {
 export function useHealthData(): UseHealthDataReturn {
   const [connectionStatus, setConnectionStatus] = useState<HealthConnectionStatus | null>(null);
   const [permissions, setPermissions] = useState<HealthPermissions | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  // P2-23：loading 拆桶 —— 不同操作域独立 boolean，避免 UI 互相干扰
+  const [loading, setLoading] = useState({
+    sync: false,
+    requestPermission: false,
+    checkStatus: false,
+    disconnect: false,
+  });
   const [error, setError] = useState<string | null>(null);
 
   const getService = useCallback((): HealthDataService => {
@@ -58,7 +64,7 @@ export function useHealthData(): UseHealthDataReturn {
 
   const checkAvailability = useCallback(async (): Promise<boolean> => {
     try {
-      setIsLoading(true);
+      setLoading((s) => ({ ...s, checkStatus: true }));
       setError(null);
 
       const service = getService();
@@ -70,20 +76,19 @@ export function useHealthData(): UseHealthDataReturn {
       logger.error('[useHealthData] checkAvailability 失败:', err);
       return false;
     } finally {
-      setIsLoading(false);
+      setLoading((s) => ({ ...s, checkStatus: false }));
     }
   }, [getService]);
 
   const requestPermissions = useCallback(async (): Promise<HealthPermissions> => {
     try {
-      setIsLoading(true);
+      setLoading((s) => ({ ...s, requestPermission: true }));
       setError(null);
 
       const service = getService();
       const result = await service.requestPermissions();
       setPermissions(result);
 
-      // 更新连接状态
       const status = await service.getConnectionStatus();
       setConnectionStatus(status);
 
@@ -94,13 +99,13 @@ export function useHealthData(): UseHealthDataReturn {
       logger.error('[useHealthData] requestPermissions 失败:', err);
       throw err;
     } finally {
-      setIsLoading(false);
+      setLoading((s) => ({ ...s, requestPermission: false }));
     }
   }, [getService]);
 
   const checkPermissions = useCallback(async (): Promise<HealthPermissions> => {
     try {
-      setIsLoading(true);
+      setLoading((s) => ({ ...s, checkStatus: true }));
       setError(null);
 
       const service = getService();
@@ -113,13 +118,13 @@ export function useHealthData(): UseHealthDataReturn {
       logger.error('[useHealthData] checkPermissions 失败:', err);
       throw err;
     } finally {
-      setIsLoading(false);
+      setLoading((s) => ({ ...s, checkStatus: false }));
     }
   }, [getService]);
 
   const getConnectionStatus = useCallback(async (): Promise<HealthConnectionStatus> => {
     try {
-      setIsLoading(true);
+      setLoading((s) => ({ ...s, checkStatus: true }));
       setError(null);
 
       const service = getService();
@@ -132,13 +137,13 @@ export function useHealthData(): UseHealthDataReturn {
       logger.error('[useHealthData] getConnectionStatus 失败:', err);
       throw err;
     } finally {
-      setIsLoading(false);
+      setLoading((s) => ({ ...s, checkStatus: false }));
     }
   }, [getService]);
 
   const syncData = useCallback(async (): Promise<HealthSyncResult> => {
     try {
-      setIsLoading(true);
+      setLoading((s) => ({ ...s, sync: true }));
       setError(null);
 
       const service = getService();
@@ -159,13 +164,13 @@ export function useHealthData(): UseHealthDataReturn {
       logger.error('[useHealthData] syncData 失败:', err);
       throw err;
     } finally {
-      setIsLoading(false);
+      setLoading((s) => ({ ...s, sync: false }));
     }
   }, [getService]);
 
   const disconnect = useCallback(async (): Promise<void> => {
     try {
-      setIsLoading(true);
+      setLoading((s) => ({ ...s, disconnect: true }));
       setError(null);
 
       const service = getService();
@@ -182,9 +187,13 @@ export function useHealthData(): UseHealthDataReturn {
       logger.error('[useHealthData] disconnect 失败:', err);
       throw err;
     } finally {
-      setIsLoading(false);
+      setLoading((s) => ({ ...s, disconnect: false }));
     }
   }, [getService]);
+
+  // 暴露兼容旧 isLoading 字段（任一 loading 桶 true 即为 loading）
+  const isLoading =
+    loading.sync || loading.requestPermission || loading.checkStatus || loading.disconnect;
 
   return {
     connectionStatus,

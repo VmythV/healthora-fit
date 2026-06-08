@@ -1,8 +1,10 @@
 // components/charts/LineChart.tsx
 // 折线图组件
+//
+// P2-29：默认 width 用 useWindowDimensions 响应屏幕旋转/分屏
 
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
 import { theme } from '@/constants/theme';
 
@@ -49,7 +51,7 @@ interface LineChartProps {
  */
 export function LineChart({
   data,
-  width = Dimensions.get('window').width - 48,
+  width: widthProp,
   height = 200,
   color = theme.colors.primary.main,
   showDots = true,
@@ -59,6 +61,8 @@ export function LineChart({
   targetLabel,
   unit = '',
 }: LineChartProps) {
+  const { width: screenWidth } = useWindowDimensions();
+  const width = widthProp ?? screenWidth - 48;
   if (!data || data.length === 0) {
     return (
       <View style={[styles.container, { width, height }]}>

@@ -7,6 +7,7 @@
 import { logger } from '@/utils/logger';
 import { aiConfigQueries } from '@/database/queries/aiConfig';
 import { testActiveConfig, TestResult } from './aiConnection';
+import { AI_PROMPTS } from '@/constants/aiPrompts';
 import {
   imageToBase64,
   callVisionApi,
@@ -155,26 +156,7 @@ export class AiService {
       const base64 = await imageToBase64(imageUri);
       logger.log('[AI] 图片 Base64 长度:', base64.length, '字符');
 
-      const prompt = `请分析这张食物图片，识别出所有食物并估算营养成分。
-
-请以 JSON 格式返回，格式如下：
-{
-  "foods": [
-    {
-      "name": "食物名称",
-      "portion": "份量描述（如：1碗、100g）",
-      "calories": 卡路里数值,
-      "protein": 蛋白质克数,
-      "carbs": 碳水化合物克数,
-      "fat": 脂肪克数
-    }
-  ]
-}
-
-注意：
-1. 请尽可能准确估算
-2. 如果无法确定具体数值，给出合理估计
-3. 只返回 JSON，不要有其他文字`;
+      const prompt = AI_PROMPTS.foodAnalysis;
 
       const apiEndpoint = this.getApiEndpoint();
       logger.log('[AI] 请求端点:', apiEndpoint);

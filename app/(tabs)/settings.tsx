@@ -1,7 +1,7 @@
 // app/(tabs)/settings.tsx
 // 设置页面
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -20,7 +20,7 @@ import { Locale } from '@/constants/i18n';
 import { dataTransferService } from '@/services/dataTransfer';
 import { aiConfigQueries } from '@/database/queries/aiConfig';
 import { Icon, ArrowRightIcon, CheckIcon } from '@/components/icons';
-import { useWeekStartDay, WEEK_START_OPTIONS } from '@/hooks/useWeekStartDay';
+import { useWeekStartDay } from '@/hooks/useWeekStartDay';
 import { logger } from '@/utils/logger';
 import { showNotification, showConfirm } from '@/components/ui';
 
@@ -35,15 +35,8 @@ export default function SettingsScreen() {
   const [aiEndpoint, setAiEndpoint] = useState('');
   const [debugMode, setDebugMode] = useState(logger.isEnabled());
 
-  useFocusEffect(
-    useCallback(() => {
-      loadActive('target_weight');
-      loadAiConfigStatus();
-    }, [])
-  );
-
   // 加载 AI 配置状态
-  const loadAiConfigStatus = async () => {
+  const loadAiConfigStatus = useCallback(async () => {
     try {
       const config = await aiConfigQueries.getActive();
       if (config) {
@@ -56,7 +49,20 @@ export default function SettingsScreen() {
     } catch (error) {
       logger.error('[Settings] 加载 AI 配置状态失败:', error);
     }
-  };
+  }, []);
+
+  // P2-31：useFocusEffect 改用 ref 模式拿最新回调
+  const loadActiveRef = useRef(loadActive);
+  loadActiveRef.current = loadActive;
+  const loadAiConfigStatusRef = useRef(loadAiConfigStatus);
+  loadAiConfigStatusRef.current = loadAiConfigStatus;
+
+  useFocusEffect(
+    useCallback(() => {
+      loadActiveRef.current('target_weight');
+      loadAiConfigStatusRef.current();
+    }, [])
+  );
 
   const handleLanguageChange = async (newLocale: Locale) => {
     if (newLocale === locale) return;
@@ -231,7 +237,7 @@ export default function SettingsScreen() {
             </View>
             <View style={styles.menuRight}>
               <Text style={styles.menuValue}>
-                {WEEK_START_OPTIONS.find(o => o.value === weekStartDay)?.label}
+                {t(`settings.weekStart.days.${weekStartDay}`)}
               </Text>
               <ArrowRightIcon size={16} color={theme.colors.text.tertiary} />
             </View>

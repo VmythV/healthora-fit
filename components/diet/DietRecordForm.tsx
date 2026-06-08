@@ -2,7 +2,7 @@
 // 饮食记录表单组件
 
 import { logger } from '@/utils/logger';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -81,13 +81,13 @@ export function DietRecordForm({
     }
   }, [initialFoods]);
 
-  // 计算营养成分总量
-  const totals = {
+  // P2-20：计算营养成分总量用 useMemo，避免每次 render（特别是 note 输入时）跑 4 次 reduce
+  const totals = useMemo(() => ({
     calories: foods.reduce((sum, f) => sum + f.calories, 0),
     protein: foods.reduce((sum, f) => sum + f.protein, 0),
     carbs: foods.reduce((sum, f) => sum + f.carbs, 0),
     fat: foods.reduce((sum, f) => sum + f.fat, 0),
-  };
+  }), [foods]);
 
   // 获取默认餐次
   function getDefaultMealType(): MealType {

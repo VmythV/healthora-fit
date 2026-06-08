@@ -68,7 +68,12 @@ class Database {
   }
 
   /**
-   * 清空所有数据（危险操作）
+   * 清空所有业务数据（保留 schema_version 与表结构）
+   *
+   * @deprecated 当前 0 消费方。如需"完全重置到出厂"，应改用 resetDatabase(db)
+   * （来自 ./migrations）。
+   *
+   * P2-37：保留方法（向后兼容），但加 JSDoc 标注。
    */
   async clearAll(): Promise<void> {
     const db = this.getDatabase();

@@ -1,10 +1,13 @@
 // components/exercise/ExerciseTypeSelector.tsx
 // 运动类型选择器
+//
+// P2-27：复用 @/constants/exerciseTypes 的 EXERCISE_TYPES（含 id + icon + caloriesPerMinute）
 
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
+import { EXERCISE_TYPES } from '@/constants/exerciseTypes';
 import { Icon } from '@/components/icons';
 import { IconName } from '@/components/icons/Icon';
 
@@ -13,16 +16,9 @@ interface ExerciseTypeSelectorProps {
   onChange: (type: string) => void;
 }
 
-const EXERCISE_TYPES: { key: string; icon: IconName }[] = [
-  { key: 'running', icon: 'running' },
-  { key: 'walking', icon: 'walking' },
-  { key: 'cycling', icon: 'cycling' },
-  { key: 'swimming', icon: 'swimming' },
-  { key: 'strength', icon: 'strength' },
-  { key: 'yoga', icon: 'yoga' },
-  { key: 'hiit', icon: 'hiit' },
-  { key: 'other', icon: 'other-exercise' },
-];
+function iconFor(name: string): IconName {
+  return name as IconName;
+}
 
 /**
  * 运动类型选择器
@@ -38,23 +34,27 @@ export function ExerciseTypeSelector({ value, onChange }: ExerciseTypeSelectorPr
     >
       {EXERCISE_TYPES.map((type) => (
         <TouchableOpacity
-          key={type.key}
+          key={type.id}
           style={[
             styles.item,
-            value === type.key && styles.itemActive,
+            value === type.id && styles.itemActive,
           ]}
-          onPress={() => onChange(type.key)}
+          onPress={() => onChange(type.id)}
         >
           <View style={styles.iconContainer}>
-            <Icon name={type.icon} size={28} color={value === type.key ? theme.colors.primary.main : theme.colors.text.secondary} />
+            <Icon
+              name={iconFor(type.icon)}
+              size={28}
+              color={value === type.id ? theme.colors.primary.main : theme.colors.text.secondary}
+            />
           </View>
           <Text
             style={[
               styles.label,
-              value === type.key && styles.labelActive,
+              value === type.id && styles.labelActive,
             ]}
           >
-            {t(`exerciseType.${type.key}`)}
+            {t(`exerciseType.${type.id}`)}
           </Text>
         </TouchableOpacity>
       ))}

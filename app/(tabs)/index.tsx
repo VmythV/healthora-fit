@@ -35,8 +35,8 @@ export default function HomeScreen() {
   } = useDietRecords();
   const {
     todayRecords: exerciseRecords,
-    todayMinutes,
-    todayCaloriesBurned,
+    todayDuration,
+    todayCalories,
     loadToday: loadExerciseToday,
   } = useExerciseRecords();
   const {
@@ -103,7 +103,7 @@ export default function HomeScreen() {
 
     // 运动完成评分（20%）- 有运动记录
     if (exerciseRecords.length > 0) {
-      score += 20 * Math.min(1, todayMinutes / 30);
+      score += 20 * Math.min(1, todayDuration / 30);
     }
 
     // 体重趋势评分（10%）- 有记录
@@ -112,7 +112,7 @@ export default function HomeScreen() {
     }
 
     return Math.min(100, Math.round(score));
-  }, [dietRecords, exerciseRecords, todayCalories, todayNutrition, todayMinutes, latestWeight, activeGoal]);
+  }, [dietRecords, exerciseRecords, todayCalories, todayNutrition, todayDuration, latestWeight, activeGoal]);
 
   // 计算体重变化
   const weightChange = latestWeight && yesterdayWeight
@@ -173,8 +173,8 @@ export default function HomeScreen() {
               targetWeight={activeGoal?.targetValue}
               mealsCount={dietRecords.length}
               totalCalories={todayCalories}
-              exerciseMinutes={todayMinutes}
-              caloriesBurned={todayCaloriesBurned}
+              exerciseMinutes={todayDuration}
+              caloriesBurned={todayCalories}
             />
           </AnimatedCard>
 

@@ -317,7 +317,16 @@
     },
     "weekStart": {
       "title": "Week Start Day",
-      "hint": "Choose which day the week starts with"
+      "hint": "Choose which day the week starts with",
+      "days": {
+        "0": "Sunday",
+        "1": "Monday",
+        "2": "Tuesday",
+        "3": "Wednesday",
+        "4": "Thursday",
+        "5": "Friday",
+        "6": "Saturday"
+      }
     },
     "about": {
       "title": "About",

@@ -351,6 +351,80 @@ export const exerciseQueries = {
   },
 
   /**
+   * P2-36：根据 timestamp 查单条
+   */
+  async findByTimestamp(timestamp: string): Promise<ExerciseRecord | null> {
+    const db = database.getDatabase();
+    return db.getFirstAsync<ExerciseRecord>(
+      'SELECT * FROM exercise_records WHERE timestamp = ? LIMIT 1',
+      [timestamp]
+    );
+  },
+
+  /**
+   * P2-18：批量插入
+   */
+  async insertMany(
+    records: Array<{
+      timestamp: string;
+      exerciseType: string;
+      durationMinutes: number;
+      caloriesBurned?: number;
+      distanceKm?: number;
+      heartRateAvg?: number;
+      source?: string;
+      screenshotUri?: string;
+      rawData?: string;
+      note?: string;
+    }>
+  ): Promise<{ inserted: number; skipped: number }> {
+    if (records.length === 0) return { inserted: 0, skipped: 0 };
+    const db = database.getDatabase();
+    let inserted = 0;
+    let skipped = 0;
+
+    const CHUNK = 500;
+    for (let i = 0; i < records.length; i += CHUNK) {
+      const chunk = records.slice(i, i + CHUNK);
+      const existingTs = new Set<string>();
+      for (const r of chunk) existingTs.add(r.timestamp);
+      const existingRows = await db.getAllAsync<{ timestamp: string }>(
+        `SELECT timestamp FROM exercise_records WHERE timestamp IN (${Array.from(existingTs).map(() => '?').join(',')})`,
+        Array.from(existingTs)
+      );
+      const existingSet = new Set(existingRows.map((r) => r.timestamp));
+
+      const toInsert = chunk.filter((r) => !existingSet.has(r.timestamp));
+      skipped += chunk.length - toInsert.length;
+      if (toInsert.length === 0) continue;
+
+      const cols = 10;
+      const placeholders = toInsert.map(() => `(${Array(cols).fill('?').join(',')})`).join(',');
+      const flatParams: any[] = [];
+      for (const r of toInsert) {
+        flatParams.push(
+          r.timestamp,
+          r.exerciseType,
+          r.durationMinutes,
+          r.caloriesBurned || null,
+          r.distanceKm || null,
+          r.heartRateAvg || null,
+          r.source || 'manual',
+          r.screenshotUri || null,
+          r.rawData || null,
+          r.note || null
+        );
+      }
+      await db.runAsync(
+        `INSERT INTO exercise_records (timestamp, exercise_type, duration_minutes, calories_burned, distance_km, heart_rate_avg, source, screenshot_uri, raw_data, note) VALUES ${placeholders}`,
+        flatParams
+      );
+      inserted += toInsert.length;
+    }
+    return { inserted, skipped };
+  },
+
+  /**
    * 获取日期范围内有记录的日期列表（用于月视图标记）
    */
   async getDatesWithRecords(startDate: string, endDate: string): Promise<string[]> {

@@ -74,9 +74,7 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 计算属性（别名）
-  const todayMinutes = todayDuration;
-  const todayCaloriesBurned = todayCalories;
+  // P2-24：去掉 todayMinutes/todayCaloriesBurned 别名（仅 todayDuration/todayCalories 为规范名）
 
   const loadToday = useCallback(async () => {
     try {
@@ -264,8 +262,6 @@ export function useExerciseRecords(date?: string): UseExerciseRecordsReturn {
     todayRecords,
     todayDuration,
     todayCalories,
-    todayMinutes,
-    todayCaloriesBurned,
     isLoading,
     error,
 

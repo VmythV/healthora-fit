@@ -1,12 +1,12 @@
 // utils/performance.ts
 // 性能优化工具
+//
+// P2-33/P2-34：删除 preloadImage/preloadImages（用 web Image，RN 端无效）
+// 与 useMemoizedCallback（仅 useCallback 套壳）。保留 throttle/debounce/Cache 等实用函数。
 
+import { useCallback, useRef } from 'react';
 import { logger } from '@/utils/logger';
-import { useCallback, useRef, useMemo } from 'react';
 
-/**
- * 防抖函数
- */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
@@ -24,9 +24,6 @@ export function debounce<T extends (...args: any[]) => any>(
   };
 }
 
-/**
- * 节流函数
- */
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
   limit: number
@@ -45,9 +42,6 @@ export function throttle<T extends (...args: any[]) => any>(
   };
 }
 
-/**
- * 防抖 Hook
- */
 export function useDebounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number
@@ -68,9 +62,6 @@ export function useDebounce<T extends (...args: any[]) => any>(
   ) as T;
 }
 
-/**
- * 节流 Hook
- */
 export function useThrottle<T extends (...args: any[]) => any>(
   func: T,
   limit: number
@@ -90,58 +81,6 @@ export function useThrottle<T extends (...args: any[]) => any>(
     },
     [func, limit]
   ) as T;
-}
-
-/**
- * 记忆化 Hook
- */
-export function useMemoizedCallback<T extends (...args: any[]) => any>(
-  callback: T,
-  deps: any[]
-): T {
-  return useCallback(callback, deps);
-}
-
-/**
- * 延迟加载工具
- */
-export function createLazyLoader<T>(
-  loader: () => Promise<T>,
-  delay: number = 0
-): () => Promise<T> {
-  let cached: T | null = null;
-  let loading = false;
-  let loadPromise: Promise<T> | null = null;
-
-  return async () => {
-    if (cached) {
-      return cached;
-    }
-
-    if (loading && loadPromise) {
-      return loadPromise;
-    }
-
-    loading = true;
-    loadPromise = new Promise(async (resolve, reject) => {
-      try {
-        if (delay > 0) {
-          await new Promise((r) => setTimeout(r, delay));
-        }
-
-        const result = await loader();
-        cached = result;
-        resolve(result);
-      } catch (error) {
-        reject(error);
-      } finally {
-        loading = false;
-        loadPromise = null;
-      }
-    });
-
-    return loadPromise;
-  };
 }
 
 /**
@@ -255,25 +194,6 @@ export class Cache<T> {
   get size(): number {
     return this.cache.size;
   }
-}
-
-/**
- * 图片预加载
- */
-export function preloadImage(uri: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve();
-    img.onerror = reject;
-    img.src = uri;
-  });
-}
-
-/**
- * 批量图片预加载
- */
-export async function preloadImages(uris: string[]): Promise<void> {
-  await Promise.all(uris.map(preloadImage));
 }
 
 /**

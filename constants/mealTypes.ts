@@ -20,7 +20,7 @@ export const MEAL_TYPES: MealType[] = [
   {
     id: 'lunch',
     name: '午餐',
-    icon: 'bowl',
+    icon: 'plate',
     timeRange: { start: 11, end: 14 },
   },
   {

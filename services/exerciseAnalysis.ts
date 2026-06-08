@@ -8,6 +8,7 @@ import { logger } from '@/utils/logger';
 import { aiService } from './ai';
 import { ExerciseAnalysisResult } from '@/types/exercise';
 import { imageToBase64, callVisionApi } from './vision/baseVisionClient';
+import { AI_PROMPTS } from '@/constants/aiPrompts';
 
 // 运动类型映射
 const EXERCISE_TYPE_MAP: Record<string, string> = {
@@ -62,26 +63,7 @@ export class ExerciseAnalysisService {
       const base64 = await imageToBase64(imageUri);
       logger.log('[AI] 图片 Base64 长度:', base64.length, '字符');
 
-      const prompt = `请分析这张运动截图，提取运动数据。这可能是运动 App 的截图、智能手表的运动记录、或者运动设备的显示屏。
-
-请以 JSON 格式返回，格式如下：
-{
-  "exerciseType": "运动类型（如：running, walking, cycling, swimming, strength, yoga, hiit, other）",
-  "durationMinutes": 运动时长（分钟）,
-  "caloriesBurned": 消耗卡路里,
-  "distanceKm": 距离（公里，如果没有则为 null）,
-  "heartRateAvg": 平均心率（如果没有则为 null）,
-  "timestamp": "截图中显示的运动时间（ISO 8601 格式，如截图中有时钟或时间信息则提取，否则为 null）",
-  "confidence": "识别置信度（high/medium/low）"
-}
-
-注意：
-1. 运动类型必须是以下之一：running, walking, cycling, swimming, strength, yoga, hiit, other
-2. 如果无法识别具体运动类型，请使用 "other"
-3. 时长必须是数字（分钟）
-4. 卡路里必须是数字
-5. timestamp 是截图中显示的运动开始时间，不是截图时间。如果截图中没有时间信息，则设为 null
-6. 只返回 JSON，不要有其他文字`;
+      const prompt = AI_PROMPTS.exerciseAnalysis;
 
       const config = aiService.getConfig()!;
       const apiEndpoint = aiService.getApiEndpoint();

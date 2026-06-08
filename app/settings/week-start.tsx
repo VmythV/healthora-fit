@@ -52,7 +52,7 @@ export default function WeekStartScreen() {
             >
               <View style={styles.menuLeft}>
                 <Icon name="calendar" size={20} color={theme.colors.primary.main} />
-                <Text style={styles.menuLabel}>{option.label}</Text>
+                <Text style={styles.menuLabel}>{t(`settings.weekStart.days.${option.value}`)}</Text>
               </View>
               {weekStartDay === option.value && (
                 <Icon name="checkmark" size={20} color={theme.colors.primary.main} />

@@ -68,6 +68,9 @@ export const aiConfigQueries = {
    *
    * - 若已存在激活配置 → UPDATE（顺手清掉旧句柄、写入新句柄）
    * - 若不存在 → INSERT，标记 is_active=1
+   *
+   * P2-30：原 this.getActive() 会 hydrate 完整 AIConfig（包含反查 SecureStore 明文），
+   * 这里只需要 id + api_key + is_encrypted 三列 —— 内联 SQL 节省一次 SecureStore IO。
    */
   async save(config: {
     apiEndpoint: string;
@@ -84,19 +87,24 @@ export const aiConfigQueries = {
       storedKey = await secureStoreApiKey(config.apiKey);
       isEncrypted = 1;
     } else {
-      // SecureStore 不可用：降级为明文 + is_encrypted=0（不推荐，但保证可用性）
       logger.warn('[AI Config] SecureStore 不可用，降级为明文存储');
       storedKey = config.apiKey;
       isEncrypted = 0;
     }
 
-    // 检查是否已有激活的配置
-    const existing = await this.getActive();
+    // P2-30：内联 SQL 查 id + api_key + is_encrypted（不 hydrate 明文）
+    const existing = await db.getFirstAsync<{
+      id: number;
+      api_key: string;
+      is_encrypted: number;
+    }>(
+      `SELECT id, api_key, is_encrypted FROM ai_config WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1`
+    );
 
     if (existing) {
       // 清理旧句柄（若以前是加密的）
-      if (existing.isEncrypted && isSecureHandle(existing.apiKey)) {
-        await deleteApiKey(existing.apiKey);
+      if (existing.is_encrypted === 1 && isSecureHandle(existing.api_key)) {
+        await deleteApiKey(existing.api_key);
       }
       await db.runAsync(
         `UPDATE ai_config

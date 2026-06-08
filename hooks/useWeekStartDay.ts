@@ -1,5 +1,7 @@
 // hooks/useWeekStartDay.ts
 // 星期开始日设置 Hook
+//
+// P2-26：label/labelEn 硬编码删了，翻译走 i18n（settings.weekStart.days.${value}）
 
 import { logger } from '@/utils/logger';
 import { useState, useEffect, useCallback } from 'react';
@@ -7,15 +9,16 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const WEEK_START_DAY_KEY = '@healthora:weekStartDay';
 
-// 星期开始日选项
+// 星期开始日选项（0-6 对应周日-周六）
+// 注意：label 改为通过 t('settings.weekStart.days.${value}') 渲染
 export const WEEK_START_OPTIONS = [
-  { value: 0, label: '周日', labelEn: 'Sunday' },
-  { value: 1, label: '周一', labelEn: 'Monday' },
-  { value: 2, label: '周二', labelEn: 'Tuesday' },
-  { value: 3, label: '周三', labelEn: 'Wednesday' },
-  { value: 4, label: '周四', labelEn: 'Thursday' },
-  { value: 5, label: '周五', labelEn: 'Friday' },
-  { value: 6, label: '周六', labelEn: 'Saturday' },
+  { value: 0 },
+  { value: 1 },
+  { value: 2 },
+  { value: 3 },
+  { value: 4 },
+  { value: 5 },
+  { value: 6 },
 ];
 
 /**

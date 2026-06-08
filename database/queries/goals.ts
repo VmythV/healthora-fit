@@ -128,19 +128,37 @@ export const goalQueries = {
 
   /**
    * 更新目标
+   *
+   * P2-25：支持全字段（goalType / targetValue / startValue / startDate / targetDate / isActive），
+   * 自动触 updated_at。
    */
   async update(id: number, updates: Partial<{
+    goalType: string;
     targetValue: number;
-    targetDate: string;
+    startValue: number | null;
+    startDate: string | null;
+    targetDate: string | null;
     isActive: boolean;
   }>): Promise<void> {
     const db = database.getDatabase();
     const setClauses: string[] = [];
     const params: any[] = [];
 
+    if (updates.goalType !== undefined) {
+      setClauses.push('goal_type = ?');
+      params.push(updates.goalType);
+    }
     if (updates.targetValue !== undefined) {
       setClauses.push('target_value = ?');
       params.push(updates.targetValue);
+    }
+    if (updates.startValue !== undefined) {
+      setClauses.push('start_value = ?');
+      params.push(updates.startValue);
+    }
+    if (updates.startDate !== undefined) {
+      setClauses.push('start_date = ?');
+      params.push(updates.startDate);
     }
     if (updates.targetDate !== undefined) {
       setClauses.push('target_date = ?');
@@ -152,6 +170,9 @@ export const goalQueries = {
     }
 
     if (setClauses.length === 0) return;
+
+    // P2-25：自动触 updated_at
+    setClauses.push("updated_at = datetime('now', 'localtime')");
 
     params.push(id);
     await db.runAsync(

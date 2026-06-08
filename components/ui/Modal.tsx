@@ -35,7 +35,7 @@ interface ConfirmModalProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
-  confirmVariant?: 'primary' | 'ghost';
+  confirmVariant?: 'primary' | 'ghost' | 'danger';
 }
 
 /**

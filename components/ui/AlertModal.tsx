@@ -84,9 +84,9 @@ export function AlertModalView({
         <Button
           title={config.confirmText || '确定'}
           onPress={handleConfirm}
-          variant={isDanger ? 'primary' : 'primary'}
+          variant={isDanger ? 'danger' : 'primary'}
           size="md"
-          style={isDanger ? { ...styles.button, ...styles.dangerButton } : styles.button}
+          style={styles.button}
         />
       </View>
     </Modal>
@@ -157,8 +157,5 @@ const styles = StyleSheet.create({
   },
   button: {
     minWidth: 90,
-  },
-  dangerButton: {
-    backgroundColor: theme.colors.error,
   },
 });
