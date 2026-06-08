@@ -69,10 +69,11 @@ export default function AIConfigScreen() {
 
   // 加载配置到表单
   const loadConfigToForm = (config: AIConfig) => {
-    logger.log('[AI Config] Loading config to form:', config);
-    logger.log('[AI Config] apiEndpoint:', config.apiEndpoint);
-    logger.log('[AI Config] apiKey:', config.apiKey);
-    logger.log('[AI Config] modelName:', config.modelName);
+    logger.log('[AI Config] Loading config to form:', {
+      apiEndpoint: config.apiEndpoint,
+      modelName: config.modelName,
+      hasApiKey: !!config.apiKey,
+    });
 
     setApiEndpoint(config.apiEndpoint || '');
     setApiKey(config.apiKey || '');
@@ -208,7 +209,8 @@ export default function AIConfigScreen() {
   const handleTest = async () => {
     try {
       setIsTesting(true);
-      const result = await aiConfigQueries.testConnection();
+      // P0.4：统一走 aiService.testConnection()（内部用 aiConnection 共享实现）
+      const result = await aiService.testConnection();
       if (result.success) {
         showNotification(t('settings.ai.testSuccess'), 'success');
       } else {

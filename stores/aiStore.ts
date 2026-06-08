@@ -24,7 +24,8 @@ interface AIState {
     apiKey: string;
     modelName: string;
   }) => Promise<void>;
-  testConnection: () => Promise<boolean>;
+  // P0.4 修正：返回值从 boolean 改为 {success, error?}，与 aiConfigQueries.testConnection 一致
+  testConnection: () => Promise<{ success: boolean; error?: string }>;
   setAnalyzing: (isAnalyzing: boolean, progress?: number) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
@@ -90,16 +91,21 @@ export const useAIStore = create<AIState>((set, get) => ({
   },
 
   // 测试连接
+  // P0.4 修正：原本 return isConnected 把 {success, error} 当 boolean（永远 truthy）。
+  // 现在透传 {success, error}，与 aiConfigQueries.testConnection / aiService.testConnection 行为一致。
   testConnection: async () => {
     try {
       set({ error: null });
-      const isConnected = await aiConfigQueries.testConnection();
-      return isConnected;
+      const result = await aiConfigQueries.testConnection();
+      if (!result.success && result.error) {
+        set({ error: result.error });
+      }
+      return result;
     } catch (err) {
       const message = err instanceof Error ? err.message : '测试连接失败';
       set({ error: message });
       logger.error('[aiStore] testConnection 失败:', err);
-      return false;
+      return { success: false, error: message };
     }
   },
 

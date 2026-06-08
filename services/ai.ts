@@ -4,6 +4,7 @@
 import { logger } from '@/utils/logger';
 import { File } from 'expo-file-system';
 import { aiConfigQueries } from '@/database/queries/aiConfig';
+import { testActiveConfig, TestResult } from './aiConnection';
 
 export interface AiConfig {
   endpoint: string;
@@ -129,103 +130,22 @@ export class AiService {
   /**
    * 测试连接
    *
-   * 支持多种 API 提供商：
-   * - OpenAI 兼容 API（使用 /models 端点）
-   * - 火山引擎等（使用简单聊天请求测试）
-   * - Responses API（使用 /responses 端点）
+   * P0.4 重构：薄包装，复用 services/aiConnection.testActiveConfig 的实现。
+   * 这样 database/queries/aiConfig.ts 和 services/ai.ts 不再各持一份 ~100 行重复代码。
    */
-  async testConnection(): Promise<{ success: boolean; error?: string }> {
+  async testConnection(): Promise<TestResult> {
+    if (!this.config) {
+      await this.loadConfig();
+    }
     if (!this.isConfigured()) {
       return { success: false, error: 'AI 服务未配置' };
     }
-
-    try {
-      // 首先尝试 /models 端点（适用于 OpenAI 兼容 API）
-      const baseUrl = this.config!.endpoint.replace(/\/(chat\/completions|responses)$/, '');
-      try {
-        const modelsResponse = await fetch(`${baseUrl}/models`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${this.config!.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (modelsResponse.ok) {
-          return { success: true };
-        }
-      } catch (e) {
-        // /models 端点不可用，继续尝试其他方式
-      }
-
-      // 根据 API 类型发送测试请求
-      const apiEndpoint = this.getApiEndpoint();
-      let testResponse: Response;
-
-      if (this.config!.apiType === 'responses') {
-        // Responses API 格式
-        testResponse = await fetch(apiEndpoint, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${this.config!.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: this.config!.model,
-            input: [
-              {
-                role: 'user',
-                content: [
-                  {
-                    type: 'input_text',
-                    text: 'Hi',
-                  },
-                ],
-              },
-            ],
-            max_output_tokens: 5,
-          }),
-        });
-      } else {
-        // Chat Completions API 格式
-        testResponse = await fetch(apiEndpoint, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${this.config!.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: this.config!.model,
-            messages: [
-              {
-                role: 'user',
-                content: 'Hi',
-              },
-            ],
-            max_tokens: 5,
-          }),
-        });
-      }
-
-      if (testResponse.ok) {
-        return { success: true };
-      }
-
-      // 解析错误信息
-      let errorMessage = '连接失败';
-      try {
-        const errorData = await testResponse.json();
-        errorMessage = errorData.error?.message || errorData.message || `HTTP ${testResponse.status}`;
-      } catch {
-        errorMessage = `HTTP ${testResponse.status}`;
-      }
-
-      return { success: false, error: errorMessage };
-    } catch (error) {
-      logger.error('[AI] 测试连接失败:', error);
-      const message = error instanceof Error ? error.message : '网络连接失败';
-      return { success: false, error: message };
-    }
+    return testActiveConfig({
+      endpoint: this.config!.endpoint,
+      apiKey: this.config!.apiKey,
+      model: this.config!.model,
+      apiType: this.config!.apiType,
+    });
   }
 
   /**

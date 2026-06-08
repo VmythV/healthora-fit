@@ -56,23 +56,27 @@ export default function CalendarScreen() {
   const { records: exerciseRecords } = useExerciseRecords(selectedDate);
 
   // 加载某月标记日期
+  // P0.5 加固：函数式更新里直接创建新 Set（不基于 prev 合并），
+  // 保证跨月切换时历史月份一定被丢弃，set 只含当月 prefix 的日期。
   const loadMarkedDates = useCallback(async (year: number, month0: number) => {
     try {
-      const ms = `${year}-${String(month0 + 1).padStart(2, '0')}-01`;
+      const prefix = `${year}-${String(month0 + 1).padStart(2, '0')}-`;
+      const ms = `${prefix}01`;
       const last = new Date(year, month0 + 1, 0).getDate();
-      const me = `${year}-${String(month0 + 1).padStart(2, '0')}-${String(last).padStart(2, '0')}`;
+      const me = `${prefix}${String(last).padStart(2, '0')}`;
       const [dd, ed] = await Promise.all([
         dietQueries.getDatesWithRecords(ms, me),
         exerciseQueries.getDatesWithRecords(ms, me),
       ]);
-      setMonthMarked((prev) => {
-        const next = new Set(prev);
-        const prefix = `${year}-${String(month0 + 1).padStart(2, '0')}-`;
-        for (const d of prev) {
-          if (d.startsWith(prefix)) next.delete(d);
-        }
-        dd.forEach((d) => next.add(d));
-        ed.forEach((d) => next.add(d));
+      setMonthMarked(() => {
+        const next = new Set<string>();
+        // 防御性过滤：只接受当月 prefix 的日期，避免 SQL 查询返回意外数据
+        dd.forEach((d) => {
+          if (d.startsWith(prefix)) next.add(d);
+        });
+        ed.forEach((d) => {
+          if (d.startsWith(prefix)) next.add(d);
+        });
         return next;
       });
     } catch (err) {

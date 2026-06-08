@@ -2,7 +2,7 @@
 // 体重记录 Hook
 
 import { logger } from '@/utils/logger';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { weightQueries } from '@/database/queries';
 import { WeightRecord, WeightStats } from '@/types/weight';
 
@@ -67,10 +67,9 @@ export function useWeightRecords(): UseWeightRecordsReturn {
   const [error, setError] = useState<string | null>(null);
 
   // 自动加载最新数据
-  useEffect(() => {
-    loadLatest();
-    loadYesterday();
-  }, []);
+  // P0.2 修复：useEffect 改用 ref 模式拿最新回调引用。
+  // 注意：ref 必须在 useCallback 定义之后赋值，否则捕获到 undefined。
+  // 这里的 useEffect 注册在所有 useCallback 之后。
 
   const loadYesterday = useCallback(async () => {
     try {
@@ -100,6 +99,16 @@ export function useWeightRecords(): UseWeightRecordsReturn {
     }
   }, []);
 
+  // P0.2 ref 模式：先把最新 loadLatest / loadYesterday 写到 ref，effect 通过 ref 调用
+  const loadLatestRef = useRef(loadLatest);
+  loadLatestRef.current = loadLatest;
+  const loadYesterdayRef = useRef(loadYesterday);
+  loadYesterdayRef.current = loadYesterday;
+  useEffect(() => {
+    loadLatestRef.current();
+    loadYesterdayRef.current();
+  }, []);
+
   const loadRecent = useCallback(async (limit?: number) => {
     try {
       setIsLoading(true);
@@ -122,7 +131,9 @@ export function useWeightRecords(): UseWeightRecordsReturn {
       setError(null);
 
       const result = await weightQueries.getByDate(date);
-      setLatestWeight(result);
+      // P0.2 修复：原来 setLatestWeight(result) 把单条记录写到了 latestWeight 状态，
+      // 导致 records 永远是空数组。getByDate 返回单条记录，应转为数组后写入 records。
+      setRecords(result ? [result] : []);
     } catch (err) {
       const message = err instanceof Error ? err.message : '加载记录失败';
       setError(message);

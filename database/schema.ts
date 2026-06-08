@@ -3,8 +3,12 @@
 
 /**
  * 数据库版本
+ *
+ * 版本历史：
+ * - v1: 初始表结构
+ * - v2: ai_config 表新增 is_encrypted 列（标记 apiKey 是否已迁移到 SecureStore）
  */
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
 /**
  * 创建表的 SQL 语句
@@ -168,4 +172,14 @@ CREATE TABLE IF NOT EXISTS schema_version (
   description TEXT,
   applied_at TEXT DEFAULT (datetime('now', 'localtime'))
 );
+`;
+
+/**
+ * v2 迁移：ai_config 表新增 is_encrypted 列
+ *
+ * 仅供新增写入使用；历史明文 key 不回填（is_encrypted 默认为 0）。
+ * 写入路径（utils/secureStorage.ts → aiConfigQueries.save()）会自动加密并标记 is_encrypted=1。
+ */
+export const ALTER_AI_CONFIG_V2_SQL = `
+ALTER TABLE ai_config ADD COLUMN is_encrypted INTEGER NOT NULL DEFAULT 0;
 `;

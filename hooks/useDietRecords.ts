@@ -2,7 +2,7 @@
 // 饮食记录 Hook
 
 import { logger } from '@/utils/logger';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { dietQueries } from '@/database/queries';
 import { DietRecord } from '@/types/diet';
 
@@ -81,18 +81,6 @@ export function useDietRecords(date?: string): UseDietRecordsReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // 自动加载今日数据
-  useEffect(() => {
-    loadToday();
-  }, []);
-
-  // 按日期加载
-  useEffect(() => {
-    if (date) {
-      loadByDate(date);
-    }
-  }, [date]);
-
   // 计算属性
   const todayCalories = todayNutrition.calories;
 
@@ -148,6 +136,22 @@ export function useDietRecords(date?: string): UseDietRecordsReturn {
       setIsLoading(false);
     }
   }, []);
+
+  // P0.2 ref 模式：useEffect 拿最新 loadToday / loadByDate 引用
+  const loadTodayRef = useRef(loadToday);
+  loadTodayRef.current = loadToday;
+  const loadByDateRef = useRef(loadByDate);
+  loadByDateRef.current = loadByDate;
+
+  useEffect(() => {
+    loadTodayRef.current();
+  }, []);
+
+  useEffect(() => {
+    if (date) {
+      loadByDateRef.current(date);
+    }
+  }, [date]);
 
   const loadRecent = useCallback(async (limit?: number) => {
     try {

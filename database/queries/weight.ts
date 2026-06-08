@@ -95,6 +95,10 @@ export const weightQueries = {
 
   /**
    * 获取体重统计
+   *
+   * P0.3 合并：原本 3 次串行查询（MIN/MAX/AVG + first + last）改为单条 SQL。
+   * 使用子查询保证兼容性（expo-sqlite 16.x 自带 SQLite 3.40+ 也支持窗口函数，
+   * 但子查询版本更稳，未来降级 SQLite 也不怕）。
    */
   async getStats(
     startDate: string,
@@ -108,41 +112,41 @@ export const weightQueries = {
     change: number;
   } | null> {
     const db = database.getDatabase();
-    const result = await db.getFirstAsync(
+    const result = await db.getFirstAsync<{
+      min: number | null;
+      max: number | null;
+      avg: number | null;
+      first: number | null;
+      last: number | null;
+    }>(
       `SELECT
-        MIN(weight) as min,
-        MAX(weight) as max,
-        AVG(weight) as avg
-       FROM weight_records
-       WHERE date(timestamp) BETWEEN ? AND ?`,
-      [startDate, endDate]
+        (SELECT MIN(weight) FROM weight_records
+         WHERE date(timestamp) BETWEEN ? AND ?) as min,
+        (SELECT MAX(weight) FROM weight_records
+         WHERE date(timestamp) BETWEEN ? AND ?) as max,
+        (SELECT AVG(weight) FROM weight_records
+         WHERE date(timestamp) BETWEEN ? AND ?) as avg,
+        (SELECT weight FROM weight_records
+         WHERE date(timestamp) BETWEEN ? AND ?
+         ORDER BY timestamp ASC LIMIT 1) as first,
+        (SELECT weight FROM weight_records
+         WHERE date(timestamp) BETWEEN ? AND ?
+         ORDER BY timestamp DESC LIMIT 1) as last`,
+      [startDate, endDate, startDate, endDate, startDate, endDate, startDate, endDate, startDate, endDate]
     );
 
-    if (!result || !result.min) return null;
+    if (!result || result.min === null || result.max === null) return null;
 
-    const first = await db.getFirstAsync<{ weight: number }>(
-      `SELECT weight FROM weight_records
-       WHERE date(timestamp) BETWEEN ? AND ?
-       ORDER BY timestamp ASC
-       LIMIT 1`,
-      [startDate, endDate]
-    );
-
-    const last = await db.getFirstAsync<{ weight: number }>(
-      `SELECT weight FROM weight_records
-       WHERE date(timestamp) BETWEEN ? AND ?
-       ORDER BY timestamp DESC
-       LIMIT 1`,
-      [startDate, endDate]
-    );
+    const first = result.first ?? 0;
+    const last = result.last ?? 0;
 
     return {
       min: result.min,
       max: result.max,
-      avg: Math.round(result.avg * 10) / 10,
-      first: first?.weight || 0,
-      last: last?.weight || 0,
-      change: last && first ? Math.round((last.weight - first.weight) * 10) / 10 : 0,
+      avg: Math.round((result.avg ?? 0) * 10) / 10,
+      first,
+      last,
+      change: first && last ? Math.round((last - first) * 10) / 10 : 0,
     };
   },
 

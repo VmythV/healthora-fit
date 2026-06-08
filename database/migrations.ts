@@ -9,6 +9,7 @@ import {
   CREATE_INDEXES_SQL,
   CREATE_TRIGGERS_SQL,
   CREATE_MIGRATION_TABLE_SQL,
+  ALTER_AI_CONFIG_V2_SQL,
 } from './schema';
 
 /**
@@ -38,9 +39,18 @@ const migrations: Migration[] = [
       await db.execAsync(CREATE_TRIGGERS_SQL);
     },
   },
+  {
+    version: 2,
+    description: 'ai_config 表新增 is_encrypted 标记列（仅用于新写入；历史明文不回填）',
+    up: async (db) => {
+      // SQLite 的 ALTER TABLE ADD COLUMN 不支持 IF NOT EXISTS，
+      // 但 schema_version 表保证 version=2 只会执行一次
+      await db.execAsync(ALTER_AI_CONFIG_V2_SQL);
+    },
+  },
   // 未来版本的迁移在这里添加
   // {
-  //   version: 2,
+  //   version: 3,
   //   description: '添加新字段',
   //   up: async (db) => {
   //     await db.execAsync(`ALTER TABLE diet_records ADD COLUMN new_field TEXT;`);

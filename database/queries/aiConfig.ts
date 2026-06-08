@@ -1,9 +1,41 @@
 // database/queries/aiConfig.ts
 // AI 配置查询
+//
+// P0.1 加固：
+// - 写入前 secureStoreApiKey(plain) 拿 handle 存 DB，标记 is_encrypted=1
+// - 读取时 readApiKey(handle) 反查明文
+// - 历史明文（is_encrypted=0）按用户决定不迁移，直接返回
+//
+// P0.4 重构：
+// - testConnection 抽出到 services/aiConnection.ts 共享
 
 import { logger } from '@/utils/logger';
 import { database } from '../index';
 import { AIConfig } from '@/types/ai';
+import {
+  secureStoreApiKey,
+  readApiKey,
+  deleteApiKey,
+  isSecureHandle,
+  isSecureStoreAvailable,
+} from '@/utils/secureStorage';
+import { testActiveConfig } from '@/services/aiConnection';
+
+const SELECT_COLS = `id, api_endpoint as apiEndpoint, api_key as apiKey, model_name as modelName,
+        is_active as isActive, is_encrypted as isEncrypted,
+        created_at as createdAt, updated_at as updatedAt`;
+
+/**
+ * 把 DB 行还原为 AIConfig（必要时反查 SecureStore）
+ */
+async function hydrateApiKey(row: any): Promise<AIConfig> {
+  if (row.isEncrypted === 1 && isSecureHandle(row.apiKey)) {
+    const apiKey = await readApiKey(row.apiKey);
+    return { ...row, apiKey };
+  }
+  // 历史明文直接返回
+  return row as AIConfig;
+}
 
 export const aiConfigQueries = {
   /**
@@ -11,12 +43,12 @@ export const aiConfigQueries = {
    */
   async getActive(): Promise<AIConfig | null> {
     const db = database.getDatabase();
-    const result = await db.getFirstAsync<any>(
-      `SELECT id, api_endpoint as apiEndpoint, api_key as apiKey, model_name as modelName,
-              is_active as isActive, created_at as createdAt, updated_at as updatedAt
+    const row = await db.getFirstAsync<any>(
+      `SELECT ${SELECT_COLS}
        FROM ai_config WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1`
     );
-    return result as AIConfig | null;
+    if (!row) return null;
+    return hydrateApiKey(row);
   },
 
   /**
@@ -24,16 +56,18 @@ export const aiConfigQueries = {
    */
   async getAll(): Promise<AIConfig[]> {
     const db = database.getDatabase();
-    const results = await db.getAllAsync<any>(
-      `SELECT id, api_endpoint as apiEndpoint, api_key as apiKey, model_name as modelName,
-              is_active as isActive, created_at as createdAt, updated_at as updatedAt
+    const rows = await db.getAllAsync<any>(
+      `SELECT ${SELECT_COLS}
        FROM ai_config ORDER BY created_at DESC`
     );
-    return results as AIConfig[];
+    return Promise.all(rows.map(hydrateApiKey));
   },
 
   /**
    * 保存配置
+   *
+   * - 若已存在激活配置 → UPDATE（顺手清掉旧句柄、写入新句柄）
+   * - 若不存在 → INSERT，标记 is_active=1
    */
   async save(config: {
     apiEndpoint: string;
@@ -42,23 +76,41 @@ export const aiConfigQueries = {
   }): Promise<number> {
     const db = database.getDatabase();
 
+    // 加密 api_key
+    const secureAvailable = await isSecureStoreAvailable();
+    let storedKey: string;
+    let isEncrypted: 0 | 1;
+    if (secureAvailable) {
+      storedKey = await secureStoreApiKey(config.apiKey);
+      isEncrypted = 1;
+    } else {
+      // SecureStore 不可用：降级为明文 + is_encrypted=0（不推荐，但保证可用性）
+      logger.warn('[AI Config] SecureStore 不可用，降级为明文存储');
+      storedKey = config.apiKey;
+      isEncrypted = 0;
+    }
+
     // 检查是否已有激活的配置
     const existing = await this.getActive();
 
     if (existing) {
-      // 更新现有配置
+      // 清理旧句柄（若以前是加密的）
+      if (existing.isEncrypted && isSecureHandle(existing.apiKey)) {
+        await deleteApiKey(existing.apiKey);
+      }
       await db.runAsync(
-        `UPDATE ai_config SET api_endpoint = ?, api_key = ?, model_name = ?, updated_at = datetime('now', 'localtime')
+        `UPDATE ai_config
+         SET api_endpoint = ?, api_key = ?, is_encrypted = ?,
+             model_name = ?, updated_at = datetime('now', 'localtime')
          WHERE id = ?`,
-        [config.apiEndpoint, config.apiKey, config.modelName, existing.id]
+        [config.apiEndpoint, storedKey, isEncrypted, config.modelName, existing.id]
       );
       return existing.id;
     } else {
-      // 插入新配置
       const result = await db.runAsync(
-        `INSERT INTO ai_config (api_endpoint, api_key, model_name, is_active)
-         VALUES (?, ?, ?, 1)`,
-        [config.apiEndpoint, config.apiKey, config.modelName]
+        `INSERT INTO ai_config (api_endpoint, api_key, is_encrypted, model_name, is_active)
+         VALUES (?, ?, ?, ?, 1)`,
+        [config.apiEndpoint, storedKey, isEncrypted, config.modelName]
       );
       return result.lastInsertRowId;
     }
@@ -80,6 +132,30 @@ export const aiConfigQueries = {
       await db.runAsync(`UPDATE ai_config SET is_active = 0 WHERE id != ?`, [id]);
     }
 
+    // 若更新 apiKey，加密后入库
+    let storedKey: string | undefined;
+    let isEncrypted: 0 | 1 | undefined;
+    if (updates.apiKey !== undefined) {
+      const secureAvailable = await isSecureStoreAvailable();
+      if (secureAvailable) {
+        storedKey = await secureStoreApiKey(updates.apiKey);
+        isEncrypted = 1;
+      } else {
+        logger.warn('[AI Config] SecureStore 不可用，apiKey 降级为明文');
+        storedKey = updates.apiKey;
+        isEncrypted = 0;
+      }
+      // 清理旧句柄
+      const all = await db.getAllAsync<any>(
+        `SELECT api_key FROM ai_config WHERE id = ?`,
+        [id]
+      );
+      const oldHandle = all[0]?.api_key;
+      if (oldHandle && isSecureHandle(oldHandle)) {
+        await deleteApiKey(oldHandle);
+      }
+    }
+
     const setClauses: string[] = [];
     const params: any[] = [];
 
@@ -87,9 +163,13 @@ export const aiConfigQueries = {
       setClauses.push('api_endpoint = ?');
       params.push(updates.apiEndpoint);
     }
-    if (updates.apiKey !== undefined) {
+    if (storedKey !== undefined) {
       setClauses.push('api_key = ?');
-      params.push(updates.apiKey);
+      params.push(storedKey);
+    }
+    if (isEncrypted !== undefined) {
+      setClauses.push('is_encrypted = ?');
+      params.push(isEncrypted);
     }
     if (updates.modelName !== undefined) {
       setClauses.push('model_name = ?');
@@ -114,16 +194,20 @@ export const aiConfigQueries = {
    */
   async delete(id: number): Promise<void> {
     const db = database.getDatabase();
+    // 顺手清掉 SecureStore 句柄
+    const rows = await db.getAllAsync<any>(
+      `SELECT api_key, is_encrypted FROM ai_config WHERE id = ?`,
+      [id]
+    );
+    const row = rows[0];
+    if (row?.is_encrypted === 1 && isSecureHandle(row.api_key)) {
+      await deleteApiKey(row.api_key);
+    }
     await db.runAsync('DELETE FROM ai_config WHERE id = ?', [id]);
   },
 
   /**
-   * 测试连接
-   *
-   * 支持多种 API 提供商：
-   * - OpenAI 兼容 API（使用 /models 端点）
-   * - 火山引擎等（使用简单聊天请求测试）
-   * - Responses API（使用 /responses 端点）
+   * 测试连接（薄包装，共享 services/aiConnection.testActiveConfig 的实现）
    */
   async testConnection(): Promise<{ success: boolean; error?: string }> {
     const config = await this.getActive();
@@ -131,102 +215,14 @@ export const aiConfigQueries = {
       return { success: false, error: 'AI 服务未配置' };
     }
 
-    try {
-      // 检测 API 类型
-      const isResponsesApi = config.apiEndpoint?.endsWith('/responses');
-      const baseUrl = config.apiEndpoint?.replace(/\/(chat\/completions|responses)$/, '') || '';
+    const apiType: 'chat-completions' | 'responses' | undefined =
+      config.apiEndpoint?.endsWith('/responses') ? 'responses' : undefined;
 
-      // 首先尝试 /models 端点（适用于 OpenAI 兼容 API）
-      try {
-        const modelsResponse = await fetch(`${baseUrl}/models`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${config.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (modelsResponse.ok) {
-          return { success: true };
-        }
-      } catch (e) {
-        // /models 端点不可用，继续尝试其他方式
-      }
-
-      // 根据 API 类型发送测试请求
-      let testResponse: Response;
-
-      if (isResponsesApi) {
-        // Responses API 格式
-        const apiEndpoint = config.apiEndpoint?.endsWith('/responses')
-          ? config.apiEndpoint
-          : `${config.apiEndpoint}/responses`;
-
-        testResponse = await fetch(apiEndpoint, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${config.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: config.modelName,
-            input: [
-              {
-                role: 'user',
-                content: [
-                  {
-                    type: 'input_text',
-                    text: 'Hi',
-                  },
-                ],
-              },
-            ],
-            max_output_tokens: 5,
-          }),
-        });
-      } else {
-        // Chat Completions API 格式
-        const apiEndpoint = config.apiEndpoint?.endsWith('/chat/completions')
-          ? config.apiEndpoint
-          : `${config.apiEndpoint}/chat/completions`;
-
-        testResponse = await fetch(apiEndpoint, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${config.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: config.modelName,
-            messages: [
-              {
-                role: 'user',
-                content: 'Hi',
-              },
-            ],
-            max_tokens: 5,
-          }),
-        });
-      }
-
-      if (testResponse.ok) {
-        return { success: true };
-      }
-
-      // 解析错误信息
-      let errorMessage = '连接失败';
-      try {
-        const errorData = await testResponse.json();
-        errorMessage = errorData.error?.message || errorData.message || `HTTP ${testResponse.status}`;
-      } catch {
-        errorMessage = `HTTP ${testResponse.status}`;
-      }
-
-      return { success: false, error: errorMessage };
-    } catch (error) {
-      logger.error('[AI Config] 测试连接失败:', error);
-      const message = error instanceof Error ? error.message : '网络连接失败';
-      return { success: false, error: message };
-    }
+    return testActiveConfig({
+      endpoint: config.apiEndpoint || '',
+      apiKey: config.apiKey || '',
+      model: config.modelName || '',
+      apiType,
+    });
   },
 };
