@@ -29,16 +29,23 @@ An intelligent health tracking app that helps you effortlessly track diet, exerc
 
 <div align="center">
 
-![GitHub Stats](https://github-readme-stats.vercel.app/api/github-user-stats?username=VmythV&show_icons=true&theme=default&include_all_commits=true&count_private=true)
-![Repo Stats](https://github-readme-stats.vercel.app/api/pin/?username=VmythV&repo=healthora-fit&theme=default)
+### 📈 Contribution Graph
+
+![VmythV's GitHub Chart](https://ghchart.rshah.org/VmythV)
+
+### 🔥 Streak Stats
+
+![GitHub Streak](https://github-readme-streak-stats.cyclic.app/?user=VmythV&theme=default&hide_border=true)
 
 </div>
 
 <div align="center">
 
-![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=VmythV&layout=compact&theme=default&langs_count=8&hide=html,css,scss)
+![Profile Views](https://komarev.com/ghpvc/?username=VmythV&label=Profile%20Views&color=0e75b6&style=flat)
 
 </div>
+
+> 💡 仓库的 stars / forks / issues / 最近提交等已通过顶部 shields.io 徽章实时展示。`github-readme-stats.vercel.app` 公共实例因 GitHub API 限流经常返回 `Error Fetching Resource`，故改用 `ghchart.rshah.org`（贡献图）+ `cyclic.app`（连续打卡）+ `komarev.com`（访问计数）三个稳定服务。
 
 ## ✨ Features
 
