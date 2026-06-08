@@ -78,6 +78,11 @@ export const goalQueries = {
 
   /**
    * 设置目标
+   *
+   * P3-38：原"DELETE WHERE id NOT IN (SELECT ... LIMIT 4)"子查询
+   * 拆为两段：先 SELECT id，再 DELETE WHERE id NOT IN (...)。
+   * SQLite 3.40+ 上单条子查询也稳，但拆开后更可读、避免 NOT IN
+   * 语义边缘 case。性能几乎无差异（目标表行数极小）。
    */
   async set(goal: {
     goalType: string;
@@ -109,19 +114,28 @@ export const goalQueries = {
       ]
     );
 
-    // 保留最多 5 条历史记录（1 条活跃 + 4 条历史），删除更旧的
-    await db.runAsync(
-      `DELETE FROM goals
-       WHERE goal_type = ?
-         AND is_active = 0
-         AND id NOT IN (
-           SELECT id FROM goals
-           WHERE goal_type = ? AND is_active = 0
-           ORDER BY created_at DESC
-           LIMIT 4
-         )`,
-      [goal.goalType, goal.goalType]
+    // P3-38：两段法 —— 先查保留的 4 条 id，再 DELETE
+    const keepIds = await db.getAllAsync<{ id: number }>(
+      `SELECT id FROM goals
+       WHERE goal_type = ? AND is_active = 0
+       ORDER BY created_at DESC
+       LIMIT 4`,
+      [goal.goalType]
     );
+    if (keepIds.length > 0) {
+      const placeholders = keepIds.map(() => '?').join(',');
+      await db.runAsync(
+        `DELETE FROM goals
+         WHERE goal_type = ? AND is_active = 0
+           AND id NOT IN (${placeholders})`,
+        [goal.goalType, ...keepIds.map((r) => r.id)]
+      );
+    } else {
+      await db.runAsync(
+        `DELETE FROM goals WHERE goal_type = ? AND is_active = 0`,
+        [goal.goalType]
+      );
+    }
 
     return result.lastInsertRowId;
   },

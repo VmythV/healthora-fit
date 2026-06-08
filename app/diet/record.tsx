@@ -2,7 +2,7 @@
 // 饮食记录页面
 
 import { logger } from '@/utils/logger';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import {
   View,
   Text,
@@ -25,6 +25,10 @@ import { showNotification, showConfirm } from '@/components/ui';
 export default function DietRecordScreen() {
   const { t } = useI18n();
   const router = useRouter();
+  // P3-42：i18n headerTitle（modal 屏内部用 setOptions 跟随语言切换）
+  useLayoutEffect(() => {
+    router.setOptions({ title: t('diet.recordTitle') });
+  }, [router, t]);
   const params = useLocalSearchParams<{
     photoUri?: string;
     foods?: string;

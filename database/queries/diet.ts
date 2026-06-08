@@ -4,6 +4,13 @@
 import { database } from '../index';
 import { DietRecord } from '@/types/diet';
 
+/**
+ * P3-39：导出/单次取记录上限。
+ * 理论安全值（按 1 天 1 餐 = 27 年），实际不会触达；
+ * 仅用于 dataTransfer 全量备份的硬上限。
+ */
+export const MAX_EXPORT_RECORDS = 10000;
+
 export const dietQueries = {
   /**
    * 获取指定日期的记录

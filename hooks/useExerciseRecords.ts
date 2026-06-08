@@ -43,6 +43,13 @@ interface UseExerciseRecordsReturn {
 /**
  * 运动记录 Hook
  *
+ * P3-48：date 形参的格式约束 —— 必须是 `'YYYY-MM-DD'` 格式字符串（如 '2026-06-08'）。
+ * 父组件应保证引用稳定（来自 `useState` 派生或 `useMemo` 缓存），
+ * 否则内部 `useEffect([date], ...)` 会每次 render 重复执行。
+ *
+ * @param date 可选，'YYYY-MM-DD' 格式字符串（如 '2026-06-08'）。
+ *             undefined 或 null 表示"今日"（由 hook 内部 `loadToday` 计算）。
+ *
  * @example
  * ```tsx
  * const {

@@ -10,9 +10,9 @@ import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import { database } from '@/database';
-import { dietQueries } from '@/database/queries/diet';
+import { dietQueries, MAX_EXPORT_RECORDS as DIET_MAX } from '@/database/queries/diet';
 import { exerciseQueries } from '@/database/queries/exercise';
-import { weightQueries } from '@/database/queries/weight';
+import { weightQueries, MAX_EXPORT_RECORDS as WEIGHT_MAX } from '@/database/queries/weight';
 import { goalQueries } from '@/database/queries/goals';
 import { aiConfigQueries } from '@/database/queries/aiConfig';
 
@@ -62,14 +62,14 @@ export const dataTransferService = {
     try {
       // 第一批：饮食 + 运动
       const [dietRecords, exerciseRecords] = await Promise.all([
-        dietQueries.getRecent(10000),
+        dietQueries.getRecent(DIET_MAX),
         exerciseQueries.getByDateRange('2000-01-01', '2099-12-31'),
       ]);
       await yieldToUI();
 
       // 第二批：体重 + 目标
       const [weightRecords, goals] = await Promise.all([
-        weightQueries.getRecent(10000),
+        weightQueries.getRecent(WEIGHT_MAX),
         goalQueries.getAll(),
       ]);
       await yieldToUI();

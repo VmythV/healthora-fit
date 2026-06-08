@@ -78,6 +78,7 @@
   },
   "diet": {
     "title": "记录饮食",
+    "recordTitle": "记录饮食",
     "takePhoto": "拍照",
     "fromGallery": "相册",
     "analyzing": "AI 分析中...",
@@ -107,6 +108,7 @@
   },
   "exercise": {
     "title": "记录运动",
+    "recordTitle": "记录运动",
     "manual": "手动输入",
     "screenshot": "截图识别",
     "sync": "自动同步",
@@ -157,6 +159,7 @@
   },
   "weight": {
     "title": "记录体重",
+    "recordTitle": "记录体重",
     "currentWeight": "当前体重",
     "lastRecord": "上次记录",
     "targetWeight": "目标体重",

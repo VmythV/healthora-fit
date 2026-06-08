@@ -1,5 +1,7 @@
 // components/exercise/ScreenshotPicker.tsx
 // 运动截图选择组件
+//
+// P3-44：原 RN Image → expo-image
 
 import { logger } from '@/utils/logger';
 import React, { useState, useEffect } from 'react';
@@ -8,10 +10,10 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   Alert,
   ActivityIndicator,
 } from 'react-native';
+import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
@@ -159,7 +161,7 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
       {/* 图片预览 */}
       {imageUri ? (
         <View style={styles.previewContainer}>
-          <Image source={{ uri: imageUri }} style={styles.preview} resizeMode="contain" />
+          <Image source={{ uri: imageUri }} style={styles.preview} contentFit="contain" />
           <TouchableOpacity style={styles.clearButton} onPress={clearImage}>
             <Icon name="close" size={16} color={theme.colors.text.tertiary} />
           </TouchableOpacity>

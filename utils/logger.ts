@@ -28,6 +28,8 @@ const DEBUG_MODE_KEY = '@healthora:debugMode';
  */
 class Logger {
   private enabled: boolean = true;
+  // P3-45：写盘防抖 timer
+  private writeTimer: ReturnType<typeof setTimeout> | null = null;
 
   /**
    * 从 AsyncStorage 加载调试模式状态
@@ -45,14 +47,23 @@ class Logger {
 
   /**
    * 设置调试模式并持久化
+   *
+   * P3-45：写盘加 300ms 防抖 —— 防止用户在设置页快速来回拨 Switch
+   * 时产生多次磁盘 IO。AsyncStorage 单次写盘有 30-50ms 序列化 + 系统调用开销。
+   *
+   * 注意：此实例是 App 生命周期单例，无需 dispose。
+   * AsyncStorage 自身由系统管理（iOS Keychain / Android SharedPreferences），
+   * 不需要手动释放。
    */
   async setEnabled(enabled: boolean): Promise<void> {
     this.enabled = enabled;
-    try {
-      await AsyncStorage.setItem(DEBUG_MODE_KEY, String(enabled));
-    } catch {
-      // AsyncStorage 写入失败时静默处理，不抛出异常
-    }
+    if (this.writeTimer) clearTimeout(this.writeTimer);
+    this.writeTimer = setTimeout(() => {
+      AsyncStorage.setItem(DEBUG_MODE_KEY, String(enabled)).catch(() => {
+        // 写盘失败时静默处理
+      });
+      this.writeTimer = null;
+    }, 300);
   }
 
   /**

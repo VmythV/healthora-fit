@@ -1,5 +1,7 @@
 // components/diet/DietRecordDetail.tsx
 // 饮食记录详情
+//
+// P3-44：原 RN Image → expo-image（更优内存缓存、过渡动画、占位符）
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -9,8 +11,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Image,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { theme } from '@/constants/theme';
 import { useI18n } from '@/hooks/useI18n';
@@ -114,12 +116,13 @@ export function DietRecordDetail({ record, onDelete }: DietRecordDetailProps) {
           )}
         </View>
 
-        {/* 照片 */}
+        {/* 照片 —— expo-image：contentFit + transition */}
         {record.photoUri && (
           <Image
             source={{ uri: record.photoUri }}
             style={styles.photo}
-            resizeMode="cover"
+            contentFit="cover"
+            transition={200}
           />
         )}
       </Card>

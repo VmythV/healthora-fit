@@ -4,6 +4,12 @@
 import { database } from '../index';
 import { WeightRecord } from '@/types/weight';
 
+/**
+ * P3-39：导出/单次取记录上限。
+ * 理论安全值（按 1 天 1 次 = 27 年），实际不会触达。
+ */
+export const MAX_EXPORT_RECORDS = 10000;
+
 export const weightQueries = {
   /**
    * 获取最新记录

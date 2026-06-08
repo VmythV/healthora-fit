@@ -79,6 +79,7 @@
   },
   "diet": {
     "title": "Record Diet",
+    "recordTitle": "Record Diet",
     "takePhoto": "Take Photo",
     "fromGallery": "Gallery",
     "analyzing": "AI Analyzing...",
@@ -108,6 +109,7 @@
   },
   "exercise": {
     "title": "Record Exercise",
+    "recordTitle": "Record Exercise",
     "manual": "Manual Input",
     "screenshot": "Screenshot",
     "sync": "Auto Sync",
@@ -158,6 +160,7 @@
   },
   "weight": {
     "title": "Record Weight",
+    "recordTitle": "Record Weight",
     "currentWeight": "Current Weight",
     "lastRecord": "Last Record",
     "targetWeight": "Target Weight",

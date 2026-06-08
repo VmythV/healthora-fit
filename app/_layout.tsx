@@ -10,6 +10,12 @@ import { logger } from '@/utils/logger';
 import { NotificationProvider } from '@/hooks/useNotification';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 
+// P3-49：抽常量避免 inline 对象（每次 render 都新建引用）
+const ROOT_SCREEN_OPTIONS = { headerShown: false } as const;
+const DIET_RECORD_OPTIONS = { presentation: 'modal', headerShown: true } as const;
+const EXERCISE_RECORD_OPTIONS = { presentation: 'modal', headerShown: true } as const;
+const WEIGHT_RECORD_OPTIONS = { presentation: 'modal', headerShown: true } as const;
+
 export default function RootLayout() {
   useFrameworkReady();
   const { isReady, isLoading, error } = useDatabase();
@@ -42,47 +48,35 @@ export default function RootLayout() {
       <ErrorBoundary>
         <SafeAreaProvider>
           <NotificationProvider>
-            <Stack screenOptions={{ headerShown: false }}>
+            <Stack screenOptions={ROOT_SCREEN_OPTIONS}>
               <Stack.Screen name="(tabs)" />
               <Stack.Screen
                 name="diet/record"
-                options={{
-                  presentation: 'modal',
-                  headerShown: true,
-                  headerTitle: '记录饮食',
-                }}
+                options={DIET_RECORD_OPTIONS}
               />
               <Stack.Screen
                 name="exercise/record"
-                options={{
-                  presentation: 'modal',
-                  headerShown: true,
-                  headerTitle: '记录运动',
-                }}
+                options={EXERCISE_RECORD_OPTIONS}
               />
               <Stack.Screen
                 name="weight/record"
-                options={{
-                  presentation: 'modal',
-                  headerShown: true,
-                  headerTitle: '记录体重',
-                }}
+                options={WEIGHT_RECORD_OPTIONS}
               />
               <Stack.Screen
                 name="settings/ai-config"
-                options={{ headerShown: false }}
+                options={ROOT_SCREEN_OPTIONS}
               />
               <Stack.Screen
                 name="settings/goals"
-                options={{ headerShown: false }}
+                options={ROOT_SCREEN_OPTIONS}
               />
               <Stack.Screen
                 name="settings/about"
-                options={{ headerShown: false }}
+                options={ROOT_SCREEN_OPTIONS}
               />
               <Stack.Screen
                 name="settings/health-connect"
-                options={{ headerShown: false }}
+                options={ROOT_SCREEN_OPTIONS}
               />
             </Stack>
             <StatusBar style="auto" />

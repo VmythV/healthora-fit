@@ -4,8 +4,8 @@
 import React, { createContext, useContext, useCallback, useMemo, useState, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ToastItem, ToastType, ToastItemView, setGlobalNotify } from '@/components/ui/Toast';
-import { AlertModalView, AlertModalConfig, AlertModalInstance, setGlobalConfirm } from '@/components/ui/AlertModal';
+import { ToastItem, ToastType, ToastItemView } from '@/components/ui/Toast';
+import { AlertModalView, AlertModalConfig, AlertModalInstance } from '@/components/ui/AlertModal';
 
 interface NotificationContextType {
   showNotification: (message: string, type?: ToastType) => void;
@@ -70,15 +70,11 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     }
   }, [confirmInstance]);
 
-  // 注册全局 API
-  React.useEffect(() => {
-    setGlobalNotify(showNotification);
-    setGlobalConfirm(showConfirm);
-    return () => {
-      setGlobalNotify(null);
-      setGlobalConfirm(null);
-    };
-  }, [showNotification, showConfirm]);
+  // P3-46：删除 Provider → 全局模块变量的桥接 effect。
+  // 当前 0 个业务组件使用 useNotification Hook；消费方全部走
+  // `import { showNotification, showConfirm } from '@/components/ui'` 全局 API。
+  // 桥接的 useEffect 属于"无意义的副作用"，删除后 NotificationContext 仍保留
+  // 给未来真正用 Hook 的组件。
 
   // P1-11：value useMemo 稳定引用，避免 Provider 重渲染时所有 context 消费者跟随重渲染
   const value = useMemo<NotificationContextType>(

@@ -1,7 +1,7 @@
 // app/(tabs)/index.tsx
 // 首页
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -119,8 +119,8 @@ export default function HomeScreen() {
     ? latestWeight.weight - yesterdayWeight.weight
     : undefined;
 
-  // 整理今日记录
-  const todayRecords = [
+  // P3-40：useMemo 缓存今日记录列表，dietRecords/exerciseRecords/t 不变时引用稳定
+  const todayRecords = useMemo(() => [
     ...dietRecords.map(r => ({
       id: r.id,
       type: 'diet' as const,
@@ -135,7 +135,8 @@ export default function HomeScreen() {
       title: t(`exerciseType.${r.exerciseType}`),
       detail: `${r.durationMinutes} ${t('home.minutes')}`,
     })),
-  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
+  ].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()),
+  [dietRecords, exerciseRecords, t]);
 
   // 下拉刷新
   const onRefresh = useCallback(async () => {
@@ -145,7 +146,7 @@ export default function HomeScreen() {
   }, [refreshData]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -193,12 +194,11 @@ export default function HomeScreen() {
               {todayRecords.length > 0 ? (
                 <TodayRecords records={todayRecords} />
               ) : (
+                // P3-41：不再传空函数 onAction，让 EmptyState 自然隐藏按钮
                 <EmptyState
                   icon="note"
                   title={t('home.noRecords')}
                   message={t('home.noRecordsMessage')}
-                  actionTitle={t('record.title')}
-                  onAction={() => {}}
                 />
               )}
             </View>

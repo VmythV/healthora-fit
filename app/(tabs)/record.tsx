@@ -10,7 +10,7 @@ export default function RecordScreen() {
   const { t } = useI18n();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['bottom']}>
       <View style={styles.header}>
         <Text style={styles.title}>{t('record.title')}</Text>
         <Text style={styles.subtitle}>{t('record.subtitle')}</Text>
