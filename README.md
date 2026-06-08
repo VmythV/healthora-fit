@@ -33,10 +33,6 @@ An intelligent health tracking app that helps you effortlessly track diet, exerc
 
 ![VmythV's GitHub Chart](https://ghchart.rshah.org/VmythV)
 
-### 📈 Contribution Graph (3D)
-
-![VmythV's GitHub Chart 3D](https://ghchart.rshah.org/3d/VmythV)
-
 </div>
 
 ### 🛠️ Project Activity
