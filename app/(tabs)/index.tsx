@@ -29,7 +29,7 @@ export default function HomeScreen() {
   // 获取数据
   const {
     todayRecords: dietRecords,
-    todayCalories,
+    todayCalories: todayIntakeCalories,
     todayNutrition,
     loadToday: loadDietToday,
   } = useDietRecords();
@@ -90,14 +90,14 @@ export default function HomeScreen() {
     }
 
     // 卡路里控制评分（20%）- 在目标范围内
-    if (activeGoal?.dailyCalories && todayCalories > 0) {
-      const ratio = todayCalories / activeGoal.dailyCalories;
+    if (activeGoal?.dailyCalories && todayIntakeCalories > 0) {
+      const ratio = todayIntakeCalories / activeGoal.dailyCalories;
       if (ratio >= 0.8 && ratio <= 1.2) {
         score += 20;
       } else if (ratio >= 0.6 && ratio <= 1.4) {
         score += 10;
       }
-    } else if (todayCalories > 0) {
+    } else if (todayIntakeCalories > 0) {
       score += 15; // 没有目标但有记录
     }
 
@@ -112,7 +112,7 @@ export default function HomeScreen() {
     }
 
     return Math.min(100, Math.round(score));
-  }, [dietRecords, exerciseRecords, todayCalories, todayNutrition, todayDuration, latestWeight, activeGoal]);
+  }, [dietRecords, exerciseRecords, todayIntakeCalories, todayNutrition, todayDuration, latestWeight, activeGoal]);
 
   // 计算体重变化
   const weightChange = latestWeight && yesterdayWeight
@@ -173,7 +173,7 @@ export default function HomeScreen() {
               weightChange={weightChange}
               targetWeight={activeGoal?.targetValue}
               mealsCount={dietRecords.length}
-              totalCalories={todayCalories}
+              totalCalories={todayIntakeCalories}
               exerciseMinutes={todayDuration}
               caloriesBurned={todayCalories}
             />
