@@ -11,11 +11,34 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.2-3178C6?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
+[![GitHub stars](https://img.shields.io/github/stars/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/issues)
+[![GitHub PRs](https://img.shields.io/github/issues-pr/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/pulls)
+[![Last commit](https://img.shields.io/github/last-commit/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/commits/main)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/commits/main)
+[![Contributors](https://img.shields.io/github/contributors/VmythV/healthora-fit?style=flat&logo=github)](https://github.com/VmythV/healthora-fit/graphs/contributors)
+
 [English](README.md) | [中文](README.zh-CN.md)
 
 </div>
 
 ---
+
+## 📊 仓库统计
+
+<div align="center">
+
+![GitHub Stats](https://github-readme-stats.vercel.app/api/github-user-stats?username=VmythV&show_icons=true&theme=default&include_all_commits=true&count_private=true)
+![Repo Stats](https://github-readme-stats.vercel.app/api/pin/?username=VmythV&repo=healthora-fit&theme=default)
+
+</div>
+
+<div align="center">
+
+![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=VmythV&layout=compact&theme=default&langs_count=8&hide=html,css,scss)
+
+</div>
 
 ## ✨ 功能特性
 
