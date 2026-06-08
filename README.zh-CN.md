@@ -29,13 +29,13 @@
 
 <div align="center">
 
-### 📈 贡献图
+### 📈 贡献图（亮色）
 
 ![VmythV's GitHub Chart](https://ghchart.rshah.org/VmythV)
 
-### 🔥 连续打卡
+### 📈 贡献图（3D）
 
-![GitHub Streak](https://github-readme-streak-stats.cyclic.app/?user=VmythV&theme=default&hide_border=true)
+![VmythV's GitHub Chart 3D](https://ghchart.rshah.org/3d/VmythV)
 
 </div>
 
@@ -45,7 +45,7 @@
 
 </div>
 
-> 💡 仓库的 stars / forks / issues / 最近提交等已通过顶部 shields.io 徽章实时展示。`github-readme-stats.vercel.app` 公共实例因 GitHub API 限流经常返回 `Error Fetching Resource`，故改用 `ghchart.rshah.org`（贡献图）+ `cyclic.app`（连续打卡）+ `komarev.com`（访问计数）三个稳定服务。
+> 💡 仓库的 stars / forks / issues / 最近提交等已通过顶部 shields.io 徽章实时展示。`github-readme-stats.vercel.app` 公共实例因 GitHub API 限流经常返回 `Error Fetching Resource`，`github-readme-streak-stats.cyclic.app` 也因 Cyclic 平台关停而失效。本节统一改用 `ghchart.rshah.org`（贡献图，轻量 VPS 无限流）+ `komarev.com`（访问计数）这两个稳定服务。
 
 ## ✨ 功能特性
 
