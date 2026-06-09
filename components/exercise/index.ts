@@ -1,10 +1,10 @@
 // components/exercise/index.ts
 // 运动组件导出
 
-export { ExerciseTypeSelector } from './ExerciseTypeSelector';
-export { DurationInput } from './DurationInput';
-export { ExerciseRecordForm } from './ExerciseRecordForm';
-export { ExerciseRecordDetail } from './ExerciseRecordDetail';
-export { ExerciseRecordList } from './ExerciseRecordList';
-export { ScreenshotPicker } from './ScreenshotPicker';
-export { ScreenshotResult } from './ScreenshotResult';
+export { ExerciseTypeSelector } from './ExerciseTypeSelector'
+export { DurationInput } from './DurationInput'
+export { ExerciseRecordForm } from './ExerciseRecordForm'
+export { ExerciseRecordDetail } from './ExerciseRecordDetail'
+export { ExerciseRecordList } from './ExerciseRecordList'
+export { ScreenshotPicker } from './ScreenshotPicker'
+export { ScreenshotResult } from './ScreenshotResult'

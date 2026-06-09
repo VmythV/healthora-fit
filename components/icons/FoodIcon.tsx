@@ -1,13 +1,13 @@
 // components/icons/FoodIcon.tsx
 // 饮食图标
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Path } from 'react-native-svg'
 
 interface FoodIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -45,7 +45,7 @@ export function FoodIcon({ size = 24, color = '#000000' }: FoodIconProps) {
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -53,4 +53,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

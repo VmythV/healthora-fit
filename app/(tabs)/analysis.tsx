@@ -6,63 +6,56 @@
 // - useEffect 依赖补 currentRange + loadData（修 stale closure）
 // - 加 useFocusEffect 切回 tab 自动刷新
 
-import { logger } from '@/utils/logger';
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  RefreshControl,
-  Dimensions,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useDatabase } from '@/hooks/useDatabase';
-import { useGoals } from '@/hooks/useGoals';
-import { weightQueries } from '@/database/queries/weight';
-import { dietQueries } from '@/database/queries/diet';
-import { exerciseQueries } from '@/database/queries/exercise';
-import { TimeRangeSelector, DateRange } from '@/components/TimeRangeSelector';
-import { LineChart } from '@/components/charts/LineChart';
-import { BarChart } from '@/components/charts/BarChart';
-import { PieChart } from '@/components/charts/PieChart';
+import { logger } from '@/utils/logger'
+import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useFocusEffect } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useDatabase } from '@/hooks/useDatabase'
+import { useGoals } from '@/hooks/useGoals'
+import { weightQueries } from '@/database/queries/weight'
+import { dietQueries } from '@/database/queries/diet'
+import { exerciseQueries } from '@/database/queries/exercise'
+import { TimeRangeSelector, DateRange } from '@/components/TimeRangeSelector'
+import { LineChart } from '@/components/charts/LineChart'
+import { BarChart } from '@/components/charts/BarChart'
+import { PieChart } from '@/components/charts/PieChart'
 
 interface WeightData {
-  date: string;
-  weight: number;
+  date: string
+  weight: number
 }
 
 interface DietData {
-  date: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
+  date: string
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
 }
 
 interface ExerciseData {
-  date: string;
-  calories: number;
-  duration: number;
+  date: string
+  calories: number
+  duration: number
 }
 
 interface ExerciseTypeData {
-  exercise_type: string;
-  count: number;
-  total_duration: number;
+  exercise_type: string
+  count: number
+  total_duration: number
 }
 
 interface AnalysisData {
-  weightData: WeightData[];
-  weightStats: any;
-  dietData: DietData[];
-  dietTotal: any;
-  exerciseData: ExerciseData[];
-  exerciseTypeData: ExerciseTypeData[];
-  exerciseTotal: any;
+  weightData: WeightData[]
+  weightStats: any
+  dietData: DietData[]
+  dietTotal: any
+  exerciseData: ExerciseData[]
+  exerciseTypeData: ExerciseTypeData[]
+  exerciseTotal: any
 }
 
 const EMPTY_DATA: AnalysisData = {
@@ -73,132 +66,171 @@ const EMPTY_DATA: AnalysisData = {
   exerciseData: [],
   exerciseTypeData: [],
   exerciseTotal: null,
-};
+}
 
 export default function AnalysisScreen() {
-  const { t } = useI18n();
-  const { isReady } = useDatabase();
-  const { goal } = useGoals();
-  const [refreshing, setRefreshing] = useState(false);
-  const [currentRange, setCurrentRange] = useState<DateRange | null>(null);
+  const { t } = useI18n()
+  const { isReady } = useDatabase()
+  const { goal } = useGoals()
+  const [refreshing, setRefreshing] = useState(false)
+  const [currentRange, setCurrentRange] = useState<DateRange | null>(null)
 
   // P1-12：合并 7 个 useState → 1 个 analysisData
-  const [data, setData] = useState<AnalysisData>(EMPTY_DATA);
-  const { weightData, weightStats, dietData, dietTotal, exerciseData, exerciseTypeData, exerciseTotal } = data;
+  const [data, setData] = useState<AnalysisData>(EMPTY_DATA)
+  const {
+    weightData,
+    weightStats,
+    dietData,
+    dietTotal,
+    exerciseData,
+    exerciseTypeData,
+    exerciseTotal,
+  } = data
 
   // 加载数据
-  const loadData = useCallback(async (range: DateRange) => {
-    if (!isReady) return;
+  const loadData = useCallback(
+    async (range: DateRange) => {
+      if (!isReady) return
 
-    try {
-      const [
-        weights,
-        weightStatistics,
-        dailyNutrition,
-        totalNutrition,
-        dailyExercise,
-        typeStats,
-        totalExercise,
-      ] = await Promise.all([
-        weightQueries.getDailyWeights(range.startDate, range.endDate),
-        weightQueries.getStats(range.startDate, range.endDate),
-        dietQueries.getDailyNutritionStats(range.startDate, range.endDate),
-        dietQueries.getTotalNutrition(range.startDate, range.endDate),
-        exerciseQueries.getDailyCaloriesStats(range.startDate, range.endDate),
-        exerciseQueries.getTypeStats(range.startDate, range.endDate),
-        exerciseQueries.getTotalStats(range.startDate, range.endDate),
-      ]);
+      try {
+        const [
+          weights,
+          weightStatistics,
+          dailyNutrition,
+          totalNutrition,
+          dailyExercise,
+          typeStats,
+          totalExercise,
+        ] = await Promise.all([
+          weightQueries.getDailyWeights(range.startDate, range.endDate),
+          weightQueries.getStats(range.startDate, range.endDate),
+          dietQueries.getDailyNutritionStats(range.startDate, range.endDate),
+          dietQueries.getTotalNutrition(range.startDate, range.endDate),
+          exerciseQueries.getDailyCaloriesStats(range.startDate, range.endDate),
+          exerciseQueries.getTypeStats(range.startDate, range.endDate),
+          exerciseQueries.getTotalStats(range.startDate, range.endDate),
+        ])
 
-      // P1-12：单次 setData 合并 7 个 setXxx
-      setData({
-        weightData: weights || [],
-        weightStats: weightStatistics,
-        dietData: dailyNutrition || [],
-        dietTotal: totalNutrition,
-        exerciseData: dailyExercise || [],
-        exerciseTypeData: typeStats || [],
-        exerciseTotal: totalExercise,
-      });
-    } catch (error) {
-      logger.error('[Analysis] Failed to load analysis data:', error);
-    }
-  }, [isReady]);
+        // P1-12：单次 setData 合并 7 个 setXxx
+        setData({
+          weightData: weights || [],
+          weightStats: weightStatistics,
+          dietData: dailyNutrition || [],
+          dietTotal: totalNutrition,
+          exerciseData: dailyExercise || [],
+          exerciseTypeData: typeStats || [],
+          exerciseTotal: totalExercise,
+        })
+      } catch (error) {
+        logger.error('[Analysis] Failed to load analysis data:', error)
+      }
+    },
+    [isReady]
+  )
 
   // P1-12 修：依赖补 currentRange + loadData（修 stale closure）
   useEffect(() => {
     if (isReady && currentRange) {
-      loadData(currentRange);
+      loadData(currentRange)
     }
-  }, [isReady, currentRange, loadData]);
+  }, [isReady, currentRange, loadData])
 
   // P1-12：切回 tab 自动刷新
   useFocusEffect(
     useCallback(() => {
       if (currentRange) {
-        loadData(currentRange);
+        loadData(currentRange)
       }
     }, [currentRange, loadData])
-  );
+  )
 
   // 处理时间范围变化
-  const handleRangeChange = useCallback((range: DateRange) => {
-    setCurrentRange(range);
-    loadData(range);
-  }, [loadData]);
+  const handleRangeChange = useCallback(
+    (range: DateRange) => {
+      setCurrentRange(range)
+      loadData(range)
+    },
+    [loadData]
+  )
 
   // 下拉刷新
   const handleRefresh = useCallback(async () => {
     if (currentRange) {
-      setRefreshing(true);
-      await loadData(currentRange);
-      setRefreshing(false);
+      setRefreshing(true)
+      await loadData(currentRange)
+      setRefreshing(false)
     }
-  }, [currentRange, loadData]);
+  }, [currentRange, loadData])
 
   // 格式化日期标签
   const formatDateLabel = (dateStr: string): string => {
-    const date = new Date(dateStr);
-    return `${date.getMonth() + 1}/${date.getDate()}`;
-  };
+    const date = new Date(dateStr)
+    return `${date.getMonth() + 1}/${date.getDate()}`
+  }
+
+  // P3-50：5 个图表派生数据改 useMemo 缓存，
+  // 父组件 rerender（切语言/切时间范围）但源数据未变时，引用稳定。
+  // 为未来 chart 组件加 React.memo 做铺垫。
 
   // 准备体重图表数据
-  const weightChartData = weightData.map((d) => ({
-    date: formatDateLabel(d.date),
-    value: d.weight,
-  }));
+  const weightChartData = useMemo(
+    () =>
+      weightData.map((d) => ({
+        date: formatDateLabel(d.date),
+        value: d.weight,
+      })),
+    [weightData]
+  )
 
   // 准备卡路里图表数据
-  const caloriesChartData = dietData.map((d) => ({
-    label: formatDateLabel(d.date),
-    value: d.calories,
-  }));
+  const caloriesChartData = useMemo(
+    () =>
+      dietData.map((d) => ({
+        label: formatDateLabel(d.date),
+        value: d.calories,
+      })),
+    [dietData]
+  )
 
   // 准备营养成分饼图数据
-  const nutritionPieData = dietTotal
-    ? [
-        { label: t('diet.protein'), value: dietTotal.protein, color: '#10B981' },
-        { label: t('diet.carbs'), value: dietTotal.carbs, color: '#3B82F6' },
-        { label: t('diet.fat'), value: dietTotal.fat, color: '#F59E0B' },
-      ]
-    : [];
+  const nutritionPieData = useMemo(
+    () =>
+      dietTotal
+        ? [
+            { label: t('diet.protein'), value: dietTotal.protein, color: '#10B981' },
+            { label: t('diet.carbs'), value: dietTotal.carbs, color: '#3B82F6' },
+            { label: t('diet.fat'), value: dietTotal.fat, color: '#F59E0B' },
+          ]
+        : [],
+    [dietTotal, t]
+  )
 
   // 准备运动时长图表数据
-  const exerciseDurationData = exerciseData.map((d) => ({
-    label: formatDateLabel(d.date),
-    value: d.duration,
-  }));
+  const exerciseDurationData = useMemo(
+    () =>
+      exerciseData.map((d) => ({
+        label: formatDateLabel(d.date),
+        value: d.duration,
+      })),
+    [exerciseData]
+  )
 
   // 准备运动类型饼图数据
-  const exerciseTypePieData = exerciseTypeData.map((d, i) => ({
-    label: d.exercise_type,
-    value: d.total_duration,
-    color: ['#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6'][i % 6],
-  }));
+  const exerciseTypePieData = useMemo(
+    () =>
+      exerciseTypeData.map((d, i) => ({
+        label: d.exercise_type,
+        value: d.total_duration,
+        color: ['#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6'][i % 6],
+      })),
+    [exerciseTypeData]
+  )
 
   // 计算卡路里百分比
-  const caloriesPercentage = goal?.dailyCalories && dietTotal
-    ? Math.round((dietTotal.calories / (goal.dailyCalories * dietTotal.days)) * 100)
-    : null;
+  const caloriesPercentage =
+    goal?.dailyCalories && dietTotal
+      ? Math.round((dietTotal.calories / (goal.dailyCalories * dietTotal.days)) * 100)
+      : null
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -209,9 +241,7 @@ export default function AnalysisScreen() {
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
       >
         {/* 时间范围选择器 */}
         <TimeRangeSelector onRangeChange={handleRangeChange} />
@@ -252,8 +282,8 @@ export default function AnalysisScreen() {
                             weightStats.change < 0
                               ? theme.colors.success
                               : weightStats.change > 0
-                              ? theme.colors.error
-                              : theme.colors.text.primary,
+                                ? theme.colors.error
+                                : theme.colors.text.primary,
                         },
                       ]}
                     >
@@ -304,9 +334,7 @@ export default function AnalysisScreen() {
                           styles.statValue,
                           {
                             color:
-                              caloriesPercentage <= 100
-                                ? theme.colors.success
-                                : theme.colors.error,
+                              caloriesPercentage <= 100 ? theme.colors.success : theme.colors.error,
                           },
                         ]}
                       >
@@ -392,7 +420,7 @@ export default function AnalysisScreen() {
         <View style={styles.bottomSpacer} />
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -468,4 +496,4 @@ const styles = StyleSheet.create({
   bottomSpacer: {
     height: theme.spacing.xl,
   },
-});
+})

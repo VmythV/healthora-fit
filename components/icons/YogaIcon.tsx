@@ -1,13 +1,13 @@
 // components/icons/YogaIcon.tsx
 // 瑜伽图标
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Path, Circle } from 'react-native-svg'
 
 interface YogaIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -74,7 +74,7 @@ export function YogaIcon({ size = 24, color = '#000000' }: YogaIconProps) {
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -82,4 +82,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

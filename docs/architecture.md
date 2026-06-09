@@ -73,13 +73,13 @@
 
 ### 分层职责
 
-| 层级 | 职责 | 主要技术 |
-|------|------|---------|
-| 展示层 | UI 渲染、用户交互 | React Native Components |
-| 状态层 | 状态管理、数据缓存 | Zustand |
-| 服务层 | 业务逻辑、外部调用 | TypeScript Services |
-| 数据层 | 数据持久化 | SQLite, File System |
-| 外部层 | 第三方服务集成 | REST API, SDK |
+| 层级   | 职责               | 主要技术                |
+| ------ | ------------------ | ----------------------- |
+| 展示层 | UI 渲染、用户交互  | React Native Components |
+| 状态层 | 状态管理、数据缓存 | Zustand                 |
+| 服务层 | 业务逻辑、外部调用 | TypeScript Services     |
+| 数据层 | 数据持久化         | SQLite, File System     |
+| 外部层 | 第三方服务集成     | REST API, SDK           |
 
 ---
 
@@ -323,14 +323,14 @@ healthora-fit/
 // database/index.ts
 // 数据库初始化和管理
 
-import * as SQLite from 'expo-sqlite';
+import * as SQLite from 'expo-sqlite'
 
 class Database {
-  private db: SQLite.SQLiteDatabase;
+  private db: SQLite.SQLiteDatabase
 
   async initialize(): Promise<void> {
-    this.db = await SQLite.openDatabaseAsync('healthora.db');
-    await this.runMigrations();
+    this.db = await SQLite.openDatabaseAsync('healthora.db')
+    await this.runMigrations()
   }
 
   async runMigrations(): Promise<void> {
@@ -338,18 +338,18 @@ class Database {
   }
 
   getDatabase(): SQLite.SQLiteDatabase {
-    return this.db;
+    return this.db
   }
 }
 
-export const database = new Database();
+export const database = new Database()
 ```
 
 ```typescript
 // database/schema.ts
 // Schema 定义
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 1
 
 export const CREATE_TABLES = `
   CREATE TABLE IF NOT EXISTS diet_records (
@@ -409,7 +409,7 @@ export const CREATE_TABLES = `
   CREATE INDEX IF NOT EXISTS idx_diet_timestamp ON diet_records(timestamp);
   CREATE INDEX IF NOT EXISTS idx_exercise_timestamp ON exercise_records(timestamp);
   CREATE INDEX IF NOT EXISTS idx_weight_timestamp ON weight_records(timestamp);
-`;
+`
 ```
 
 ### 2. 状态管理模块 (stores/)
@@ -418,24 +418,24 @@ export const CREATE_TABLES = `
 // stores/dietStore.ts
 // 饮食记录状态管理
 
-import { create } from 'zustand';
-import { DietRecord, FoodItem } from '@/types/diet';
-import { database } from '@/database';
+import { create } from 'zustand'
+import { DietRecord, FoodItem } from '@/types/diet'
+import { database } from '@/database'
 
 interface DietState {
   // 状态
-  records: DietRecord[];
-  todayRecords: DietRecord[];
-  isLoading: boolean;
-  error: string | null;
+  records: DietRecord[]
+  todayRecords: DietRecord[]
+  isLoading: boolean
+  error: string | null
 
   // Actions
-  loadRecords: (date?: Date) => Promise<void>;
-  loadTodayRecords: () => Promise<void>;
-  addRecord: (record: Omit<DietRecord, 'id'>) => Promise<number>;
-  updateRecord: (id: number, updates: Partial<DietRecord>) => Promise<void>;
-  deleteRecord: (id: number) => Promise<void>;
-  clearError: () => void;
+  loadRecords: (date?: Date) => Promise<void>
+  loadTodayRecords: () => Promise<void>
+  addRecord: (record: Omit<DietRecord, 'id'>) => Promise<number>
+  updateRecord: (id: number, updates: Partial<DietRecord>) => Promise<void>
+  deleteRecord: (id: number) => Promise<void>
+  clearError: () => void
 }
 
 export const useDietStore = create<DietState>((set, get) => ({
@@ -445,37 +445,37 @@ export const useDietStore = create<DietState>((set, get) => ({
   error: null,
 
   loadRecords: async (date) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null })
     try {
-      const db = database.getDatabase();
-      let query = 'SELECT * FROM diet_records';
-      let params: any[] = [];
+      const db = database.getDatabase()
+      let query = 'SELECT * FROM diet_records'
+      let params: any[] = []
 
       if (date) {
-        const dateStr = date.toISOString().split('T')[0];
-        query += ' WHERE date(timestamp) = ?';
-        params.push(dateStr);
+        const dateStr = date.toISOString().split('T')[0]
+        query += ' WHERE date(timestamp) = ?'
+        params.push(dateStr)
       }
 
-      query += ' ORDER BY timestamp DESC';
+      query += ' ORDER BY timestamp DESC'
 
-      const result = await db.getAllAsync(query, params);
-      set({ records: result as DietRecord[], isLoading: false });
+      const result = await db.getAllAsync(query, params)
+      set({ records: result as DietRecord[], isLoading: false })
     } catch (error) {
-      set({ error: (error as Error).message, isLoading: false });
+      set({ error: (error as Error).message, isLoading: false })
     }
   },
 
   loadTodayRecords: async () => {
-    const today = new Date();
-    await get().loadRecords(today);
-    set({ todayRecords: get().records });
+    const today = new Date()
+    await get().loadRecords(today)
+    set({ todayRecords: get().records })
   },
 
   addRecord: async (record) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null })
     try {
-      const db = database.getDatabase();
+      const db = database.getDatabase()
       const result = await db.runAsync(
         `INSERT INTO diet_records (timestamp, photo_uri, foods_json, total_calories, total_protein, total_carbs, total_fat, meal_type, note, is_edited)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -491,63 +491,60 @@ export const useDietStore = create<DietState>((set, get) => ({
           record.note,
           record.isEdited ? 1 : 0,
         ]
-      );
-      set({ isLoading: false });
-      return result.lastInsertRowId;
+      )
+      set({ isLoading: false })
+      return result.lastInsertRowId
     } catch (error) {
-      set({ error: (error as Error).message, isLoading: false });
-      throw error;
+      set({ error: (error as Error).message, isLoading: false })
+      throw error
     }
   },
 
   updateRecord: async (id, updates) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null })
     try {
-      const db = database.getDatabase();
-      const setClauses: string[] = [];
-      const params: any[] = [];
+      const db = database.getDatabase()
+      const setClauses: string[] = []
+      const params: any[] = []
 
       if (updates.timestamp !== undefined) {
-        setClauses.push('timestamp = ?');
-        params.push(updates.timestamp);
+        setClauses.push('timestamp = ?')
+        params.push(updates.timestamp)
       }
       if (updates.foodsJson !== undefined) {
-        setClauses.push('foods_json = ?');
-        params.push(updates.foodsJson);
+        setClauses.push('foods_json = ?')
+        params.push(updates.foodsJson)
       }
       if (updates.totalCalories !== undefined) {
-        setClauses.push('total_calories = ?');
-        params.push(updates.totalCalories);
+        setClauses.push('total_calories = ?')
+        params.push(updates.totalCalories)
       }
       // ... 其他字段
 
-      setClauses.push("updated_at = datetime('now')");
-      params.push(id);
+      setClauses.push("updated_at = datetime('now')")
+      params.push(id)
 
-      await db.runAsync(
-        `UPDATE diet_records SET ${setClauses.join(', ')} WHERE id = ?`,
-        params
-      );
+      await db.runAsync(`UPDATE diet_records SET ${setClauses.join(', ')} WHERE id = ?`, params)
 
-      set({ isLoading: false });
+      set({ isLoading: false })
     } catch (error) {
-      set({ error: (error as Error).message, isLoading: false });
+      set({ error: (error as Error).message, isLoading: false })
     }
   },
 
   deleteRecord: async (id) => {
-    set({ isLoading: true, error: null });
+    set({ isLoading: true, error: null })
     try {
-      const db = database.getDatabase();
-      await db.runAsync('DELETE FROM diet_records WHERE id = ?', [id]);
-      set({ isLoading: false });
+      const db = database.getDatabase()
+      await db.runAsync('DELETE FROM diet_records WHERE id = ?', [id])
+      set({ isLoading: false })
     } catch (error) {
-      set({ error: (error as Error).message, isLoading: false });
+      set({ error: (error as Error).message, isLoading: false })
     }
   },
 
   clearError: () => set({ error: null }),
-}));
+}))
 ```
 
 ### 3. AI 服务模块 (services/ai/)
@@ -557,27 +554,27 @@ export const useDietStore = create<DietState>((set, get) => ({
 // AI API 客户端
 
 interface AIConfig {
-  endpoint: string;
-  apiKey: string;
-  model: string;
+  endpoint: string
+  apiKey: string
+  model: string
 }
 
 interface AIResponse {
-  success: boolean;
-  data?: any;
-  error?: string;
+  success: boolean
+  data?: any
+  error?: string
 }
 
 class AIClient {
-  private config: AIConfig | null = null;
+  private config: AIConfig | null = null
 
   setConfig(config: AIConfig): void {
-    this.config = config;
+    this.config = config
   }
 
   async analyzeImage(imageBase64: string, prompt: string): Promise<AIResponse> {
     if (!this.config) {
-      return { success: false, error: 'AI 配置未设置' };
+      return { success: false, error: 'AI 配置未设置' }
     }
 
     try {
@@ -585,7 +582,7 @@ class AIClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          Authorization: `Bearer ${this.config.apiKey}`,
         },
         body: JSON.stringify({
           model: this.config.model,
@@ -608,48 +605,48 @@ class AIClient {
           ],
           max_tokens: 1000,
         }),
-      });
+      })
 
       if (!response.ok) {
-        const error = await response.json();
-        return { success: false, error: error.message || '请求失败' };
+        const error = await response.json()
+        return { success: false, error: error.message || '请求失败' }
       }
 
-      const data = await response.json();
-      const content = data.choices[0]?.message?.content;
+      const data = await response.json()
+      const content = data.choices[0]?.message?.content
 
       // 解析 JSON 响应
-      const parsed = JSON.parse(content);
-      return { success: true, data: parsed };
+      const parsed = JSON.parse(content)
+      return { success: true, data: parsed }
     } catch (error) {
-      return { success: false, error: (error as Error).message };
+      return { success: false, error: (error as Error).message }
     }
   }
 
   async testConnection(): Promise<AIResponse> {
     if (!this.config) {
-      return { success: false, error: 'AI 配置未设置' };
+      return { success: false, error: 'AI 配置未设置' }
     }
 
     try {
       const response = await fetch(`${this.config.endpoint}/models`, {
         headers: {
-          'Authorization': `Bearer ${this.config.apiKey}`,
+          Authorization: `Bearer ${this.config.apiKey}`,
         },
-      });
+      })
 
       if (!response.ok) {
-        return { success: false, error: '连接失败' };
+        return { success: false, error: '连接失败' }
       }
 
-      return { success: true };
+      return { success: true }
     } catch (error) {
-      return { success: false, error: (error as Error).message };
+      return { success: false, error: (error as Error).message }
     }
   }
 }
 
-export const aiClient = new AIClient();
+export const aiClient = new AIClient()
 ```
 
 ```typescript
@@ -684,7 +681,7 @@ export const DIET_ANALYSIS_PROMPT = `你是一个专业的营养师和食物识�
 1. 如果无法确定具体食物，请给出最可能的猜测
 2. 份量基于照片中食物的大小估算
 3. 营养成分基于常见食物数据库估算
-4. 只返回 JSON，不要其他文字`;
+4. 只返回 JSON，不要其他文字`
 
 export const EXERCISE_ANALYSIS_PROMPT = `你是一个运动数据分析专家。请分析这张运动 App 截图，提取运动数据。
 
@@ -702,36 +699,36 @@ export const EXERCISE_ANALYSIS_PROMPT = `你是一个运动数据分析专家。
 注意：
 1. 优先从截图中的数字识别
 2. 如果某些数据无法识别，设为 null
-3. 只返回 JSON，不要其他文字`;
+3. 只返回 JSON，不要其他文字`
 ```
 
 ```typescript
 // services/ai/parsers.ts
 // 响应解析器
 
-import { FoodItem } from '@/types/diet';
-import { ExerciseRecord } from '@/types/exercise';
+import { FoodItem } from '@/types/diet'
+import { ExerciseRecord } from '@/types/exercise'
 
 interface DietAnalysisResult {
-  foods: FoodItem[];
+  foods: FoodItem[]
   total: {
-    calories: number;
-    protein: number;
-    carbs: number;
-    fat: number;
-  };
-  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
-  confidence: 'high' | 'medium' | 'low';
+    calories: number
+    protein: number
+    carbs: number
+    fat: number
+  }
+  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack'
+  confidence: 'high' | 'medium' | 'low'
 }
 
 interface ExerciseAnalysisResult {
-  exerciseType: string;
-  durationMinutes: number;
-  caloriesBurned: number;
-  distanceKm: number | null;
-  heartRateAvg: number | null;
-  timestamp: string | null;
-  confidence: 'high' | 'medium' | 'low';
+  exerciseType: string
+  durationMinutes: number
+  caloriesBurned: number
+  distanceKm: number | null
+  heartRateAvg: number | null
+  timestamp: string | null
+  confidence: 'high' | 'medium' | 'low'
 }
 
 export function parseDietAnalysis(data: any): DietAnalysisResult {
@@ -752,7 +749,7 @@ export function parseDietAnalysis(data: any): DietAnalysisResult {
     },
     mealType: data.meal_type,
     confidence: data.confidence,
-  };
+  }
 }
 
 export function parseExerciseAnalysis(data: any): ExerciseAnalysisResult {
@@ -764,7 +761,7 @@ export function parseExerciseAnalysis(data: any): ExerciseAnalysisResult {
     heartRateAvg: data.heart_rate_avg,
     timestamp: data.timestamp,
     confidence: data.confidence,
-  };
+  }
 }
 ```
 
@@ -774,74 +771,74 @@ export function parseExerciseAnalysis(data: any): ExerciseAnalysisResult {
 // services/health/healthConnect.ts
 // Android Health Connect 集成
 
-import { Platform } from 'react-native';
-import { WeightRecord, ExerciseRecord } from '@/types';
+import { Platform } from 'react-native'
+import { WeightRecord, ExerciseRecord } from '@/types'
 
 class HealthConnectService {
-  private isAvailable = false;
+  private isAvailable = false
 
   async initialize(): Promise<boolean> {
     if (Platform.OS !== 'android') {
-      return false;
+      return false
     }
 
     try {
       // 检查 Health Connect 是否可用
       // 这里需要使用 expo-health-connect 或原生模块
-      this.isAvailable = true;
-      return true;
+      this.isAvailable = true
+      return true
     } catch (error) {
-      console.error('Health Connect 初始化失败:', error);
-      return false;
+      console.error('Health Connect 初始化失败:', error)
+      return false
     }
   }
 
   async requestPermissions(): Promise<boolean> {
-    if (!this.isAvailable) return false;
+    if (!this.isAvailable) return false
 
     try {
       // 请求权限
       // 读取体重、运动、步数、心率
-      return true;
+      return true
     } catch (error) {
-      console.error('权限请求失败:', error);
-      return false;
+      console.error('权限请求失败:', error)
+      return false
     }
   }
 
   async readWeightRecords(startDate: Date, endDate: Date): Promise<WeightRecord[]> {
-    if (!this.isAvailable) return [];
+    if (!this.isAvailable) return []
 
     try {
       // 读取体重记录
       // 转换为应用数据格式
-      return [];
+      return []
     } catch (error) {
-      console.error('读取体重失败:', error);
-      return [];
+      console.error('读取体重失败:', error)
+      return []
     }
   }
 
   async readExerciseRecords(startDate: Date, endDate: Date): Promise<ExerciseRecord[]> {
-    if (!this.isAvailable) return [];
+    if (!this.isAvailable) return []
 
     try {
       // 读取运动记录
       // 映射运动类型
-      return [];
+      return []
     } catch (error) {
-      console.error('读取运动失败:', error);
-      return [];
+      console.error('读取运动失败:', error)
+      return []
     }
   }
 
   async syncData(): Promise<{ weight: number; exercise: number }> {
     // 同步数据逻辑
-    return { weight: 0, exercise: 0 };
+    return { weight: 0, exercise: 0 }
   }
 }
 
-export const healthConnectService = new HealthConnectService();
+export const healthConnectService = new HealthConnectService()
 ```
 
 ### 5. 图片服务模块 (services/image/)
@@ -850,81 +847,81 @@ export const healthConnectService = new HealthConnectService();
 // services/image/camera.ts
 // 相机和图片选择
 
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker'
+import * as FileSystem from 'expo-file-system'
 
 interface ImageResult {
-  uri: string;
-  base64: string;
-  width: number;
-  height: number;
+  uri: string
+  base64: string
+  width: number
+  height: number
 }
 
 export async function takePhoto(): Promise<ImageResult | null> {
-  const permission = await ImagePicker.requestCameraPermissionsAsync();
+  const permission = await ImagePicker.requestCameraPermissionsAsync()
 
   if (!permission.granted) {
-    throw new Error('需要相机权限');
+    throw new Error('需要相机权限')
   }
 
   const result = await ImagePicker.launchCameraAsync({
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
     quality: 0.8,
     base64: true,
-  });
+  })
 
   if (result.canceled || !result.assets[0]) {
-    return null;
+    return null
   }
 
-  const asset = result.assets[0];
+  const asset = result.assets[0]
   return {
     uri: asset.uri,
     base64: asset.base64 || '',
     width: asset.width,
     height: asset.height,
-  };
+  }
 }
 
 export async function pickImage(): Promise<ImageResult | null> {
-  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync()
 
   if (!permission.granted) {
-    throw new Error('需要相册权限');
+    throw new Error('需要相册权限')
   }
 
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ImagePicker.MediaTypeOptions.Images,
     quality: 0.8,
     base64: true,
-  });
+  })
 
   if (result.canceled || !result.assets[0]) {
-    return null;
+    return null
   }
 
-  const asset = result.assets[0];
+  const asset = result.assets[0]
   return {
     uri: asset.uri,
     base64: asset.base64 || '',
     width: asset.width,
     height: asset.height,
-  };
+  }
 }
 
 export async function saveImage(uri: string, filename: string): Promise<string> {
-  const directory = `${FileSystem.documentDirectory}images/`;
-  await FileSystem.makeDirectoryAsync(directory, { intermediates: true });
+  const directory = `${FileSystem.documentDirectory}images/`
+  await FileSystem.makeDirectoryAsync(directory, { intermediates: true })
 
-  const destination = `${directory}${filename}`;
-  await FileSystem.copyAsync({ from: uri, to: destination });
+  const destination = `${directory}${filename}`
+  await FileSystem.copyAsync({ from: uri, to: destination })
 
-  return destination;
+  return destination
 }
 
 export async function deleteImage(uri: string): Promise<void> {
   try {
-    await FileSystem.deleteAsync(uri);
+    await FileSystem.deleteAsync(uri)
   } catch (error) {
     // 忽略文件不存在的错误
   }
@@ -1028,36 +1025,36 @@ export async function deleteImage(uri: string): Promise<void> {
 
 export interface AIService {
   // 配置
-  setConfig(config: AIConfig): void;
-  getConfig(): AIConfig | null;
-  testConnection(): Promise<boolean>;
+  setConfig(config: AIConfig): void
+  getConfig(): AIConfig | null
+  testConnection(): Promise<boolean>
 
   // 分析功能
-  analyzeFood(imageBase64: string): Promise<DietAnalysisResult>;
-  analyzeExercise(imageBase64: string): Promise<ExerciseAnalysisResult>;
+  analyzeFood(imageBase64: string): Promise<DietAnalysisResult>
+  analyzeExercise(imageBase64: string): Promise<ExerciseAnalysisResult>
 }
 
 export interface AIConfig {
-  endpoint: string;      // API 地址
-  apiKey: string;        // API Key
-  model: string;         // 模型名称
+  endpoint: string // API 地址
+  apiKey: string // API Key
+  model: string // 模型名称
 }
 
 export interface DietAnalysisResult {
-  foods: FoodItem[];
-  total: NutritionInfo;
-  mealType: MealType;
-  confidence: ConfidenceLevel;
+  foods: FoodItem[]
+  total: NutritionInfo
+  mealType: MealType
+  confidence: ConfidenceLevel
 }
 
 export interface ExerciseAnalysisResult {
-  exerciseType: string;
-  durationMinutes: number;
-  caloriesBurned: number;
-  distanceKm: number | null;
-  heartRateAvg: number | null;
-  timestamp: string | null;
-  confidence: ConfidenceLevel;
+  exerciseType: string
+  durationMinutes: number
+  caloriesBurned: number
+  distanceKm: number | null
+  heartRateAvg: number | null
+  timestamp: string | null
+  confidence: ConfidenceLevel
 }
 ```
 
@@ -1068,33 +1065,33 @@ export interface ExerciseAnalysisResult {
 
 export interface HealthService {
   // 初始化
-  initialize(): Promise<boolean>;
-  requestPermissions(): Promise<boolean>;
-  isAvailable(): boolean;
+  initialize(): Promise<boolean>
+  requestPermissions(): Promise<boolean>
+  isAvailable(): boolean
 
   // 数据读取
-  readWeight(startDate: Date, endDate: Date): Promise<WeightRecord[]>;
-  readExercise(startDate: Date, endDate: Date): Promise<ExerciseRecord[]>;
-  readSteps(date: Date): Promise<number>;
+  readWeight(startDate: Date, endDate: Date): Promise<WeightRecord[]>
+  readExercise(startDate: Date, endDate: Date): Promise<ExerciseRecord[]>
+  readSteps(date: Date): Promise<number>
 
   // 数据同步
-  syncWeight(): Promise<WeightRecord[]>;
-  syncExercise(): Promise<ExerciseRecord[]>;
+  syncWeight(): Promise<WeightRecord[]>
+  syncExercise(): Promise<ExerciseRecord[]>
 }
 
 export interface WeightRecord {
-  timestamp: Date;
-  weight: number;        // kg
-  source: 'health_connect' | 'manual';
+  timestamp: Date
+  weight: number // kg
+  source: 'health_connect' | 'manual'
 }
 
 export interface ExerciseRecord {
-  timestamp: Date;
-  type: string;
-  duration: number;      // minutes
-  calories: number;
-  distance?: number;     // km
-  source: 'health_connect' | 'manual';
+  timestamp: Date
+  type: string
+  duration: number // minutes
+  calories: number
+  distance?: number // km
+  source: 'health_connect' | 'manual'
 }
 ```
 
@@ -1105,38 +1102,38 @@ export interface ExerciseRecord {
 
 export interface ExportService {
   // 导出
-  exportToJSON(): Promise<string>;
-  exportToFile(): Promise<string>;  // 返回文件路径
+  exportToJSON(): Promise<string>
+  exportToFile(): Promise<string> // 返回文件路径
 
   // 导入
-  importFromJSON(json: string): Promise<ImportResult>;
-  importFromFile(uri: string): Promise<ImportResult>;
+  importFromJSON(json: string): Promise<ImportResult>
+  importFromFile(uri: string): Promise<ImportResult>
 }
 
 export interface ImportResult {
-  success: boolean;
+  success: boolean
   imported: {
-    dietRecords: number;
-    exerciseRecords: number;
-    weightRecords: number;
-  };
-  skipped: number;
-  errors: string[];
+    dietRecords: number
+    exerciseRecords: number
+    weightRecords: number
+  }
+  skipped: number
+  errors: string[]
 }
 
 export interface ExportData {
-  version: string;
-  exportedAt: string;
+  version: string
+  exportedAt: string
   app: {
-    name: string;
-    version: string;
-  };
+    name: string
+    version: string
+  }
   data: {
-    dietRecords: DietRecord[];
-    exerciseRecords: ExerciseRecord[];
-    weightRecords: WeightRecord[];
-    goals: Goal[];
-  };
+    dietRecords: DietRecord[]
+    exerciseRecords: ExerciseRecord[]
+    weightRecords: WeightRecord[]
+    goals: Goal[]
+  }
 }
 ```
 
@@ -1155,36 +1152,36 @@ export class AppError extends Error {
     public code: string,
     public details?: any
   ) {
-    super(message);
-    this.name = 'AppError';
+    super(message)
+    this.name = 'AppError'
   }
 }
 
 export class DatabaseError extends AppError {
   constructor(message: string, details?: any) {
-    super(message, 'DATABASE_ERROR', details);
-    this.name = 'DatabaseError';
+    super(message, 'DATABASE_ERROR', details)
+    this.name = 'DatabaseError'
   }
 }
 
 export class AIError extends AppError {
   constructor(message: string, details?: any) {
-    super(message, 'AI_ERROR', details);
-    this.name = 'AIError';
+    super(message, 'AI_ERROR', details)
+    this.name = 'AIError'
   }
 }
 
 export class NetworkError extends AppError {
   constructor(message: string, details?: any) {
-    super(message, 'NETWORK_ERROR', details);
-    this.name = 'NetworkError';
+    super(message, 'NETWORK_ERROR', details)
+    this.name = 'NetworkError'
   }
 }
 
 export class PermissionError extends AppError {
   constructor(message: string, details?: any) {
-    super(message, 'PERMISSION_ERROR', details);
-    this.name = 'PermissionError';
+    super(message, 'PERMISSION_ERROR', details)
+    this.name = 'PermissionError'
   }
 }
 ```
@@ -1215,16 +1212,16 @@ export class PermissionError extends AppError {
 ```typescript
 // components/ui/Toast.tsx
 
-type ToastType = 'success' | 'error' | 'warning' | 'info';
+type ToastType = 'success' | 'error' | 'warning' | 'info'
 
 interface ToastProps {
-  type: ToastType;
-  message: string;
-  duration?: number;
+  type: ToastType
+  message: string
+  duration?: number
   action?: {
-    label: string;
-    onPress: () => void;
-  };
+    label: string
+    onPress: () => void
+  }
 }
 
 // 使用示例
@@ -1235,7 +1232,7 @@ showToast({
     label: '重试',
     onPress: () => retryAnalysis(),
   },
-});
+})
 ```
 
 ---
@@ -1249,20 +1246,20 @@ showToast({
 
 describe('计算工具函数', () => {
   test('计算 BMI', () => {
-    expect(calculateBMI(70, 175)).toBe(22.86);
-  });
+    expect(calculateBMI(70, 175)).toBe(22.86)
+  })
 
   test('计算卡路里目标', () => {
-    expect(calculateCalorieTarget(70, 175, 25, 'male')).toBe(2200);
-  });
+    expect(calculateCalorieTarget(70, 175, 25, 'male')).toBe(2200)
+  })
 
   test('计算营养成分比例', () => {
-    const ratio = calculateNutritionRatio(100, 50, 30);
-    expect(ratio.protein).toBeCloseTo(55.6);
-    expect(ratio.carbs).toBeCloseTo(27.8);
-    expect(ratio.fat).toBeCloseTo(16.7);
-  });
-});
+    const ratio = calculateNutritionRatio(100, 50, 30)
+    expect(ratio.protein).toBeCloseTo(55.6)
+    expect(ratio.carbs).toBeCloseTo(27.8)
+    expect(ratio.fat).toBeCloseTo(16.7)
+  })
+})
 ```
 
 ### 集成测试
@@ -1272,23 +1269,23 @@ describe('计算工具函数', () => {
 
 describe('DietStore', () => {
   beforeEach(async () => {
-    await database.initialize();
-  });
+    await database.initialize()
+  })
 
   test('添加饮食记录', async () => {
-    const { addRecord, todayRecords } = useDietStore.getState();
+    const { addRecord, todayRecords } = useDietStore.getState()
 
     await addRecord({
       timestamp: new Date().toISOString(),
       foodsJson: JSON.stringify([{ name: '苹果', calories: 95 }]),
       totalCalories: 95,
       mealType: 'snack',
-    });
+    })
 
-    expect(todayRecords).toHaveLength(1);
-    expect(todayRecords[0].totalCalories).toBe(95);
-  });
-});
+    expect(todayRecords).toHaveLength(1)
+    expect(todayRecords[0].totalCalories).toBe(95)
+  })
+})
 ```
 
 ### E2E 测试
@@ -1298,25 +1295,25 @@ describe('DietStore', () => {
 
 describe('饮食记录流程', () => {
   test('完整记录流程', async () => {
-    await element(by.id('record-button')).tap();
-    await element(by.id('diet-tab')).tap();
-    await element(by.id('camera-button')).tap();
+    await element(by.id('record-button')).tap()
+    await element(by.id('diet-tab')).tap()
+    await element(by.id('camera-button')).tap()
 
     // 模拟拍照
-    await device.takeScreenshot('food');
+    await device.takeScreenshot('food')
 
     // 等待 AI 分析
     await waitFor(element(by.id('analysis-result')))
       .toBeVisible()
-      .withTimeout(10000);
+      .withTimeout(10000)
 
     // 确认保存
-    await element(by.id('save-button')).tap();
+    await element(by.id('save-button')).tap()
 
     // 验证保存成功
-    await expect(element(by.id('success-toast'))).toBeVisible();
-  });
-});
+    await expect(element(by.id('success-toast'))).toBeVisible()
+  })
+})
 ```
 
 ---
@@ -1400,20 +1397,19 @@ const getRecords = async (page: number, pageSize: number) => {
 ```typescript
 // 压缩图片
 const compressImage = async (uri: string) => {
-  const manipulated = await ImageManipulator.manipulateAsync(
-    uri,
-    [{ resize: { width: 1024 } }],
-    { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
-  );
-  return manipulated.uri;
-};
+  const manipulated = await ImageManipulator.manipulateAsync(uri, [{ resize: { width: 1024 } }], {
+    compress: 0.8,
+    format: ImageManipulator.SaveFormat.JPEG,
+  })
+  return manipulated.uri
+}
 ```
 
 ### 3. 状态优化
 
 ```typescript
 // 使用 shallow compare 避免不必要的渲染
-import { shallow } from 'zustand/shallow';
+import { shallow } from 'zustand/shallow'
 
 const { records, isLoading } = useDietStore(
   (state) => ({
@@ -1421,7 +1417,7 @@ const { records, isLoading } = useDietStore(
     isLoading: state.isLoading,
   }),
   shallow
-);
+)
 ```
 
 ### 4. 列表优化
@@ -1440,5 +1436,5 @@ import { FlashList } from '@shopify/flash-list';
 
 ---
 
-*文档版本：v1.0*
-*最后更新：2026-06-03*
+_文档版本：v1.0_
+_最后更新：2026-06-03_

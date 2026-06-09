@@ -2,45 +2,45 @@
 // 日期标签 + 三宫格统计（摄入 / 消耗 / 净值）
 // 作为 AgendaList 的 ListHeaderComponent 使用
 
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useDietRecords } from '@/hooks/useDietRecords';
-import { useExerciseRecords } from '@/hooks/useExerciseRecords';
+import React, { useMemo } from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useDietRecords } from '@/hooks/useDietRecords'
+import { useExerciseRecords } from '@/hooks/useExerciseRecords'
 
 interface DaySummaryProps {
-  date: string;
+  date: string
 }
 
 export function DaySummary({ date }: DaySummaryProps) {
-  const { t } = useI18n();
+  const { t } = useI18n()
 
-  const { records: dietRecords } = useDietRecords(date);
-  const { records: exerciseRecords } = useExerciseRecords(date);
+  const { records: dietRecords } = useDietRecords(date)
+  const { records: exerciseRecords } = useExerciseRecords(date)
 
   // 统计
   const { totalCalories, totalExerciseCalories, netCalories } = useMemo(() => {
-    const cal = dietRecords.reduce((sum, r) => sum + (r.totalCalories || 0), 0);
-    const exerciseCal = exerciseRecords.reduce((sum, r) => sum + (r.caloriesBurned || 0), 0);
+    const cal = dietRecords.reduce((sum, r) => sum + (r.totalCalories || 0), 0)
+    const exerciseCal = exerciseRecords.reduce((sum, r) => sum + (r.caloriesBurned || 0), 0)
     return {
       totalCalories: cal,
       totalExerciseCalories: exerciseCal,
       netCalories: cal - exerciseCal,
-    };
-  }, [dietRecords, exerciseRecords]);
+    }
+  }, [dietRecords, exerciseRecords])
 
   // 日期标签：今天 / 昨天 / 具体日期
   const dateLabel = useMemo(() => {
-    const d = new Date(date);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+    const d = new Date(date)
+    const today = new Date()
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
 
-    if (d.toDateString() === today.toDateString()) return t('common.today');
-    if (d.toDateString() === yesterday.toDateString()) return t('common.yesterday');
-    return d.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' });
-  }, [date, t]);
+    if (d.toDateString() === today.toDateString()) return t('common.today')
+    if (d.toDateString() === yesterday.toDateString()) return t('common.yesterday')
+    return d.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' })
+  }, [date, t])
 
   return (
     <View style={styles.container}>
@@ -56,7 +56,9 @@ export function DaySummary({ date }: DaySummaryProps) {
         <View style={[styles.statCard, styles.statCardOut]}>
           <Text style={styles.statLabel}>{t('calendar.caloriesOut')}</Text>
           <View style={styles.statValueRow}>
-            <Text style={[styles.statValue, { color: theme.colors.primary.main }]}>{totalExerciseCalories}</Text>
+            <Text style={[styles.statValue, { color: theme.colors.primary.main }]}>
+              {totalExerciseCalories}
+            </Text>
             <Text style={styles.statUnit}>{t('home.kcal')}</Text>
           </View>
         </View>
@@ -71,8 +73,8 @@ export function DaySummary({ date }: DaySummaryProps) {
                     netCalories > 0
                       ? theme.colors.warning
                       : netCalories < 0
-                      ? theme.colors.primary.main
-                      : theme.colors.text.secondary,
+                        ? theme.colors.primary.main
+                        : theme.colors.text.secondary,
                 },
               ]}
             >
@@ -83,7 +85,7 @@ export function DaySummary({ date }: DaySummaryProps) {
         </View>
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -142,4 +144,4 @@ const styles = StyleSheet.create({
     color: theme.colors.text.tertiary,
     fontWeight: theme.fontWeight.medium,
   },
-});
+})

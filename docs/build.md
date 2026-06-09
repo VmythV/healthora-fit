@@ -6,11 +6,11 @@
 
 ## 📋 打包方式总览
 
-| 方式 | 用途 | 输出格式 | 状态 | 说明 |
-|------|------|---------|------|------|
-| 本地构建 | 测试分发 | APK | ✅ 可用 | 推荐使用 |
-| 本地构建 | 上架 Google Play | AAB | ✅ 可用 | 需要 Android Studio |
-| EAS Build | 云端构建 | APK/AAB | ⚠️ 有问题 | 暂时不可用 |
+| 方式      | 用途             | 输出格式 | 状态      | 说明                |
+| --------- | ---------------- | -------- | --------- | ------------------- |
+| 本地构建  | 测试分发         | APK      | ✅ 可用   | 推荐使用            |
+| 本地构建  | 上架 Google Play | AAB      | ✅ 可用   | 需要 Android Studio |
+| EAS Build | 云端构建         | APK/AAB  | ⚠️ 有问题 | 暂时不可用          |
 
 ---
 
@@ -21,11 +21,13 @@
 **状态**：暂时不可用
 
 **问题描述**：
+
 - `package-lock.json` 与 `package.json` 不同步
 - 依赖版本冲突导致构建失败
 - `react-native-worklets` 版本兼容性问题
 
 **错误信息**：
+
 ```
 npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync.
 ```
@@ -33,6 +35,7 @@ npm error `npm ci` can only install packages when your package.json and package-
 **临时解决方案**：使用本地构建
 
 **待修复**：
+
 - [ ] 解决依赖版本冲突
 - [ ] 更新 package-lock.json
 - [ ] 测试 EAS Build 兼容性
@@ -44,6 +47,7 @@ npm error `npm ci` can only install packages when your package.json and package-
 ### 前置准备
 
 确保已安装：
+
 - Node.js 18+
 - Android Studio
 - JDK 17
@@ -210,6 +214,6 @@ npm install react-native-worklets@0.8.0 --legacy-peer-deps
 
 ---
 
-*文档版本：v1.1*
-*最后更新：2026-06-03*
-*状态：EAS Build 暂时不可用，推荐使用本地构建*
+_文档版本：v1.1_
+_最后更新：2026-06-03_
+_状态：EAS Build 暂时不可用，推荐使用本地构建_

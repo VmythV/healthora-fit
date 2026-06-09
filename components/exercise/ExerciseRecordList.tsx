@@ -6,27 +6,20 @@
 // - 行级 ExerciseRow 提取为 React.memo 组件
 // - renderItem / keyExtractor / handleDelete 改 useCallback
 
-import React, { useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ListRenderItem,
-} from 'react-native';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useExerciseRecords } from '@/hooks/useExerciseRecords';
-import { ExerciseRecord } from '@/types/exercise';
-import { Card, Empty } from '@/components/ui';
-import { Icon } from '@/components/icons';
-import { IconName } from '@/components/icons/Icon';
-import { showConfirm } from '@/components/ui';
+import React, { useCallback } from 'react'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ListRenderItem } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useExerciseRecords } from '@/hooks/useExerciseRecords'
+import { ExerciseRecord } from '@/types/exercise'
+import { Card, Empty } from '@/components/ui'
+import { Icon } from '@/components/icons'
+import { IconName } from '@/components/icons/Icon'
+import { showConfirm } from '@/components/ui'
 
 interface ExerciseRecordListProps {
-  date?: string;
-  onRecordPress?: (record: ExerciseRecord) => void;
+  date?: string
+  onRecordPress?: (record: ExerciseRecord) => void
 }
 
 const EXERCISE_ICONS: Record<string, IconName> = {
@@ -38,27 +31,27 @@ const EXERCISE_ICONS: Record<string, IconName> = {
   yoga: 'yoga',
   hiit: 'hiit',
   other: 'other-exercise',
-};
+}
 
 // 模块级 helper
 function formatTime(timestamp: string): string {
-  const d = new Date(timestamp);
-  return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+  const d = new Date(timestamp)
+  return d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
 }
 
 function getExerciseIcon(type: string): IconName {
-  return EXERCISE_ICONS[type] || 'other-exercise';
+  return EXERCISE_ICONS[type] || 'other-exercise'
 }
 
 // 行级组件 —— React.memo 防止同 props 重复渲染
 interface ExerciseRowProps {
-  item: ExerciseRecord;
-  minutesLabel: string;
-  kcalLabel: string;
-  kmLabel: string;
-  exerciseTypeName: string;
-  onPress?: (record: ExerciseRecord) => void;
-  onDelete: (id: number) => void;
+  item: ExerciseRecord
+  minutesLabel: string
+  kcalLabel: string
+  kmLabel: string
+  exerciseTypeName: string
+  onPress?: (record: ExerciseRecord) => void
+  onDelete: (id: number) => void
 }
 
 const ExerciseRow = React.memo(function ExerciseRow({
@@ -70,8 +63,8 @@ const ExerciseRow = React.memo(function ExerciseRow({
   onPress,
   onDelete,
 }: ExerciseRowProps) {
-  const handlePress = useCallback(() => onPress?.(item), [item, onPress]);
-  const handleDelete = useCallback(() => onDelete(item.id), [item.id, onDelete]);
+  const handlePress = useCallback(() => onPress?.(item), [item, onPress])
+  const handleDelete = useCallback(() => onDelete(item.id), [item.id, onDelete])
 
   return (
     <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
@@ -100,14 +93,16 @@ const ExerciseRow = React.memo(function ExerciseRow({
           <View style={styles.detailItem}>
             <Icon name="fire" size={14} color={theme.colors.text.secondary} />
             <Text style={styles.detailText}>
-              {' '}{item.caloriesBurned || 0} {kcalLabel}
+              {' '}
+              {item.caloriesBurned || 0} {kcalLabel}
             </Text>
           </View>
           {item.distanceKm ? (
             <View style={styles.detailItem}>
               <Icon name="chart-bar" size={14} color={theme.colors.text.secondary} />
               <Text style={styles.detailText}>
-                {' '}{item.distanceKm} {kmLabel}
+                {' '}
+                {item.distanceKm} {kmLabel}
               </Text>
             </View>
           ) : null}
@@ -118,12 +113,12 @@ const ExerciseRow = React.memo(function ExerciseRow({
         </TouchableOpacity>
       </Card>
     </TouchableOpacity>
-  );
-});
+  )
+})
 
 export function ExerciseRecordList({ date, onRecordPress }: ExerciseRecordListProps) {
-  const { t } = useI18n();
-  const { records, loading, deleteRecord } = useExerciseRecords(date);
+  const { t } = useI18n()
+  const { records, loading, deleteRecord } = useExerciseRecords(date)
 
   const handleDelete = useCallback(
     async (id: number) => {
@@ -133,11 +128,11 @@ export function ExerciseRecordList({ date, onRecordPress }: ExerciseRecordListPr
         type: 'danger',
         confirmText: t('common.delete'),
         cancelText: t('common.cancel'),
-      });
-      if (ok) deleteRecord(id);
+      })
+      if (ok) deleteRecord(id)
     },
     [t, deleteRecord]
-  );
+  )
 
   const renderItem: ListRenderItem<ExerciseRecord> = useCallback(
     ({ item }) => (
@@ -152,18 +147,14 @@ export function ExerciseRecordList({ date, onRecordPress }: ExerciseRecordListPr
       />
     ),
     [t, onRecordPress, handleDelete]
-  );
+  )
 
-  const keyExtractor = useCallback((item: ExerciseRecord) => item.id.toString(), []);
+  const keyExtractor = useCallback((item: ExerciseRecord) => item.id.toString(), [])
 
   if (!loading && records.length === 0) {
     return (
-      <Empty
-        icon="running"
-        title={t('exercise.noRecords')}
-        description={t('common.comingSoon')}
-      />
-    );
+      <Empty icon="running" title={t('exercise.noRecords')} description={t('common.comingSoon')} />
+    )
   }
 
   return (
@@ -174,7 +165,7 @@ export function ExerciseRecordList({ date, onRecordPress }: ExerciseRecordListPr
       contentContainerStyle={styles.list}
       showsVerticalScrollIndicator={false}
     />
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -247,4 +238,4 @@ const styles = StyleSheet.create({
     right: theme.spacing.sm,
     padding: theme.spacing.xs,
   },
-});
+})

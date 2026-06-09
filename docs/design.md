@@ -104,32 +104,32 @@
 export const lightTheme = {
   // 背景
   background: {
-    primary: '#FFFFFF',      // 主背景
-    secondary: '#F9FAFB',    // 次级背景（卡片、区块）
-    tertiary: '#F3F4F6',     // 三级背景（输入框、标签）
+    primary: '#FFFFFF', // 主背景
+    secondary: '#F9FAFB', // 次级背景（卡片、区块）
+    tertiary: '#F3F4F6', // 三级背景（输入框、标签）
   },
 
   // 文字
   text: {
-    primary: '#111827',      // 主要文字
-    secondary: '#4B5563',    // 次要文字
-    tertiary: '#9CA3AF',     // 辅助文字（占位符、禁用）
-    inverse: '#FFFFFF',      // 反色文字（深色背景上）
+    primary: '#111827', // 主要文字
+    secondary: '#4B5563', // 次要文字
+    tertiary: '#9CA3AF', // 辅助文字（占位符、禁用）
+    inverse: '#FFFFFF', // 反色文字（深色背景上）
   },
 
   // 边框
   border: {
-    light: '#E5E7EB',        // 轻边框
-    main: '#D1D5DB',         // 主边框
-    dark: '#9CA3AF',         // 深边框
+    light: '#E5E7EB', // 轻边框
+    main: '#D1D5DB', // 主边框
+    dark: '#9CA3AF', // 深边框
   },
 
   // 品牌色应用
   primary: {
-    main: '#10B981',         // 主色
-    light: '#D1FAE5',        // 浅色背景
-    dark: '#059669',         // 深色/按压态
-    text: '#FFFFFF',         // 主色上的文字
+    main: '#10B981', // 主色
+    light: '#D1FAE5', // 浅色背景
+    dark: '#059669', // 深色/按压态
+    text: '#FFFFFF', // 主色上的文字
   },
 
   // 辅助色应用
@@ -151,7 +151,7 @@ export const lightTheme = {
     background: '#FFFFFF',
     shadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
   },
-};
+}
 ```
 
 ### 深色模式配色方案
@@ -160,17 +160,17 @@ export const lightTheme = {
 export const darkTheme = {
   // 背景
   background: {
-    primary: '#111827',      // 主背景
-    secondary: '#1F2937',    // 次级背景
-    tertiary: '#374151',     // 三级背景
+    primary: '#111827', // 主背景
+    secondary: '#1F2937', // 次级背景
+    tertiary: '#374151', // 三级背景
   },
 
   // 文字
   text: {
-    primary: '#F9FAFB',      // 主要文字
-    secondary: '#D1D5DB',    // 次要文字
-    tertiary: '#9CA3AF',     // 辅助文字
-    inverse: '#111827',      // 反色文字
+    primary: '#F9FAFB', // 主要文字
+    secondary: '#D1D5DB', // 次要文字
+    tertiary: '#9CA3AF', // 辅助文字
+    inverse: '#111827', // 反色文字
   },
 
   // 边框
@@ -182,8 +182,8 @@ export const darkTheme = {
 
   // 品牌色应用（深色模式下略微调整亮度）
   primary: {
-    main: '#34D399',         // 稍微提亮
-    light: '#065F46',        // 深色背景
+    main: '#34D399', // 稍微提亮
+    light: '#065F46', // 深色背景
     dark: '#10B981',
     text: '#111827',
   },
@@ -207,7 +207,7 @@ export const darkTheme = {
     background: '#1F2937',
     shadow: '0 1px 3px rgba(0, 0, 0, 0.3)',
   },
-};
+}
 ```
 
 ### 主题切换机制
@@ -267,7 +267,7 @@ export const fontFamily = {
     android: 'Roboto Mono',
     fallback: 'monospace',
   },
-};
+}
 ```
 
 ### 字号梯度
@@ -275,20 +275,20 @@ export const fontFamily = {
 ```typescript
 export const fontSize = {
   // 标题
-  h1: 28,      // 大标题
-  h2: 24,      // 中标题
-  h3: 20,      // 小标题
-  h4: 18,      // 最小标题
+  h1: 28, // 大标题
+  h2: 24, // 中标题
+  h3: 20, // 小标题
+  h4: 18, // 最小标题
 
   // 正文
-  bodyLg: 16,  // 大正文
-  body: 14,    // 正文（默认）
-  bodySm: 12,  // 小正文
+  bodyLg: 16, // 大正文
+  body: 14, // 正文（默认）
+  bodySm: 12, // 小正文
 
   // 辅助
   caption: 11, // 说明文字
-  tiny: 10,    // 最小文字
-};
+  tiny: 10, // 最小文字
+}
 
 // 使用示例
 const styles = StyleSheet.create({
@@ -302,28 +302,28 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: fontSize.body * 1.6,
   },
-});
+})
 ```
 
 ### 字重
 
 ```typescript
 export const fontWeight = {
-  regular: '400',    // 正文
-  medium: '500',     // 强调
-  semibold: '600',   // 标题
-  bold: '700',       // 重点
-};
+  regular: '400', // 正文
+  medium: '500', // 强调
+  semibold: '600', // 标题
+  bold: '700', // 重点
+}
 ```
 
 ### 行高
 
 ```typescript
 export const lineHeight = {
-  tight: 1.2,    // 紧凑（标题）
-  normal: 1.5,   // 正常（正文）
-  relaxed: 1.8,  // 宽松（长文本）
-};
+  tight: 1.2, // 紧凑（标题）
+  normal: 1.5, // 正常（正文）
+  relaxed: 1.8, // 宽松（长文本）
+}
 ```
 
 ---
@@ -334,39 +334,39 @@ export const lineHeight = {
 
 ```typescript
 // 基础间距单位：4px
-export const BASE_UNIT = 4;
+export const BASE_UNIT = 4
 
 // 间距梯度
 export const spacing = {
-  xs: 4,       // 1x - 最小间距
-  sm: 8,       // 2x - 小间距
-  md: 12,      // 3x - 中间距
-  base: 16,    // 4x - 基础间距
-  lg: 20,      // 5x - 大间距
-  xl: 24,      // 6x - 特大间距
-  '2xl': 32,   // 8x
-  '3xl': 40,   // 10x
-  '4xl': 48,   // 12x
-  '5xl': 64,   // 16x
-};
+  xs: 4, // 1x - 最小间距
+  sm: 8, // 2x - 小间距
+  md: 12, // 3x - 中间距
+  base: 16, // 4x - 基础间距
+  lg: 20, // 5x - 大间距
+  xl: 24, // 6x - 特大间距
+  '2xl': 32, // 8x
+  '3xl': 40, // 10x
+  '4xl': 48, // 12x
+  '5xl': 64, // 16x
+}
 
 // 使用场景
 export const spacingUsage = {
   // 内边距
-  paddingSmall: spacing.sm,      // 8px - 小组件
-  paddingMedium: spacing.base,   // 16px - 卡片、列表项
-  paddingLarge: spacing.xl,      // 24px - 页面边距
+  paddingSmall: spacing.sm, // 8px - 小组件
+  paddingMedium: spacing.base, // 16px - 卡片、列表项
+  paddingLarge: spacing.xl, // 24px - 页面边距
 
   // 外边距
-  marginSmall: spacing.sm,       // 8px - 紧凑元素间距
-  marginMedium: spacing.base,    // 16px - 标准元素间距
-  marginLarge: spacing['2xl'],   // 32px - 区块间距
+  marginSmall: spacing.sm, // 8px - 紧凑元素间距
+  marginMedium: spacing.base, // 16px - 标准元素间距
+  marginLarge: spacing['2xl'], // 32px - 区块间距
 
   // 间距
-  gapSmall: spacing.sm,          // 8px - 图标与文字
-  gapMedium: spacing.md,         // 12px - 列表项之间
-  gapLarge: spacing.base,        // 16px - 区块内部
-};
+  gapSmall: spacing.sm, // 8px - 图标与文字
+  gapMedium: spacing.md, // 12px - 列表项之间
+  gapLarge: spacing.base, // 16px - 区块内部
+}
 ```
 
 ### 常用间距组合
@@ -374,19 +374,19 @@ export const spacingUsage = {
 ```typescript
 // 页面边距
 export const pageMargin = {
-  horizontal: spacing.xl,  // 24px
-  vertical: spacing.base,  // 16px
-};
+  horizontal: spacing.xl, // 24px
+  vertical: spacing.base, // 16px
+}
 
 // 卡片内边距
 export const cardPadding = {
-  small: spacing.sm,       // 8px
-  medium: spacing.base,    // 16px
-  large: spacing.xl,       // 24px
-};
+  small: spacing.sm, // 8px
+  medium: spacing.base, // 16px
+  large: spacing.xl, // 24px
+}
 
 // 列表项间距
-export const listItemGap = spacing.md;  // 12px
+export const listItemGap = spacing.md // 12px
 ```
 
 ---
@@ -396,23 +396,23 @@ export const listItemGap = spacing.md;  // 12px
 ```typescript
 export const borderRadius = {
   none: 0,
-  sm: 4,       // 小圆角（标签、小按钮）
-  md: 8,       // 中圆角（输入框、卡片）
-  lg: 12,      // 大圆角（大卡片）
-  xl: 16,      // 特大圆角（弹窗）
-  '2xl': 24,   // 胶囊按钮
-  full: 9999,  // 全圆角（圆形）
-};
+  sm: 4, // 小圆角（标签、小按钮）
+  md: 8, // 中圆角（输入框、卡片）
+  lg: 12, // 大圆角（大卡片）
+  xl: 16, // 特大圆角（弹窗）
+  '2xl': 24, // 胶囊按钮
+  full: 9999, // 全圆角（圆形）
+}
 
 // 使用场景
 export const borderRadiusUsage = {
-  button: borderRadius.md,        // 8px
-  input: borderRadius.md,         // 8px
-  card: borderRadius.lg,          // 12px
-  modal: borderRadius.xl,         // 16px
-  avatar: borderRadius.full,      // 圆形
-  tag: borderRadius['2xl'],       // 24px - 胶囊形
-};
+  button: borderRadius.md, // 8px
+  input: borderRadius.md, // 8px
+  card: borderRadius.lg, // 12px
+  modal: borderRadius.xl, // 16px
+  avatar: borderRadius.full, // 圆形
+  tag: borderRadius['2xl'], // 24px - 胶囊形
+}
 ```
 
 ---
@@ -458,7 +458,7 @@ export const shadow = {
     shadowRadius: 8,
     elevation: 5,
   },
-};
+}
 
 // 深色模式阴影（更明显）
 export const darkShadow = {
@@ -470,7 +470,7 @@ export const darkShadow = {
     elevation: 2,
   },
   // ...
-};
+}
 ```
 
 ---
@@ -488,11 +488,11 @@ export const darkShadow = {
 
 ```typescript
 export const duration = {
-  instant: 100,    // 即时反馈（按钮按压）
-  fast: 200,       // 快速动画（切换、展开）
-  normal: 300,     // 正常动画（页面转场）
-  slow: 500,       // 慢速动画（复杂动画）
-};
+  instant: 100, // 即时反馈（按钮按压）
+  fast: 200, // 快速动画（切换、展开）
+  normal: 300, // 正常动画（页面转场）
+  slow: 500, // 慢速动画（复杂动画）
+}
 ```
 
 ### 缓动函数
@@ -510,7 +510,7 @@ export const easing = {
 
   // 弹性（活泼）
   bounce: Easing.bezier(0.68, -0.55, 0.265, 1.55),
-};
+}
 ```
 
 ### 常用动画模式
@@ -522,7 +522,7 @@ export const fadeInOut = {
   to: { opacity: 1 },
   duration: duration.fast,
   easing: easing.easeOut,
-};
+}
 
 // 从下方滑入
 export const slideUp = {
@@ -530,7 +530,7 @@ export const slideUp = {
   to: { transform: [{ translateY: 0 }], opacity: 1 },
   duration: duration.normal,
   easing: easing.easeOut,
-};
+}
 
 // 缩放弹入
 export const scaleIn = {
@@ -538,14 +538,14 @@ export const scaleIn = {
   to: { transform: [{ scale: 1 }], opacity: 1 },
   duration: duration.fast,
   easing: easing.easeOut,
-};
+}
 
 // 按压缩放（按钮反馈）
 export const pressScale = {
   from: { transform: [{ scale: 1 }] },
   to: { transform: [{ scale: 0.98 }] },
   duration: duration.instant,
-};
+}
 ```
 
 ### 页面转场动画
@@ -555,19 +555,19 @@ export const pressScale = {
 export const tabTransition = {
   animation: 'fade',
   duration: duration.fast,
-};
+}
 
 // Modal 弹出 - 从下方滑入
 export const modalTransition = {
   animation: 'slide_from_bottom',
   duration: duration.normal,
-};
+}
 
 // 详情页进入 - 从右侧滑入
 export const detailTransition = {
   animation: 'slide_from_right',
   duration: duration.normal,
-};
+}
 ```
 
 ---
@@ -592,9 +592,10 @@ export const detailTransition = {
 2. **统一入口**：`components/icons/Icon.tsx`
 3. **类型定义**：使用 `IconName` 类型
 4. **使用方法**：
+
    ```tsx
-   import { Icon } from '@/components/icons';
-   <Icon name="home" size={24} color="#10B981" />
+   import { Icon } from '@/components/icons'
+   ;<Icon name="home" size={24} color="#10B981" />
    ```
 
 5. **新增图标规范**：
@@ -612,12 +613,12 @@ export const detailTransition = {
 
 ```typescript
 export const iconSize = {
-  xs: 16,      // 小图标（标签、辅助）
-  sm: 20,      // 默认图标（列表项）
-  md: 24,      // 中等图标（按钮）
-  lg: 32,      // 大图标（功能入口）
-  xl: 48,      // 特大图标（空状态）
-};
+  xs: 16, // 小图标（标签、辅助）
+  sm: 20, // 默认图标（列表项）
+  md: 24, // 中等图标（按钮）
+  lg: 32, // 大图标（功能入口）
+  xl: 48, // 特大图标（空状态）
+}
 ```
 
 ### 图标网格
@@ -859,7 +860,7 @@ export const buttonSize = {
   sm: { height: 32, paddingHorizontal: 12, fontSize: 12 },
   md: { height: 40, paddingHorizontal: 16, fontSize: 14 },
   lg: { height: 48, paddingHorizontal: 24, fontSize: 16 },
-};
+}
 
 // 按钮状态
 export const buttonState = {
@@ -867,7 +868,7 @@ export const buttonState = {
   pressed: { opacity: 0.9, transform: [{ scale: 0.98 }] },
   disabled: { opacity: 0.5 },
   loading: { opacity: 0.8 },
-};
+}
 ```
 
 ### Input 输入框
@@ -907,7 +908,7 @@ export const inputSize = {
   sm: { height: 36, fontSize: 12 },
   md: { height: 44, fontSize: 14 },
   lg: { height: 52, fontSize: 16 },
-};
+}
 ```
 
 ### Card 卡片
@@ -1049,9 +1050,9 @@ export const inputSize = {
 
 ```typescript
 export const pageMargin = {
-  horizontal: 24,  // 左右边距
-  vertical: 16,    // 上下边距
-};
+  horizontal: 24, // 左右边距
+  vertical: 16, // 上下边距
+}
 ```
 
 ### 页面标题栏
@@ -1075,11 +1076,11 @@ export const pageMargin = {
 
 ```typescript
 export const listSpacing = {
-  sectionGap: 32,      // 区块间距
+  sectionGap: 32, // 区块间距
   sectionTitleGap: 16, // 区块标题与内容间距
-  itemGap: 1,          // 列表项之间（分割线）
-  itemPadding: 16,     // 列表项内边距
-};
+  itemGap: 1, // 列表项之间（分割线）
+  itemPadding: 16, // 列表项内边距
+}
 ```
 
 ---
@@ -1107,7 +1108,7 @@ export const chartColors = {
   // 渐变（用于面积图）
   gradientStart: 'rgba(16, 185, 129, 0.2)',
   gradientEnd: 'rgba(16, 185, 129, 0)',
-};
+}
 ```
 
 ### 图表样式
@@ -1264,7 +1265,7 @@ export const copywriting = {
       cancel: '继续编辑',
     },
   },
-};
+}
 ```
 
 ---
@@ -1275,33 +1276,33 @@ export const copywriting = {
 
 ```typescript
 // 基准设计宽度（iPhone 14）
-export const DESIGN_WIDTH = 390;
+export const DESIGN_WIDTH = 390
 
 // 响应式计算
 export const wp = (percentage: number) => {
-  return (percentage / 100) * width;
-};
+  return (percentage / 100) * width
+}
 
 export const hp = (percentage: number) => {
-  return (percentage / 100) * height;
-};
+  return (percentage / 100) * height
+}
 
 // 字体缩放（可选）
 export const scaleFont = (size: number) => {
-  const scale = width / DESIGN_WIDTH;
-  return Math.round(size * scale);
-};
+  const scale = width / DESIGN_WIDTH
+  return Math.round(size * scale)
+}
 ```
 
 ### 断点
 
 ```typescript
 export const breakpoints = {
-  sm: 320,   // 小屏手机
-  md: 375,   // 中屏手机（iPhone SE）
-  lg: 414,   // 大屏手机（iPhone 14 Pro Max）
-  xl: 768,   // 平板
-};
+  sm: 320, // 小屏手机
+  md: 375, // 中屏手机（iPhone SE）
+  lg: 414, // 大屏手机（iPhone 14 Pro Max）
+  xl: 768, // 平板
+}
 ```
 
 ---
@@ -1329,26 +1330,29 @@ export const breakpoints = {
 ## 📝 设计检查清单
 
 ### 视觉检查
+
 - [ ] 颜色对比度符合 WCAG AA 标准
 - [ ] 字体大小在不同设备上可读
 - [ ] 图标风格统一
 - [ ] 间距一致
 
 ### 交互检查
+
 - [ ] 按钮有按压反馈
 - [ ] 加载状态有提示
 - [ ] 错误状态有友好提示
 - [ ] 空状态有引导
 
 ### 动画检查
+
 - [ ] 动画时长合适（不拖沓）
 - [ ] 动画有意义（不是为了动而动）
 - [ ] 动画流畅（60fps）
 
 ---
 
-*文档版本：v1.0*
-*最后更新：2026-06-03*
+_文档版本：v1.0_
+_最后更新：2026-06-03_
 
 ---
 
@@ -1365,11 +1369,13 @@ export const breakpoints = {
 #### 上月/下月日期填充
 
 **设计思路**：
+
 - 上月末尾日期填充到月初空白
 - 下月开始日期填充到月末空白
 - 避免空白单元格，视觉更完整
 
 **示例**（假设本月 1 号是周三，星期开始于周一）：
+
 ```
 一  二  三  四  五  六  日
 29  30  31   1   2   3   4   ← 上月 29-31（灰色）
@@ -1383,6 +1389,7 @@ export const breakpoints = {
 #### 视觉层次设计
 
 **色阶设计**：
+
 - **当月日期**：`theme.colors.text.primary`（完全不透明）
 - **上月/下月日期**：`theme.colors.text.tertiary` + `opacity: 0.5`
 - **今天**：绿色背景 + 绿色文字
@@ -1390,6 +1397,7 @@ export const breakpoints = {
 - **未来日期**：`opacity: 0.4` + 不可点击
 
 **交互设计**：
+
 - 点击上月日期：跳转到上个月，选中点击的日期
 - 点击下月日期：跳转到下个月，选中点击的日期
 - 遵循 `maxDate` 限制
@@ -1397,6 +1405,7 @@ export const breakpoints = {
 #### 自适应间距
 
 **设计思路**：
+
 - 容器高度固定：264px
 - 使用 `flex: 1` 让每行自动填充
 - 不需要手动计算行高
@@ -1407,10 +1416,12 @@ export const breakpoints = {
 #### 选择项布局规则
 
 **平铺到主菜单**：
+
 - 选择项 ≤ 3 个
 - 示例：语言设置
 
 **放到二级菜单**：
+
 - 选择项 > 3 个
 - 主菜单显示当前选中值
 - 点击进入二级菜单选择
@@ -1419,6 +1430,7 @@ export const breakpoints = {
 #### 二级菜单设计
 
 **主菜单**：
+
 ```
 ┌─────────────────────────────────┐
 │ 📅 星期开始日          周一 →  │
@@ -1426,6 +1438,7 @@ export const breakpoints = {
 ```
 
 **二级菜单**：
+
 ```
 ┌─────────────────────────────────┐
 │ ← 返回         星期开始日      │

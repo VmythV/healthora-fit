@@ -8,7 +8,7 @@
  * - v1: 初始表结构
  * - v2: ai_config 表新增 is_encrypted 列（标记 apiKey 是否已迁移到 SecureStore）
  */
-export const DB_VERSION = 2;
+export const DB_VERSION = 2
 
 /**
  * 创建表的 SQL 语句
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS sync_log (
   synced_at TEXT,
   created_at TEXT DEFAULT (datetime('now', 'localtime'))
 );
-`;
+`
 
 /**
  * 创建索引的 SQL 语句
@@ -128,7 +128,7 @@ CREATE INDEX IF NOT EXISTS idx_ai_config_active ON ai_config(is_active);
 CREATE INDEX IF NOT EXISTS idx_sync_log_type ON sync_log(sync_type);
 CREATE INDEX IF NOT EXISTS idx_sync_log_status ON sync_log(sync_status);
 CREATE INDEX IF NOT EXISTS idx_sync_log_record ON sync_log(record_type, record_id);
-`;
+`
 
 /**
  * 创建触发器的 SQL 语句
@@ -161,7 +161,7 @@ AFTER UPDATE ON ai_config
 BEGIN
   UPDATE ai_config SET updated_at = datetime('now', 'localtime') WHERE id = NEW.id;
 END;
-`;
+`
 
 /**
  * 数据库迁移版本表
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS schema_version (
   description TEXT,
   applied_at TEXT DEFAULT (datetime('now', 'localtime'))
 );
-`;
+`
 
 /**
  * v2 迁移：ai_config 表新增 is_encrypted 列
@@ -182,4 +182,4 @@ CREATE TABLE IF NOT EXISTS schema_version (
  */
 export const ALTER_AI_CONFIG_V2_SQL = `
 ALTER TABLE ai_config ADD COLUMN is_encrypted INTEGER NOT NULL DEFAULT 0;
-`;
+`

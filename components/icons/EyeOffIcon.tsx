@@ -1,13 +1,13 @@
 // components/icons/EyeOffIcon.tsx
 // 眼睛关闭图标（隐藏）
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Path, Circle } from 'react-native-svg'
 
 interface EyeOffIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -50,7 +50,7 @@ export function EyeOffIcon({ size = 24, color = '#000000' }: EyeOffIconProps) {
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -58,4 +58,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

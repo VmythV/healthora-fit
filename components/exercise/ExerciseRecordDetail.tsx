@@ -1,28 +1,21 @@
 // components/exercise/ExerciseRecordDetail.tsx
 // 运动记录详情
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useExerciseRecords } from '@/hooks/useExerciseRecords';
-import { ExerciseRecord } from '@/types/exercise';
-import { Card } from '@/components/ui';
-import { Icon } from '@/components/icons';
-import { IconName } from '@/components/icons/Icon';
-import { showNotification, showConfirm } from '@/components/ui';
+import React from 'react'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { useRouter } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useExerciseRecords } from '@/hooks/useExerciseRecords'
+import { ExerciseRecord } from '@/types/exercise'
+import { Card } from '@/components/ui'
+import { Icon } from '@/components/icons'
+import { IconName } from '@/components/icons/Icon'
+import { showNotification, showConfirm } from '@/components/ui'
 
 interface ExerciseRecordDetailProps {
-  record: ExerciseRecord;
-  onDelete?: () => void;
+  record: ExerciseRecord
+  onDelete?: () => void
 }
 
 // 运动类型图标
@@ -35,34 +28,34 @@ const EXERCISE_ICONS: Record<string, IconName> = {
   yoga: 'yoga',
   hiit: 'hiit',
   other: 'other-exercise',
-};
+}
 
 /**
  * 运动记录详情
  */
 export function ExerciseRecordDetail({ record, onDelete }: ExerciseRecordDetailProps) {
-  const { t } = useI18n();
-  const router = useRouter();
-  const { deleteRecord } = useExerciseRecords();
+  const { t } = useI18n()
+  const router = useRouter()
+  const { deleteRecord } = useExerciseRecords()
 
   // 格式化时间
   const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
+    const date = new Date(timestamp)
     return date.toLocaleTimeString('zh-CN', {
       hour: '2-digit',
       minute: '2-digit',
-    });
-  };
+    })
+  }
 
   // 格式化日期
   const formatDate = (timestamp: string) => {
-    const date = new Date(timestamp);
+    const date = new Date(timestamp)
     return date.toLocaleDateString('zh-CN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    });
-  };
+    })
+  }
 
   // 编辑
   const handleEdit = () => {
@@ -76,8 +69,8 @@ export function ExerciseRecordDetail({ record, onDelete }: ExerciseRecordDetailP
         distance: record.distanceKm,
         note: record.note,
       },
-    });
-  };
+    })
+  }
 
   // 删除
   const handleDelete = async () => {
@@ -87,16 +80,16 @@ export function ExerciseRecordDetail({ record, onDelete }: ExerciseRecordDetailP
       type: 'danger',
       confirmText: t('common.delete'),
       cancelText: t('common.cancel'),
-    });
-    if (!ok) return;
+    })
+    if (!ok) return
 
     try {
-      await deleteRecord(record.id);
-      onDelete?.();
+      await deleteRecord(record.id)
+      onDelete?.()
     } catch (error) {
-      showNotification(t('error.saveFailed'), 'error');
+      showNotification(t('error.saveFailed'), 'error')
     }
-  };
+  }
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -105,11 +98,13 @@ export function ExerciseRecordDetail({ record, onDelete }: ExerciseRecordDetailP
         <View style={styles.headerRow}>
           <View style={styles.typeContainer}>
             <View style={styles.typeIconContainer}>
-              <Icon name={EXERCISE_ICONS[record.exerciseType] || 'other-exercise'} size={36} color={theme.colors.primary.main} />
+              <Icon
+                name={EXERCISE_ICONS[record.exerciseType] || 'other-exercise'}
+                size={36}
+                color={theme.colors.primary.main}
+              />
             </View>
-            <Text style={styles.typeName}>
-              {t(`exerciseType.${record.exerciseType}`)}
-            </Text>
+            <Text style={styles.typeName}>{t(`exerciseType.${record.exerciseType}`)}</Text>
           </View>
           <View style={styles.timeInfo}>
             <Text style={styles.date}>{formatDate(record.timestamp)}</Text>
@@ -140,28 +135,34 @@ export function ExerciseRecordDetail({ record, onDelete }: ExerciseRecordDetailP
       <Card style={styles.detailCard}>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>{t('exercise.exerciseType')}</Text>
-          <Text style={styles.detailValue}>
-            {t(`exerciseType.${record.exerciseType}`)}
-          </Text>
+          <Text style={styles.detailValue}>{t(`exerciseType.${record.exerciseType}`)}</Text>
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>{t('exercise.duration')}</Text>
-          <Text style={styles.detailValue}>{record.durationMinutes} {t('exercise.minutes')}</Text>
+          <Text style={styles.detailValue}>
+            {record.durationMinutes} {t('exercise.minutes')}
+          </Text>
         </View>
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>{t('exercise.caloriesBurned')}</Text>
-          <Text style={styles.detailValue}>{record.caloriesBurned || 0} {t('home.kcal')}</Text>
+          <Text style={styles.detailValue}>
+            {record.caloriesBurned || 0} {t('home.kcal')}
+          </Text>
         </View>
         {record.distanceKm ? (
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>{t('exercise.distance')}</Text>
-            <Text style={styles.detailValue}>{record.distanceKm} {t('exercise.km')}</Text>
+            <Text style={styles.detailValue}>
+              {record.distanceKm} {t('exercise.km')}
+            </Text>
           </View>
         ) : null}
         {record.heartRateAvg ? (
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>{t('exercise.heartRate')}</Text>
-            <Text style={styles.detailValue}>{record.heartRateAvg} {t('exercise.bpm')}</Text>
+            <Text style={styles.detailValue}>
+              {record.heartRateAvg} {t('exercise.bpm')}
+            </Text>
           </View>
         ) : null}
       </Card>
@@ -178,23 +179,17 @@ export function ExerciseRecordDetail({ record, onDelete }: ExerciseRecordDetailP
 
       {/* 操作按钮 */}
       <View style={styles.actions}>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.editButton]}
-          onPress={handleEdit}
-        >
+        <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={handleEdit}>
           <Icon name="edit" size={20} color="#FFFFFF" />
           <Text style={styles.editButtonText}>{t('common.edit')}</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.deleteButton]}
-          onPress={handleDelete}
-        >
+        <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} onPress={handleDelete}>
           <Icon name="delete" size={20} color="#FFFFFF" />
           <Text style={styles.deleteButtonText}>{t('common.delete')}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -326,4 +321,4 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: '#FFFFFF',
   },
-});
+})

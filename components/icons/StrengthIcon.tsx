@@ -1,13 +1,13 @@
 // components/icons/StrengthIcon.tsx
 // 力量训练图标
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Path } from 'react-native-svg'
 
 interface StrengthIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -62,7 +62,7 @@ export function StrengthIcon({ size = 24, color = '#000000' }: StrengthIconProps
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -70,4 +70,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

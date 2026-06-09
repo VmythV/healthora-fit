@@ -1,55 +1,43 @@
 // components/weight/WeightInput.tsx
 // 体重输入组件
 
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { Icon } from '@/components/icons';
-import { TrendUpIcon, TrendDownIcon, TrendFlatIcon } from '@/components/icons';
+import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { TrendUpIcon, TrendDownIcon, TrendFlatIcon } from '@/components/icons'
 
 interface WeightInputProps {
-  value: number; // kg
-  onChange: (weight: number) => void;
-  lastWeight?: number;
-  targetWeight?: number;
+  value: number // kg
+  onChange: (weight: number) => void
+  lastWeight?: number
+  targetWeight?: number
 }
 
 /**
  * 体重输入组件
  */
-export function WeightInput({
-  value,
-  onChange,
-  lastWeight,
-  targetWeight,
-}: WeightInputProps) {
-  const { t } = useI18n();
+export function WeightInput({ value, onChange, lastWeight, targetWeight }: WeightInputProps) {
+  const { t } = useI18n()
 
   const handleIncrement = (delta: number) => {
-    const newValue = Math.max(20, Math.min(300, value + delta));
-    onChange(Math.round(newValue * 10) / 10);
-  };
+    const newValue = Math.max(20, Math.min(300, value + delta))
+    onChange(Math.round(newValue * 10) / 10)
+  }
 
   // 计算与上次的差距
-  const lastDiff = lastWeight ? value - lastWeight : null;
+  const lastDiff = lastWeight ? value - lastWeight : null
   // 计算与目标的差距
-  const targetDiff = targetWeight ? value - targetWeight : null;
+  const targetDiff = targetWeight ? value - targetWeight : null
 
   return (
     <View style={styles.container}>
       {/* 主输入区域 */}
       <View style={styles.mainInput}>
-        <TouchableOpacity
-          style={styles.adjustButton}
-          onPress={() => handleIncrement(-1)}
-        >
+        <TouchableOpacity style={styles.adjustButton} onPress={() => handleIncrement(-1)}>
           <Text style={styles.adjustButtonText}>-1</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.adjustButtonSmall}
-          onPress={() => handleIncrement(-0.1)}
-        >
+        <TouchableOpacity style={styles.adjustButtonSmall} onPress={() => handleIncrement(-0.1)}>
           <Text style={styles.adjustButtonText}>-.1</Text>
         </TouchableOpacity>
 
@@ -58,16 +46,10 @@ export function WeightInput({
           <Text style={styles.unit}>{t('weight.kg')}</Text>
         </View>
 
-        <TouchableOpacity
-          style={styles.adjustButtonSmall}
-          onPress={() => handleIncrement(0.1)}
-        >
+        <TouchableOpacity style={styles.adjustButtonSmall} onPress={() => handleIncrement(0.1)}>
           <Text style={styles.adjustButtonText}>+.1</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.adjustButton}
-          onPress={() => handleIncrement(1)}
-        >
+        <TouchableOpacity style={styles.adjustButton} onPress={() => handleIncrement(1)}>
           <Text style={styles.adjustButtonText}>+1</Text>
         </TouchableOpacity>
       </View>
@@ -78,15 +60,18 @@ export function WeightInput({
         {lastWeight && (
           <View style={styles.infoCard}>
             <Text style={styles.infoLabel}>{t('weight.lastRecord')}</Text>
-            <Text style={styles.infoValue}>{lastWeight.toFixed(1)} {t('weight.kg')}</Text>
+            <Text style={styles.infoValue}>
+              {lastWeight.toFixed(1)} {t('weight.kg')}
+            </Text>
             {lastDiff !== null && (
               <View style={styles.diffRow}>
-                {lastDiff > 0
-                  ? <TrendUpIcon size={14} color={theme.colors.error} />
-                  : lastDiff < 0
-                  ? <TrendDownIcon size={14} color={theme.colors.success} />
-                  : <TrendFlatIcon size={14} color={theme.colors.text.tertiary} />
-                }
+                {lastDiff > 0 ? (
+                  <TrendUpIcon size={14} color={theme.colors.error} />
+                ) : lastDiff < 0 ? (
+                  <TrendDownIcon size={14} color={theme.colors.success} />
+                ) : (
+                  <TrendFlatIcon size={14} color={theme.colors.text.tertiary} />
+                )}
                 <Text
                   style={[
                     styles.infoDiff,
@@ -104,19 +89,26 @@ export function WeightInput({
         {targetWeight && (
           <View style={styles.infoCard}>
             <Text style={styles.infoLabel}>{t('weight.targetWeight')}</Text>
-            <Text style={styles.infoValue}>{targetWeight.toFixed(1)} {t('weight.kg')}</Text>
+            <Text style={styles.infoValue}>
+              {targetWeight.toFixed(1)} {t('weight.kg')}
+            </Text>
             {targetDiff !== null && (
               <View style={styles.diffRow}>
-                {targetDiff > 0
-                  ? <TrendUpIcon size={14} color={theme.colors.error} />
-                  : targetDiff < 0
-                  ? <TrendDownIcon size={14} color={theme.colors.success} />
-                  : <TrendFlatIcon size={14} color={theme.colors.text.tertiary} />
-                }
+                {targetDiff > 0 ? (
+                  <TrendUpIcon size={14} color={theme.colors.error} />
+                ) : targetDiff < 0 ? (
+                  <TrendDownIcon size={14} color={theme.colors.success} />
+                ) : (
+                  <TrendFlatIcon size={14} color={theme.colors.text.tertiary} />
+                )}
                 <Text
                   style={[
                     styles.infoDiff,
-                    targetDiff > 0 ? styles.diffUp : targetDiff < 0 ? styles.diffDown : styles.diffSame,
+                    targetDiff > 0
+                      ? styles.diffUp
+                      : targetDiff < 0
+                        ? styles.diffDown
+                        : styles.diffSame,
                   ]}
                 >
                   {Math.abs(targetDiff).toFixed(1)} {t('weight.kg')}
@@ -127,7 +119,7 @@ export function WeightInput({
         )}
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -215,4 +207,4 @@ const styles = StyleSheet.create({
   diffSame: {
     color: theme.colors.text.tertiary,
   },
-});
+})

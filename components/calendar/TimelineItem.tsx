@@ -1,51 +1,46 @@
 // components/calendar/TimelineItem.tsx
 // 时间轴单项组件 - 时间与标题同水平 + 类别色 + 分行详情
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
-import { theme } from '@/constants/theme';
-import { Icon } from '@/components/icons';
-import { IconName } from '@/components/icons/Icon';
-import { DietRecord } from '@/types/diet';
-import { ExerciseRecord } from '@/types/exercise';
+import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import Animated, { FadeIn } from 'react-native-reanimated'
+import { theme } from '@/constants/theme'
+import { Icon } from '@/components/icons'
+import { IconName } from '@/components/icons/Icon'
+import { DietRecord } from '@/types/diet'
+import { ExerciseRecord } from '@/types/exercise'
 
 export interface TimelineItemData {
-  id: string;
-  type: 'diet' | 'exercise';
-  time: string;
-  timeLabel: string;
-  title: string;
+  id: string
+  type: 'diet' | 'exercise'
+  time: string
+  timeLabel: string
+  title: string
   /** 核心数据行（食物名 / 时长+距离） */
-  subtitle?: string;
+  subtitle?: string
   /** 营养/能量行（kcal、蛋白质） */
-  meta?: string;
+  meta?: string
   /** 用户备注 */
-  note?: string;
-  iconName: IconName;
-  record: DietRecord | ExerciseRecord;
+  note?: string
+  iconName: IconName
+  record: DietRecord | ExerciseRecord
 }
 
 interface TimelineItemProps {
-  item: TimelineItemData;
-  isLast: boolean;
-  index: number;
-  onPress: (item: TimelineItemData) => void;
+  item: TimelineItemData
+  isLast: boolean
+  index: number
+  onPress: (item: TimelineItemData) => void
 }
 
 // 类型色（与全局 theme 一致）
 const TYPE_COLORS: Record<'diet' | 'exercise', { main: string; light: string }> = {
   diet: { main: theme.colors.warning, light: theme.colors.warningLight },
   exercise: { main: theme.colors.primary.main, light: theme.colors.primary.light },
-};
+}
 
 // 卡片内部 padding（用于让 timeLabel 与 title 视觉对齐）
-const CARD_PAD_V = 12;
+const CARD_PAD_V = 12
 
 /**
  * 时间轴单项
@@ -53,7 +48,7 @@ const CARD_PAD_V = 12;
  * 比较 item.id + isLast，其他变化（如 onPress 引用变化）不触发重渲染
  */
 function TimelineItemComponent({ item, isLast, index, onPress }: TimelineItemProps) {
-  const color = TYPE_COLORS[item.type];
+  const color = TYPE_COLORS[item.type]
 
   return (
     <Animated.View
@@ -70,11 +65,7 @@ function TimelineItemComponent({ item, isLast, index, onPress }: TimelineItemPro
       </View>
 
       {/* 右侧内容卡片 */}
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => onPress(item)}
-        activeOpacity={0.7}
-      >
+      <TouchableOpacity style={styles.card} onPress={() => onPress(item)} activeOpacity={0.7}>
         {/* 类别色图标圆 */}
         <View style={[styles.iconCircle, { backgroundColor: color.light }]}>
           <Icon name={item.iconName} size={20} color={color.main} />
@@ -103,23 +94,17 @@ function TimelineItemComponent({ item, isLast, index, onPress }: TimelineItemPro
         </View>
 
         {/* 跳转指示 */}
-        <Icon
-          name="chevron-right"
-          size={16}
-          color={theme.colors.text.tertiary}
-        />
+        <Icon name="chevron-right" size={16} color={theme.colors.text.tertiary} />
       </TouchableOpacity>
     </Animated.View>
-  );
+  )
 }
 
 export const TimelineItem = React.memo(
   TimelineItemComponent,
   (prev, next) =>
-    prev.item.id === next.item.id &&
-    prev.isLast === next.isLast &&
-    prev.index === next.index
-);
+    prev.item.id === next.item.id && prev.isLast === next.isLast && prev.index === next.index
+)
 
 const styles = StyleSheet.create({
   container: {
@@ -200,4 +185,4 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     marginTop: 2,
   },
-});
+})

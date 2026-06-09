@@ -1,11 +1,11 @@
-import { Tabs } from 'expo-router';
-import { Platform, View, StyleSheet } from 'react-native';
-import { theme } from '@/constants/theme';
-import { Icon } from '@/components/icons';
-import { useI18n } from '@/hooks/useI18n';
+import { Tabs } from 'expo-router'
+import { Platform, View, StyleSheet } from 'react-native'
+import { theme } from '@/constants/theme'
+import { Icon } from '@/components/icons'
+import { useI18n } from '@/hooks/useI18n'
 
 export default function TabLayout() {
-  const { t } = useI18n();
+  const { t } = useI18n()
 
   return (
     <Tabs
@@ -62,18 +62,18 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
-  );
+  )
 }
 
 // 添加按钮（特殊样式）
-function AddButton({ color }: { color: string }) {
+function AddButton({ color: _color }: { color: string }) {
   return (
     <View style={styles.addButtonContainer}>
       <View style={[styles.addButton, { backgroundColor: theme.colors.primary.main }]}>
         <Icon name="add" size={28} color="#FFFFFF" />
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -89,4 +89,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...theme.shadow.md,
   },
-});
+})

@@ -1,7 +1,7 @@
 // components/ui/Input.tsx
 // 输入框组件
 
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import {
   View,
   TextInput,
@@ -10,27 +10,27 @@ import {
   ViewStyle,
   TextStyle,
   KeyboardTypeOptions,
-} from 'react-native';
-import { theme } from '@/constants/theme';
-import { Icon } from '@/components/icons';
+} from 'react-native'
+import { theme } from '@/constants/theme'
+import { Icon } from '@/components/icons'
 
-type InputVariant = 'text' | 'number' | 'search';
+type InputVariant = 'text' | 'number' | 'search'
 
 interface InputProps {
-  value: string;
-  onChangeText: (text: string) => void;
-  placeholder?: string;
-  label?: string;
-  error?: string;
-  variant?: InputVariant;
-  disabled?: boolean;
-  secureTextEntry?: boolean;
-  multiline?: boolean;
-  numberOfLines?: number;
-  maxLength?: number;
-  suffix?: string;
-  style?: ViewStyle;
-  inputStyle?: TextStyle;
+  value: string
+  onChangeText: (text: string) => void
+  placeholder?: string
+  label?: string
+  error?: string
+  variant?: InputVariant
+  disabled?: boolean
+  secureTextEntry?: boolean
+  multiline?: boolean
+  numberOfLines?: number
+  maxLength?: number
+  suffix?: string
+  style?: ViewStyle
+  inputStyle?: TextStyle
 }
 
 /**
@@ -77,18 +77,18 @@ export function Input({
   style,
   inputStyle,
 }: InputProps) {
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false)
 
   const getKeyboardType = (): KeyboardTypeOptions => {
     switch (variant) {
       case 'number':
-        return 'decimal-pad';
+        return 'decimal-pad'
       case 'search':
-        return 'default';
+        return 'default'
       default:
-        return 'default';
+        return 'default'
     }
-  };
+  }
 
   return (
     <View style={[styles.container, style]}>
@@ -133,7 +133,7 @@ export function Input({
 
       {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -185,4 +185,4 @@ const styles = StyleSheet.create({
     color: theme.colors.error,
     marginTop: theme.spacing.xs,
   },
-});
+})

@@ -1,21 +1,21 @@
 // components/home/SummaryCards.tsx
 // 今日摘要卡片
 
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { Card } from '@/components/ui';
-import { Icon } from '@/components/icons';
+import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { Card } from '@/components/ui'
+import { Icon } from '@/components/icons'
 
 interface SummaryCardsProps {
-  weight?: number;
-  weightChange?: number;
-  targetWeight?: number;
-  mealsCount: number;
-  totalCalories: number;
-  exerciseMinutes: number;
-  caloriesBurned: number;
+  weight?: number
+  weightChange?: number
+  targetWeight?: number
+  mealsCount: number
+  totalCalories: number
+  exerciseMinutes: number
+  caloriesBurned: number
 }
 
 /**
@@ -24,13 +24,13 @@ interface SummaryCardsProps {
 export function SummaryCards({
   weight,
   weightChange,
-  targetWeight,
+  _targetWeight,
   mealsCount,
   totalCalories,
   exerciseMinutes,
   caloriesBurned,
 }: SummaryCardsProps) {
-  const { t } = useI18n();
+  const { t } = useI18n()
 
   return (
     <View style={styles.container}>
@@ -40,18 +40,21 @@ export function SummaryCards({
           <Icon name="weight" size={24} color={theme.colors.primary.main} />
         </View>
         <Text style={styles.cardTitle}>{t('home.weight')}</Text>
-        <Text style={styles.cardValue}>
-          {weight ? weight.toFixed(1) : '--'}
-        </Text>
+        <Text style={styles.cardValue}>{weight ? weight.toFixed(1) : '--'}</Text>
         <Text style={styles.cardUnit}>{t('home.kg')}</Text>
         {weightChange !== undefined && (
           <Text
             style={[
               styles.changeText,
-              weightChange > 0 ? styles.changeUp : weightChange < 0 ? styles.changeDown : styles.changeSame,
+              weightChange > 0
+                ? styles.changeUp
+                : weightChange < 0
+                  ? styles.changeDown
+                  : styles.changeSame,
             ]}
           >
-            {weightChange > 0 ? '+' : ''}{weightChange.toFixed(1)}
+            {weightChange > 0 ? '+' : ''}
+            {weightChange.toFixed(1)}
           </Text>
         )}
       </Card>
@@ -64,7 +67,9 @@ export function SummaryCards({
         <Text style={styles.cardTitle}>{t('home.meals')}</Text>
         <Text style={styles.cardValue}>{mealsCount}</Text>
         <Text style={styles.cardUnit}>{t('diet.calories')}</Text>
-        <Text style={styles.cardExtra}>{totalCalories} {t('home.kcal')}</Text>
+        <Text style={styles.cardExtra}>
+          {totalCalories} {t('home.kcal')}
+        </Text>
       </Card>
 
       {/* 运动卡片 */}
@@ -77,11 +82,13 @@ export function SummaryCards({
         <Text style={styles.cardUnit}>{t('home.minutes')}</Text>
         <View style={styles.cardExtraContainer}>
           <Icon name="fire" size={14} color={theme.colors.primary.main} />
-          <Text style={styles.cardExtra}>{caloriesBurned} {t('home.kcal')}</Text>
+          <Text style={styles.cardExtra}>
+            {caloriesBurned} {t('home.kcal')}
+          </Text>
         </View>
       </Card>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -145,4 +152,4 @@ const styles = StyleSheet.create({
   changeSame: {
     color: theme.colors.text.tertiary,
   },
-});
+})

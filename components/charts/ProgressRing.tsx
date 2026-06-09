@@ -1,21 +1,21 @@
 // components/charts/ProgressRing.tsx
 // 进度环组件
 
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
-import { theme } from '@/constants/theme';
+import React, { useEffect, useRef } from 'react'
+import { View, Text, StyleSheet, Animated } from 'react-native'
+import Svg, { Circle } from 'react-native-svg'
+import { theme } from '@/constants/theme'
 
 interface ProgressRingProps {
-  progress: number; // 0-100
-  size?: number;
-  strokeWidth?: number;
-  color?: string;
-  backgroundColor?: string;
-  showLabel?: boolean;
-  label?: string;
-  animated?: boolean;
-  duration?: number;
+  progress: number // 0-100
+  size?: number
+  strokeWidth?: number
+  color?: string
+  backgroundColor?: string
+  showLabel?: boolean
+  label?: string
+  animated?: boolean
+  duration?: number
 }
 
 /**
@@ -54,15 +54,15 @@ export function ProgressRing({
   animated = true,
   duration = 1000,
 }: ProgressRingProps) {
-  const animatedValue = useRef(new Animated.Value(0)).current;
+  const animatedValue = useRef(new Animated.Value(0)).current
 
   // 计算圆的属性
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const center = size / 2;
+  const radius = (size - strokeWidth) / 2
+  const circumference = 2 * Math.PI * radius
+  const center = size / 2
 
   // 限制进度范围
-  const clampedProgress = Math.min(100, Math.max(0, progress));
+  const clampedProgress = Math.min(100, Math.max(0, progress))
 
   // 动画效果
   useEffect(() => {
@@ -71,14 +71,14 @@ export function ProgressRing({
         toValue: clampedProgress,
         useNativeDriver: false,
         duration,
-      }).start();
+      }).start()
     } else {
-      animatedValue.setValue(clampedProgress);
+      animatedValue.setValue(clampedProgress)
     }
-  }, [clampedProgress, animated, duration]);
+  }, [clampedProgress, animated, duration])
 
   // 计算进度
-  const strokeDashoffset = circumference - (circumference * clampedProgress) / 100;
+  const strokeDashoffset = circumference - (circumference * clampedProgress) / 100
 
   return (
     <View style={[styles.container, { width: size, height: size }]}>
@@ -116,7 +116,7 @@ export function ProgressRing({
         </View>
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -139,4 +139,4 @@ const styles = StyleSheet.create({
     color: theme.colors.text.tertiary,
     marginTop: 2,
   },
-});
+})

@@ -1,13 +1,13 @@
 // components/icons/ConnectedIcon.tsx
 // 已连接图标
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Circle } from 'react-native-svg'
 
 interface ConnectedIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -33,15 +33,10 @@ export function ConnectedIcon({ size = 24, color = '#10B981' }: ConnectedIconPro
           strokeLinejoin="round"
         />
         {/* 内圈（填充） */}
-        <Circle
-          cx="12"
-          cy="12"
-          r="5"
-          fill={color}
-        />
+        <Circle cx="12" cy="12" r="5" fill={color} />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -49,4 +44,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

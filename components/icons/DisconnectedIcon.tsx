@@ -1,13 +1,13 @@
 // components/icons/DisconnectedIcon.tsx
 // 未连接图标
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Circle } from 'react-native-svg'
 
 interface DisconnectedIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -34,7 +34,7 @@ export function DisconnectedIcon({ size = 24, color = '#9CA3AF' }: DisconnectedI
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -42,4 +42,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

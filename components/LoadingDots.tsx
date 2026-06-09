@@ -1,14 +1,14 @@
 // components/LoadingDots.tsx
 // 加载动画组件
 
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated } from 'react-native';
-import { theme } from '@/constants/theme';
+import React, { useEffect, useRef } from 'react'
+import { View, StyleSheet, Animated } from 'react-native'
+import { theme } from '@/constants/theme'
 
 interface LoadingDotsProps {
-  size?: number;
-  color?: string;
-  count?: number;
+  size?: number
+  color?: string
+  count?: number
 }
 
 export function LoadingDots({
@@ -16,9 +16,7 @@ export function LoadingDots({
   color = theme.colors.primary.main,
   count = 3,
 }: LoadingDotsProps) {
-  const animations = useRef(
-    Array.from({ length: count }, () => new Animated.Value(0))
-  ).current;
+  const animations = useRef(Array.from({ length: count }, () => new Animated.Value(0))).current
 
   useEffect(() => {
     const createAnimation = (index: number) => {
@@ -38,11 +36,11 @@ export function LoadingDots({
             }),
           ])
         ),
-      ]);
-    };
+      ])
+    }
 
-    Animated.parallel(animations.map((_, i) => createAnimation(i))).start();
-  }, []);
+    Animated.parallel(animations.map((_, i) => createAnimation(i))).start()
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -73,7 +71,7 @@ export function LoadingDots({
         />
       ))}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -84,4 +82,4 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   dot: {},
-});
+})

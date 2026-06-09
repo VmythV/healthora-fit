@@ -1,13 +1,13 @@
 // components/icons/BowlIcon.tsx
 // 碗图标（餐食/米饭）
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Path } from 'react-native-svg'
 
 interface BowlIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -48,7 +48,7 @@ export function BowlIcon({ size = 24, color = '#000000' }: BowlIconProps) {
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -56,4 +56,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

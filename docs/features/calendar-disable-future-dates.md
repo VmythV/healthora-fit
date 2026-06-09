@@ -14,15 +14,18 @@
 ## 架构影响
 
 ### 数据模型
+
 - 无变更
 
 ### 组件变更
+
 - ✅ 需要修改 `components/calendar/CalendarGrid.tsx`
   - 添加 `maxDate` 属性
   - 禁用超过最大日期的日期
   - 禁用下个月导航（当月已是最大月份时）
 
 ### 服务变更
+
 - 无变更
 
 ## 设计方案
@@ -46,30 +49,32 @@
 ### 技术设计
 
 1. **CalendarGrid 组件修改**
+
    ```typescript
    interface CalendarGridProps {
      // ... 现有属性
-     maxDate?: string; // YYYY-MM-DD，最大可选日期
+     maxDate?: string // YYYY-MM-DD，最大可选日期
    }
    ```
 
 2. **日期判断逻辑**
+
    ```typescript
    const isFutureDate = (y: number, m: number, d: number) => {
-     if (!maxDate) return false;
-     const dateStr = formatDate(y, m, d);
-     return dateStr > maxDate;
-   };
+     if (!maxDate) return false
+     const dateStr = formatDate(y, m, d)
+     return dateStr > maxDate
+   }
    ```
 
 3. **月份导航限制**
    ```typescript
    const canGoNextMonth = () => {
-     if (!maxDate) return true;
-     const maxDateObj = new Date(maxDate);
-     const nextMonth = new Date(year, month + 1, 1);
-     return nextMonth <= maxDateObj;
-   };
+     if (!maxDate) return true
+     const maxDateObj = new Date(maxDate)
+     const nextMonth = new Date(year, month + 1, 1)
+     return nextMonth <= maxDateObj
+   }
    ```
 
 ### 实现步骤

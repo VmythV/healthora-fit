@@ -1,13 +1,13 @@
 // components/icons/SunriseIcon.tsx
 // 日出图标（早餐）
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Path, Circle } from 'react-native-svg'
 
 interface SunriseIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -50,7 +50,7 @@ export function SunriseIcon({ size = 24, color = '#000000' }: SunriseIconProps) 
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -58,4 +58,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

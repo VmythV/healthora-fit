@@ -64,41 +64,46 @@
 ## ✨ 功能特性
 
 ### 🍽️ 饮食记录
+
 - 拍照识别食物，AI 自动分析营养成分
 - 记录每餐卡路里、蛋白质、碳水、脂肪
 - 支持手动编辑修正识别结果
 
 ### 🏃 运动记录
+
 - 支持多种运动类型（跑步、骑行、游泳、力量训练等）
 - 截图识别运动数据
 - 自动计算消耗卡路里
 
 ### ⚖️ 体重追踪
+
 - 记录每日体重变化
 - 设置目标体重，追踪进度
 - 体重趋势图表展示
 
 ### 📊 数据分析
+
 - 按周/月/年查看趋势
 - 营养成分比例分析
 - 运动类型分布统计
 
 ### 🤖 AI 配置
+
 - 支持 OpenAI 协议的 API
 - 可配置 API 地址、Key、模型
 - 灵活对接不同 AI 服务
 
 ## 🛠️ 技术栈
 
-| 技术 | 版本 | 用途 |
-|------|------|------|
-| Expo | SDK 54 | 开发框架 |
-| React Native | 0.81.5 | 移动端框架 |
-| React | 19.1.0 | UI 库 |
-| TypeScript | 5.9.2 | 类型安全 |
-| Expo Router | 6.0.24 | 文件路由 |
-| SQLite | 16.0.10 | 本地存储 |
-| Zustand | 5.0.14 | 状态管理 |
+| 技术         | 版本    | 用途       |
+| ------------ | ------- | ---------- |
+| Expo         | SDK 54  | 开发框架   |
+| React Native | 0.81.5  | 移动端框架 |
+| React        | 19.1.0  | UI 库      |
+| TypeScript   | 5.9.2   | 类型安全   |
+| Expo Router  | 6.0.24  | 文件路由   |
+| SQLite       | 16.0.10 | 本地存储   |
+| Zustand      | 5.0.14  | 状态管理   |
 
 ## 🚀 快速开始
 
@@ -179,14 +184,14 @@ healthora-fit/
 使用 SQLite 本地存储，表结构定义在 `database/schema.ts`。
 
 ```typescript
-import { database } from '@/database';
-import { dietQueries } from '@/database/queries';
+import { database } from '@/database'
+import { dietQueries } from '@/database/queries'
 
 // 初始化数据库
-await database.initialize();
+await database.initialize()
 
 // 查询今日饮食记录
-const todayRecords = await dietQueries.getToday();
+const todayRecords = await dietQueries.getToday()
 ```
 
 ### 主题

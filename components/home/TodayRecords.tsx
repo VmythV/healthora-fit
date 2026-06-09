@@ -1,30 +1,24 @@
 // components/home/TodayRecords.tsx
 // 今日记录列表
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { Card, Empty } from '@/components/ui';
-import { Icon } from '@/components/icons';
-import { IconName } from '@/components/icons/Icon';
+import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { Card } from '@/components/ui'
+import { Icon } from '@/components/icons'
+import { IconName } from '@/components/icons/Icon'
 
 interface Record {
-  id: number;
-  type: 'diet' | 'exercise' | 'weight';
-  time: string;
-  title: string;
-  detail: string;
+  id: number
+  type: 'diet' | 'exercise' | 'weight'
+  time: string
+  title: string
+  detail: string
 }
 
 interface TodayRecordsProps {
-  records: Record[];
+  records: Record[]
 }
 
 // 记录类型图标
@@ -32,38 +26,37 @@ const RECORD_ICONS: { [key: string]: IconName } = {
   diet: 'bowl',
   exercise: 'running',
   weight: 'weight',
-};
+}
 
 /**
  * 今日记录列表
  */
 export function TodayRecords({ records }: TodayRecordsProps) {
-  const { t } = useI18n();
-  const router = useRouter();
+  const { t } = useI18n()
 
   // 格式化时间
   const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
+    const date = new Date(timestamp)
     return date.toLocaleTimeString('zh-CN', {
       hour: '2-digit',
       minute: '2-digit',
-    });
-  };
+    })
+  }
 
   // 点击记录
   const handlePress = (record: Record) => {
     switch (record.type) {
       case 'diet':
         // TODO: 跳转到饮食记录详情
-        break;
+        break
       case 'exercise':
         // TODO: 跳转到运动记录详情
-        break;
+        break
       case 'weight':
         // TODO: 跳转到体重记录详情
-        break;
+        break
     }
-  };
+  }
 
   if (records.length === 0) {
     return (
@@ -73,12 +66,12 @@ export function TodayRecords({ records }: TodayRecordsProps) {
         </View>
         <Text style={styles.emptyText}>{t('common.noData')}</Text>
       </View>
-    );
+    )
   }
 
   return (
     <View style={styles.container}>
-      {records.map((record, index) => (
+      {records.map((record, _index) => (
         <TouchableOpacity
           key={`${record.type}-${record.id}`}
           onPress={() => handlePress(record)}
@@ -87,7 +80,11 @@ export function TodayRecords({ records }: TodayRecordsProps) {
           <Card style={styles.recordCard} shadow="none">
             <View style={styles.recordRow}>
               <View style={styles.recordIconContainer}>
-                <Icon name={RECORD_ICONS[record.type]} size={24} color={theme.colors.primary.main} />
+                <Icon
+                  name={RECORD_ICONS[record.type]}
+                  size={24}
+                  color={theme.colors.primary.main}
+                />
               </View>
               <View style={styles.recordInfo}>
                 <Text style={styles.recordTitle}>{record.title}</Text>
@@ -99,7 +96,7 @@ export function TodayRecords({ records }: TodayRecordsProps) {
         </TouchableOpacity>
       ))}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -148,4 +145,4 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.caption,
     color: theme.colors.text.tertiary,
   },
-});
+})

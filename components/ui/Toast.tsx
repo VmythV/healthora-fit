@@ -1,29 +1,22 @@
 // components/ui/Toast.tsx
 // 提示通知组件
 
-import React, { useEffect, useRef, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  TouchableOpacity,
-  Dimensions,
-} from 'react-native';
-import { theme } from '@/constants/theme';
-import { CheckIcon, CloseIcon, WarningIcon, InfoIcon } from '@/components/icons';
+import React, { useEffect, useRef, useCallback } from 'react'
+import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native'
+import { theme } from '@/constants/theme'
+import { CheckIcon, CloseIcon, WarningIcon, InfoIcon } from '@/components/icons'
 
-export type ToastType = 'success' | 'error' | 'warning' | 'info';
+export type ToastType = 'success' | 'error' | 'warning' | 'info'
 
 export interface ToastItem {
-  id: number;
-  message: string;
-  type: ToastType;
+  id: number
+  message: string
+  type: ToastType
 }
 
 interface ToastProps {
-  toast: ToastItem;
-  onDismiss: (id: number) => void;
+  toast: ToastItem
+  onDismiss: (id: number) => void
 }
 
 const ICON_MAP = {
@@ -31,14 +24,14 @@ const ICON_MAP = {
   error: CloseIcon,
   warning: WarningIcon,
   info: InfoIcon,
-};
+}
 
 /**
  * 单个 Toast 通知
  */
 function ToastItemView({ toast, onDismiss }: ToastProps) {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(-20)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current
+  const slideAnim = useRef(new Animated.Value(-20)).current
 
   useEffect(() => {
     Animated.parallel([
@@ -52,14 +45,14 @@ function ToastItemView({ toast, onDismiss }: ToastProps) {
         duration: 250,
         useNativeDriver: true,
       }),
-    ]).start();
+    ]).start()
 
     const timer = setTimeout(() => {
-      dismiss();
-    }, 3000);
+      dismiss()
+    }, 3000)
 
-    return () => clearTimeout(timer);
-  }, []);
+    return () => clearTimeout(timer)
+  }, [])
 
   const dismiss = useCallback(() => {
     Animated.parallel([
@@ -74,11 +67,11 @@ function ToastItemView({ toast, onDismiss }: ToastProps) {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      onDismiss(toast.id);
-    });
-  }, [fadeAnim, slideAnim, onDismiss, toast.id]);
+      onDismiss(toast.id)
+    })
+  }, [fadeAnim, slideAnim, onDismiss, toast.id])
 
-  const Icon = ICON_MAP[toast.type];
+  const Icon = ICON_MAP[toast.type]
 
   return (
     <Animated.View
@@ -88,23 +81,22 @@ function ToastItemView({ toast, onDismiss }: ToastProps) {
         { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
       ]}
     >
-      <TouchableOpacity
-        style={styles.toastInner}
-        onPress={dismiss}
-        activeOpacity={0.9}
-      >
+      <TouchableOpacity style={styles.toastInner} onPress={dismiss} activeOpacity={0.9}>
         <View style={styles.iconContainer}>
           <Icon size={18} color="#FFFFFF" />
         </View>
-        <Text style={styles.message} numberOfLines={2}>{toast.message}</Text>
+        <Text style={styles.message} numberOfLines={2}>
+          {toast.message}
+        </Text>
       </TouchableOpacity>
     </Animated.View>
-  );
+  )
 }
 
-export { ToastItemView };
+export { ToastItemView }
 
-const { width } = Dimensions.get('window');
+// 已弃用：改用 useWindowDimensions().width（按需）
+// const { width } = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   toast: {
@@ -138,19 +130,19 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.body,
     color: '#FFFFFF',
   },
-});
+})
 
 // ===== 全局通知管理 =====
 
-type NotificationHandler = (message: string, type: ToastType) => void;
+type NotificationHandler = (message: string, type: ToastType) => void
 
-let globalNotify: NotificationHandler | null = null;
+let globalNotify: NotificationHandler | null = null
 
 /**
  * 注册全局通知函数（由 NotificationProvider 调用）
  */
 export function setGlobalNotify(handler: NotificationHandler | null) {
-  globalNotify = handler;
+  globalNotify = handler
 }
 
 /**
@@ -159,9 +151,9 @@ export function setGlobalNotify(handler: NotificationHandler | null) {
  */
 export function showNotification(message: string, type: ToastType = 'info') {
   if (globalNotify) {
-    globalNotify(message, type);
+    globalNotify(message, type)
   } else {
     // 降级：使用 console
-    console.log(`[Notification] ${type}: ${message}`);
+    console.log(`[Notification] ${type}: ${message}`)
   }
 }

@@ -1,59 +1,51 @@
 // app/settings/goals.tsx
 // 目标设置页面
 
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useGoals } from '@/hooks/useGoals';
-import { useWeightRecords } from '@/hooks/useWeightRecords';
-import { ProgressRing } from '@/components/charts/ProgressRing';
-import { Icon, BackIcon } from '@/components/icons';
-import { showNotification, showConfirm } from '@/components/ui';
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useGoals } from '@/hooks/useGoals'
+import { useWeightRecords } from '@/hooks/useWeightRecords'
+import { ProgressRing } from '@/components/charts/ProgressRing'
+import { Icon, BackIcon } from '@/components/icons'
+import { showNotification } from '@/components/ui'
 
 export default function GoalsScreen() {
-  const { t } = useI18n();
-  const router = useRouter();
-  const { activeGoal, goals, loadActive, loadAll, setGoal } = useGoals();
-  const { latestWeight, loadLatest } = useWeightRecords();
+  const { t } = useI18n()
+  const router = useRouter()
+  const { activeGoal, goals, loadActive, loadAll, setGoal } = useGoals()
+  const { latestWeight, loadLatest } = useWeightRecords()
 
-  const [targetWeight, setTargetWeight] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
+  const [targetWeight, setTargetWeight] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
-    loadActive('target_weight');
-    loadAll();
-    loadLatest();
-  }, []);
+    loadActive('target_weight')
+    loadAll()
+    loadLatest()
+  }, [])
 
   useEffect(() => {
     if (activeGoal && activeGoal.targetValue != null) {
-      setTargetWeight(activeGoal.targetValue.toString());
+      setTargetWeight(activeGoal.targetValue.toString())
     }
-  }, [activeGoal]);
+  }, [activeGoal])
 
   // 计算进度
   const calculateProgress = () => {
-    if (!activeGoal || !latestWeight) return null;
+    if (!activeGoal || !latestWeight) return null
 
-    const start = activeGoal.startValue || latestWeight.weight;
-    const target = activeGoal.targetValue;
-    const current = latestWeight.weight;
+    const start = activeGoal.startValue || latestWeight.weight
+    const target = activeGoal.targetValue
+    const current = latestWeight.weight
 
     // 计算完成百分比
-    const totalChange = Math.abs(start - target);
-    const currentChange = Math.abs(start - current);
-    const progress = totalChange > 0 ? Math.min(currentChange / totalChange, 1) : 0;
+    const totalChange = Math.abs(start - target)
+    const currentChange = Math.abs(start - current)
+    const progress = totalChange > 0 ? Math.min(currentChange / totalChange, 1) : 0
 
     return {
       progress,
@@ -61,17 +53,17 @@ export default function GoalsScreen() {
       target,
       remaining: Math.abs(current - target),
       isAchieved: Math.abs(current - target) < 0.5,
-    };
-  };
+    }
+  }
 
-  const progressInfo = calculateProgress();
+  const progressInfo = calculateProgress()
 
   // 保存目标
   const handleSave = async () => {
-    const weight = parseFloat(targetWeight);
+    const weight = parseFloat(targetWeight)
     if (isNaN(weight) || weight < 20 || weight > 300) {
-      showNotification(t('weight.invalidWeight'), 'error');
-      return;
+      showNotification(t('weight.invalidWeight'), 'error')
+      return
     }
 
     try {
@@ -80,14 +72,14 @@ export default function GoalsScreen() {
         targetValue: weight,
         startValue: latestWeight?.weight,
         startDate: new Date().toISOString().split('T')[0],
-      });
-      await loadAll();
-      setIsEditing(false);
-      showNotification(t('settings.goals.saveSuccess'), 'success');
+      })
+      await loadAll()
+      setIsEditing(false)
+      showNotification(t('settings.goals.saveSuccess'), 'success')
     } catch (error) {
-      showNotification(t('settings.goals.saveFailed'), 'error');
+      showNotification(t('settings.goals.saveFailed'), 'error')
     }
-  };
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -131,9 +123,9 @@ export default function GoalsScreen() {
                 <TouchableOpacity
                   style={styles.cancelButton}
                   onPress={() => {
-                    setIsEditing(false);
+                    setIsEditing(false)
                     if (activeGoal?.targetValue != null) {
-                      setTargetWeight(activeGoal.targetValue.toString());
+                      setTargetWeight(activeGoal.targetValue.toString())
                     }
                   }}
                 >
@@ -157,7 +149,11 @@ export default function GoalsScreen() {
                   progress={progressInfo.progress}
                   size={120}
                   color={progressInfo.isAchieved ? theme.colors.success : theme.colors.primary.main}
-                  label={progressInfo.isAchieved ? t('settings.goals.achieved') : t('settings.goals.inProgress')}
+                  label={
+                    progressInfo.isAchieved
+                      ? t('settings.goals.achieved')
+                      : t('settings.goals.inProgress')
+                  }
                 />
                 <View style={styles.progressInfo}>
                   <View style={styles.progressRow}>
@@ -171,7 +167,9 @@ export default function GoalsScreen() {
                   <View style={styles.progressRow}>
                     <Text style={styles.progressLabel}>{t('weight.toTarget')}</Text>
                     <Text style={[styles.progressValue, styles.highlight]}>
-                      {progressInfo.remaining > 0 ? `${progressInfo.remaining.toFixed(1)} kg` : t('settings.goals.achieved')}
+                      {progressInfo.remaining > 0
+                        ? `${progressInfo.remaining.toFixed(1)} kg`
+                        : t('settings.goals.achieved')}
                     </Text>
                   </View>
                 </View>
@@ -198,10 +196,7 @@ export default function GoalsScreen() {
               )}
             </View>
 
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => setIsEditing(true)}
-            >
+            <TouchableOpacity style={styles.editButton} onPress={() => setIsEditing(true)}>
               <Text style={styles.editButtonText}>{t('common.edit')}</Text>
             </TouchableOpacity>
           </View>
@@ -245,24 +240,28 @@ export default function GoalsScreen() {
               <Text style={styles.tipsTitle}>{t('settings.goals.history')}</Text>
             </View>
             {goals
-              .filter(g => g.goalType === 'target_weight')
+              .filter((g) => g.goalType === 'target_weight')
               .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
               .map((goal, index, arr) => {
-                const dateStr = goal.startDate || (goal.createdAt ? goal.createdAt.split('T')[0] : '');
-                const isLast = index === arr.length - 1;
+                const dateStr =
+                  goal.startDate || (goal.createdAt ? goal.createdAt.split('T')[0] : '')
+                const isLast = index === arr.length - 1
                 return (
                   <View
                     key={goal.id}
-                    style={[
-                      styles.historyItem,
-                      isLast ? undefined : styles.historyItemBorder,
-                    ]}
+                    style={[styles.historyItem, isLast ? undefined : styles.historyItemBorder]}
                   >
                     <View style={styles.historyLeft}>
-                      <View style={[
-                        styles.historyDot,
-                        { backgroundColor: goal.isActive ? theme.colors.primary.main : theme.colors.text.tertiary },
-                      ]} />
+                      <View
+                        style={[
+                          styles.historyDot,
+                          {
+                            backgroundColor: goal.isActive
+                              ? theme.colors.primary.main
+                              : theme.colors.text.tertiary,
+                          },
+                        ]}
+                      />
                       <View>
                         <Text style={styles.historyValue}>{goal.targetValue} kg</Text>
                         <Text style={styles.historyDate}>{dateStr}</Text>
@@ -274,7 +273,7 @@ export default function GoalsScreen() {
                       </View>
                     ) : null}
                   </View>
-                );
+                )
               })}
             <Text style={styles.historyHint}>{t('settings.goals.historyHint')}</Text>
           </View>
@@ -292,7 +291,7 @@ export default function GoalsScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -534,4 +533,4 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.caption,
     color: theme.colors.primary.dark,
   },
-});
+})

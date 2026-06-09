@@ -1,13 +1,13 @@
 // components/icons/ArrowRightIcon.tsx
 // 右箭头图标
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Path } from 'react-native-svg'
 
 interface ArrowRightIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -31,7 +31,7 @@ export function ArrowRightIcon({ size = 24, color = '#000000' }: ArrowRightIconP
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -39,4 +39,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

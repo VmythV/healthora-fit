@@ -1,13 +1,13 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { Icon, ArrowRightIcon } from '@/components/icons';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { Icon, ArrowRightIcon } from '@/components/icons'
 
 export default function RecordScreen() {
-  const router = useRouter();
-  const { t } = useI18n();
+  const router = useRouter()
+  const { t } = useI18n()
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -17,10 +17,7 @@ export default function RecordScreen() {
       </View>
 
       <View style={styles.content}>
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => router.push('/diet/record')}
-        >
+        <TouchableOpacity style={styles.card} onPress={() => router.push('/diet/record')}>
           <View style={styles.cardIconContainer}>
             <Icon name="bowl" size={36} color={theme.colors.primary.main} />
           </View>
@@ -31,10 +28,7 @@ export default function RecordScreen() {
           <ArrowRightIcon size={20} color={theme.colors.text.tertiary} />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => router.push('/exercise/record')}
-        >
+        <TouchableOpacity style={styles.card} onPress={() => router.push('/exercise/record')}>
           <View style={styles.cardIconContainer}>
             <Icon name="running" size={36} color={theme.colors.primary.main} />
           </View>
@@ -45,10 +39,7 @@ export default function RecordScreen() {
           <ArrowRightIcon size={20} color={theme.colors.text.tertiary} />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.card}
-          onPress={() => router.push('/weight/record')}
-        >
+        <TouchableOpacity style={styles.card} onPress={() => router.push('/weight/record')}>
           <View style={styles.cardIconContainer}>
             <Icon name="weight" size={36} color={theme.colors.primary.main} />
           </View>
@@ -60,7 +51,7 @@ export default function RecordScreen() {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -112,4 +103,4 @@ const styles = StyleSheet.create({
     color: theme.colors.text.tertiary,
     marginTop: theme.spacing.xs,
   },
-});
+})

@@ -2,23 +2,23 @@
 // 月份导航 + 星期标题
 // 注意：高度需要稳定（用于 CollapsibleCalendar 计算 open/close height）
 
-import React, { memo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { theme } from '@/constants/theme';
+import React, { memo } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { theme } from '@/constants/theme'
 
-export const HEADER_NAV_H = 44;
-export const HEADER_WEEKDAY_H = 26;
-export const HEADER_TOTAL_H = HEADER_NAV_H + HEADER_WEEKDAY_H;
+export const HEADER_NAV_H = 44
+export const HEADER_WEEKDAY_H = 26
+export const HEADER_TOTAL_H = HEADER_NAV_H + HEADER_WEEKDAY_H
 
 interface Props {
-  year: number;
-  month0: number; // 0-11
-  monthNames: string[];
-  weekDayNames: string[]; // 已按 firstDay 调整顺序
-  canGoNext: boolean;
-  canGoPrev: boolean;
-  onPrev: () => void;
-  onNext: () => void;
+  year: number
+  month0: number // 0-11
+  monthNames: string[]
+  weekDayNames: string[] // 已按 firstDay 调整顺序
+  canGoNext: boolean
+  canGoPrev: boolean
+  onPrev: () => void
+  onNext: () => void
 }
 
 function CalendarHeaderImpl({
@@ -67,10 +67,10 @@ function CalendarHeaderImpl({
         ))}
       </View>
     </View>
-  );
+  )
 }
 
-export const CalendarHeader = memo(CalendarHeaderImpl);
+export const CalendarHeader = memo(CalendarHeaderImpl)
 
 const styles = StyleSheet.create({
   container: {
@@ -121,4 +121,4 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.text.tertiary,
   },
-});
+})

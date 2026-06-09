@@ -1,13 +1,13 @@
 // components/icons/NoteIcon.tsx
 // 笔记图标
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Path } from 'react-native-svg'
 
 interface NoteIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -55,7 +55,7 @@ export function NoteIcon({ size = 24, color = '#000000' }: NoteIconProps) {
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -63,4 +63,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

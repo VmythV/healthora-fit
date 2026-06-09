@@ -1,29 +1,28 @@
 // app/settings/health-connect.tsx
 // 健康数据连接页面
 
-import { logger } from '@/utils/logger';
-import React, { useState, useEffect } from 'react';
+import { logger } from '@/utils/logger'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useHealthData } from '@/hooks/useHealthData';
-import { HealthConnectionStatus } from '@/services/health';
-import { Icon, BackIcon, CheckIcon, CloseIcon } from '@/components/icons';
-import { showNotification, showConfirm } from '@/components/ui';
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useHealthData } from '@/hooks/useHealthData'
+import { HealthConnectionStatus } from '@/services/health'
+import { Icon, BackIcon, CheckIcon, CloseIcon } from '@/components/icons'
+import { showNotification, showConfirm } from '@/components/ui'
 
 export default function HealthConnectScreen() {
-  const { t } = useI18n();
-  const router = useRouter();
+  const { t } = useI18n()
+  const router = useRouter()
   const {
     connectionStatus,
     permissions,
@@ -34,64 +33,64 @@ export default function HealthConnectScreen() {
     getConnectionStatus,
     syncData,
     disconnect,
-  } = useHealthData();
+  } = useHealthData()
 
-  const [isSyncing, setIsSyncing] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false)
 
   useEffect(() => {
-    loadStatus();
-  }, []);
+    loadStatus()
+  }, [])
 
   const loadStatus = async () => {
     try {
-      await getConnectionStatus();
+      await getConnectionStatus()
     } catch (error) {
-      logger.error('[Health] Failed to load health status:', error);
+      logger.error('[Health] Failed to load health status:', error)
     }
-  };
+  }
 
   // 连接健康平台
   const handleConnect = async () => {
     try {
       // 检查可用性
-      const available = await checkAvailability();
+      const available = await checkAvailability()
       if (!available) {
-        showNotification(t('settings.health.notAvailable'), 'error');
-        return;
+        showNotification(t('settings.health.notAvailable'), 'error')
+        return
       }
 
       // 请求权限
-      const perms = await requestPermissions();
+      const perms = await requestPermissions()
       if (perms.readWeight && perms.readExercise) {
-        showNotification(t('settings.health.connectedSuccess'), 'success');
+        showNotification(t('settings.health.connectedSuccess'), 'success')
       } else {
-        showNotification(t('settings.health.partialPermission'), 'warning');
+        showNotification(t('settings.health.partialPermission'), 'warning')
       }
     } catch (error) {
-      showNotification(t('settings.health.connectFailed'), 'error');
+      showNotification(t('settings.health.connectFailed'), 'error')
     }
-  };
+  }
 
   // 同步数据
   const handleSync = async () => {
     try {
-      setIsSyncing(true);
-      const result = await syncData();
+      setIsSyncing(true)
+      const result = await syncData()
 
       if (result.success) {
         showNotification(
           `${t('settings.health.syncSuccess')} - ${t('weight.title')}: ${result.counts.weight}, ${t('exercise.title')}: ${result.counts.exercise}`,
           'success'
-        );
+        )
       } else {
-        showNotification(result.message, 'error');
+        showNotification(result.message, 'error')
       }
     } catch (error) {
-      showNotification(t('settings.health.syncFailed'), 'error');
+      showNotification(t('settings.health.syncFailed'), 'error')
     } finally {
-      setIsSyncing(false);
+      setIsSyncing(false)
     }
-  };
+  }
 
   // 断开连接
   const handleDisconnect = async () => {
@@ -101,27 +100,27 @@ export default function HealthConnectScreen() {
       type: 'danger',
       confirmText: t('common.confirm'),
       cancelText: t('common.cancel'),
-    });
+    })
     if (ok) {
       try {
-        await disconnect();
-        showNotification(t('settings.health.disconnectedSuccess'), 'success');
+        await disconnect()
+        showNotification(t('settings.health.disconnectedSuccess'), 'success')
       } catch (error) {
-        showNotification(t('settings.health.disconnectFailed'), 'error');
+        showNotification(t('settings.health.disconnectFailed'), 'error')
       }
     }
-  };
+  }
 
   // 获取状态颜色
-  const getStatusColor = (connected: boolean) => {
-    return connected ? theme.colors.success : theme.colors.text.tertiary;
-  };
+  const _getStatusColor = (connected: boolean) => {
+    return connected ? theme.colors.success : theme.colors.text.tertiary
+  }
 
   // 获取状态文本
   const getStatusText = (status: HealthConnectionStatus | null) => {
-    if (!status) return t('settings.health.notConnected');
-    return status.isConnected ? t('settings.health.connected') : t('settings.health.notConnected');
-  };
+    if (!status) return t('settings.health.notConnected')
+    return status.isConnected ? t('settings.health.connected') : t('settings.health.notConnected')
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -141,12 +140,12 @@ export default function HealthConnectScreen() {
               <Icon
                 name={connectionStatus?.isConnected ? 'connected' : 'disconnected'}
                 size={24}
-                color={connectionStatus?.isConnected ? theme.colors.success : theme.colors.text.tertiary}
+                color={
+                  connectionStatus?.isConnected ? theme.colors.success : theme.colors.text.tertiary
+                }
               />
             </View>
-            <Text style={styles.statusTitle}>
-              {getStatusText(connectionStatus)}
-            </Text>
+            <Text style={styles.statusTitle}>{getStatusText(connectionStatus)}</Text>
           </View>
 
           {connectionStatus?.platform && (
@@ -157,13 +156,12 @@ export default function HealthConnectScreen() {
 
           {connectionStatus?.lastSyncDate && (
             <Text style={styles.lastSync}>
-              {t('settings.health.lastSync')}: {new Date(connectionStatus.lastSyncDate).toLocaleString()}
+              {t('settings.health.lastSync')}:{' '}
+              {new Date(connectionStatus.lastSyncDate).toLocaleString()}
             </Text>
           )}
 
-          {error && (
-            <Text style={styles.errorText}>{error}</Text>
-          )}
+          {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
 
         {/* 操作按钮 */}
@@ -212,34 +210,38 @@ export default function HealthConnectScreen() {
 
             <View style={styles.permissionItem}>
               <Text style={styles.permissionLabel}>{t('settings.health.readWeight')}</Text>
-              {permissions.readWeight
-                ? <CheckIcon size={20} color={theme.colors.success} />
-                : <CloseIcon size={20} color={theme.colors.error} />
-              }
+              {permissions.readWeight ? (
+                <CheckIcon size={20} color={theme.colors.success} />
+              ) : (
+                <CloseIcon size={20} color={theme.colors.error} />
+              )}
             </View>
 
             <View style={styles.permissionItem}>
               <Text style={styles.permissionLabel}>{t('settings.health.readExercise')}</Text>
-              {permissions.readExercise
-                ? <CheckIcon size={20} color={theme.colors.success} />
-                : <CloseIcon size={20} color={theme.colors.error} />
-              }
+              {permissions.readExercise ? (
+                <CheckIcon size={20} color={theme.colors.success} />
+              ) : (
+                <CloseIcon size={20} color={theme.colors.error} />
+              )}
             </View>
 
             <View style={styles.permissionItem}>
               <Text style={styles.permissionLabel}>{t('settings.health.writeWeight')}</Text>
-              {permissions.writeWeight
-                ? <CheckIcon size={20} color={theme.colors.success} />
-                : <CloseIcon size={20} color={theme.colors.error} />
-              }
+              {permissions.writeWeight ? (
+                <CheckIcon size={20} color={theme.colors.success} />
+              ) : (
+                <CloseIcon size={20} color={theme.colors.error} />
+              )}
             </View>
 
             <View style={styles.permissionItem}>
               <Text style={styles.permissionLabel}>{t('settings.health.writeExercise')}</Text>
-              {permissions.writeExercise
-                ? <CheckIcon size={20} color={theme.colors.success} />
-                : <CloseIcon size={20} color={theme.colors.error} />
-              }
+              {permissions.writeExercise ? (
+                <CheckIcon size={20} color={theme.colors.success} />
+              ) : (
+                <CloseIcon size={20} color={theme.colors.error} />
+              )}
             </View>
           </View>
         )}
@@ -256,7 +258,7 @@ export default function HealthConnectScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -407,4 +409,4 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing.sm,
     lineHeight: 20,
   },
-});
+})

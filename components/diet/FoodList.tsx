@@ -1,39 +1,32 @@
 // components/diet/FoodList.tsx
 // 食物列表组件
 
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-} from 'react-native';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { FoodItem } from '@/types/diet';
-import { Icon } from '@/components/icons';
-import { Card } from '@/components/ui';
+import React, { useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { FoodItem } from '@/types/diet'
+import { Icon } from '@/components/icons'
+import { Card } from '@/components/ui'
 
 interface FoodListProps {
-  foods: FoodItem[];
-  onEdit: (index: number, food: FoodItem) => void;
-  onDelete: (index: number) => void;
+  foods: FoodItem[]
+  onEdit: (index: number, food: FoodItem) => void
+  onDelete: (index: number) => void
 }
 
 /**
  * 食物列表组件
  */
 export function FoodList({ foods, onEdit, onDelete }: FoodListProps) {
-  const { t } = useI18n();
+  const { t } = useI18n()
 
   if (foods.length === 0) {
     return (
       <View style={styles.empty}>
         <Text style={styles.emptyText}>{t('diet.noFood')}</Text>
       </View>
-    );
+    )
   }
 
   return (
@@ -47,24 +40,24 @@ export function FoodList({ foods, onEdit, onDelete }: FoodListProps) {
         />
       ))}
     </View>
-  );
+  )
 }
 
 interface FoodItemCardProps {
-  food: FoodItem;
-  onEdit: (food: FoodItem) => void;
-  onDelete: () => void;
+  food: FoodItem
+  onEdit: (food: FoodItem) => void
+  onDelete: () => void
 }
 
 function FoodItemCard({ food, onEdit, onDelete }: FoodItemCardProps) {
-  const { t } = useI18n();
-  const [editing, setEditing] = useState(false);
-  const [editData, setEditData] = useState(food);
+  const { t } = useI18n()
+  const [editing, setEditing] = useState(false)
+  const [editData, setEditData] = useState(food)
 
   const handleSave = () => {
-    onEdit(editData);
-    setEditing(false);
-  };
+    onEdit(editData)
+    setEditing(false)
+  }
 
   if (editing) {
     return (
@@ -89,9 +82,7 @@ function FoodItemCard({ food, onEdit, onDelete }: FoodItemCardProps) {
             <TextInput
               style={styles.nutritionInput}
               value={String(editData.calories)}
-              onChangeText={(text) =>
-                setEditData({ ...editData, calories: Number(text) || 0 })
-              }
+              onChangeText={(text) => setEditData({ ...editData, calories: Number(text) || 0 })}
               keyboardType="numeric"
             />
           </View>
@@ -100,9 +91,7 @@ function FoodItemCard({ food, onEdit, onDelete }: FoodItemCardProps) {
             <TextInput
               style={styles.nutritionInput}
               value={String(editData.protein)}
-              onChangeText={(text) =>
-                setEditData({ ...editData, protein: Number(text) || 0 })
-              }
+              onChangeText={(text) => setEditData({ ...editData, protein: Number(text) || 0 })}
               keyboardType="numeric"
             />
           </View>
@@ -111,9 +100,7 @@ function FoodItemCard({ food, onEdit, onDelete }: FoodItemCardProps) {
             <TextInput
               style={styles.nutritionInput}
               value={String(editData.carbs)}
-              onChangeText={(text) =>
-                setEditData({ ...editData, carbs: Number(text) || 0 })
-              }
+              onChangeText={(text) => setEditData({ ...editData, carbs: Number(text) || 0 })}
               keyboardType="numeric"
             />
           </View>
@@ -122,29 +109,21 @@ function FoodItemCard({ food, onEdit, onDelete }: FoodItemCardProps) {
             <TextInput
               style={styles.nutritionInput}
               value={String(editData.fat)}
-              onChangeText={(text) =>
-                setEditData({ ...editData, fat: Number(text) || 0 })
-              }
+              onChangeText={(text) => setEditData({ ...editData, fat: Number(text) || 0 })}
               keyboardType="numeric"
             />
           </View>
         </View>
         <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => setEditing(false)}
-          >
+          <TouchableOpacity style={styles.actionButton} onPress={() => setEditing(false)}>
             <Text style={styles.cancelText}>{t('common.cancel')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionButton, styles.saveButton]}
-            onPress={handleSave}
-          >
+          <TouchableOpacity style={[styles.actionButton, styles.saveButton]} onPress={handleSave}>
             <Text style={styles.saveText}>{t('common.save')}</Text>
           </TouchableOpacity>
         </View>
       </Card>
-    );
+    )
   }
 
   return (
@@ -155,16 +134,10 @@ function FoodItemCard({ food, onEdit, onDelete }: FoodItemCardProps) {
           <Text style={styles.portion}>{food.portion}</Text>
         </View>
         <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={() => setEditing(true)}
-          >
+          <TouchableOpacity style={styles.iconButton} onPress={() => setEditing(true)}>
             <Icon name="edit" size={16} color={theme.colors.text.tertiary} />
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.iconButton}
-            onPress={onDelete}
-          >
+          <TouchableOpacity style={styles.iconButton} onPress={onDelete}>
             <Icon name="delete" size={16} color={theme.colors.error} />
           </TouchableOpacity>
         </View>
@@ -174,11 +147,12 @@ function FoodItemCard({ food, onEdit, onDelete }: FoodItemCardProps) {
           {food.calories} {t('diet.calories')}
         </Text>
         <Text style={styles.nutritionDetail}>
-          {t('diet.protein')}: {food.protein}g | {t('diet.carbs')}: {food.carbs}g | {t('diet.fat')}: {food.fat}g
+          {t('diet.protein')}: {food.protein}g | {t('diet.carbs')}: {food.carbs}g | {t('diet.fat')}:{' '}
+          {food.fat}g
         </Text>
       </View>
     </Card>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -295,4 +269,4 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: theme.fontWeight.semibold,
   },
-});
+})

@@ -1,8 +1,8 @@
 // components/diet/DietRecordForm.tsx
 // 饮食记录表单组件
 
-import { logger } from '@/utils/logger';
-import React, { useState, useEffect, useMemo } from 'react';
+import { logger } from '@/utils/logger'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   View,
   Text,
@@ -10,29 +10,27 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useDietRecords } from '@/hooks/useDietRecords';
-import { FoodItem, MealType } from '@/types/diet';
-import { FoodList } from './FoodList';
-import { NutritionSummary } from './NutritionSummary';
-import { MealTypeSelector } from './MealTypeSelector';
-import { Icon } from '@/components/icons';
-import { showNotification, showConfirm } from '@/components/ui';
+} from 'react-native'
+import { useRouter } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useDietRecords } from '@/hooks/useDietRecords'
+import { FoodItem, MealType } from '@/types/diet'
+import { FoodList } from './FoodList'
+import { NutritionSummary } from './NutritionSummary'
+import { MealTypeSelector } from './MealTypeSelector'
+import { Icon } from '@/components/icons'
+import { showNotification, showConfirm } from '@/components/ui'
 
 interface DietRecordFormProps {
-  photoUri?: string;
-  initialFoods?: FoodItem[];
-  initialMealType?: MealType;
-  initialNote?: string;
-  recordId?: number; // 编辑模式时传入
-  onSuccess?: () => void;
+  photoUri?: string
+  initialFoods?: FoodItem[]
+  initialMealType?: MealType
+  initialNote?: string
+  recordId?: number // 编辑模式时传入
+  onSuccess?: () => void
 }
 
 /**
@@ -62,40 +60,41 @@ export function DietRecordForm({
   recordId,
   onSuccess,
 }: DietRecordFormProps) {
-  const { t } = useI18n();
-  const router = useRouter();
-  const { addRecord, updateRecord } = useDietRecords();
+  const { t } = useI18n()
+  const router = useRouter()
+  const { addRecord, updateRecord } = useDietRecords()
 
-  const [mealType, setMealType] = useState<MealType>(
-    initialMealType || getDefaultMealType()
-  );
-  const [foods, setFoods] = useState<FoodItem[]>(initialFoods);
-  const [note, setNote] = useState(initialNote);
-  const [saving, setSaving] = useState(false);
+  const [mealType, setMealType] = useState<MealType>(initialMealType || getDefaultMealType())
+  const [foods, setFoods] = useState<FoodItem[]>(initialFoods)
+  const [note, setNote] = useState(initialNote)
+  const [saving, setSaving] = useState(false)
 
   // 当 initialFoods 变化时同步更新（AI 分析完成后回填数据）
   useEffect(() => {
     if (initialFoods.length > 0) {
-      setFoods(initialFoods);
-      logger.log('[DietForm] initialFoods 更新:', initialFoods.length, '种食物');
+      setFoods(initialFoods)
+      logger.log('[DietForm] initialFoods 更新:', initialFoods.length, '种食物')
     }
-  }, [initialFoods]);
+  }, [initialFoods])
 
   // P2-20：计算营养成分总量用 useMemo，避免每次 render（特别是 note 输入时）跑 4 次 reduce
-  const totals = useMemo(() => ({
-    calories: foods.reduce((sum, f) => sum + f.calories, 0),
-    protein: foods.reduce((sum, f) => sum + f.protein, 0),
-    carbs: foods.reduce((sum, f) => sum + f.carbs, 0),
-    fat: foods.reduce((sum, f) => sum + f.fat, 0),
-  }), [foods]);
+  const totals = useMemo(
+    () => ({
+      calories: foods.reduce((sum, f) => sum + f.calories, 0),
+      protein: foods.reduce((sum, f) => sum + f.protein, 0),
+      carbs: foods.reduce((sum, f) => sum + f.carbs, 0),
+      fat: foods.reduce((sum, f) => sum + f.fat, 0),
+    }),
+    [foods]
+  )
 
   // 获取默认餐次
   function getDefaultMealType(): MealType {
-    const hour = new Date().getHours();
-    if (hour < 10) return 'breakfast';
-    if (hour < 14) return 'lunch';
-    if (hour < 18) return 'snack';
-    return 'dinner';
+    const hour = new Date().getHours()
+    if (hour < 10) return 'breakfast'
+    if (hour < 14) return 'lunch'
+    if (hour < 18) return 'snack'
+    return 'dinner'
   }
 
   // 添加食物
@@ -108,16 +107,16 @@ export function DietRecordForm({
       protein: 0,
       carbs: 0,
       fat: 0,
-    };
-    setFoods([...foods, newFood]);
-  };
+    }
+    setFoods([...foods, newFood])
+  }
 
   // 编辑食物
   const handleEditFood = (index: number, updatedFood: FoodItem) => {
-    const newFoods = [...foods];
-    newFoods[index] = updatedFood;
-    setFoods(newFoods);
-  };
+    const newFoods = [...foods]
+    newFoods[index] = updatedFood
+    setFoods(newFoods)
+  }
 
   // 删除食物
   const handleDeleteFood = async (index: number) => {
@@ -127,20 +126,20 @@ export function DietRecordForm({
       type: 'danger',
       confirmText: t('common.delete'),
       cancelText: t('common.cancel'),
-    });
+    })
     if (ok) {
-      setFoods(foods.filter((_, i) => i !== index));
+      setFoods(foods.filter((_, i) => i !== index))
     }
-  };
+  }
 
   // 保存记录
   const handleSave = async () => {
     if (foods.length === 0) {
-      showNotification(t('diet.noFood'), 'error');
-      return;
+      showNotification(t('diet.noFood'), 'error')
+      return
     }
 
-    setSaving(true);
+    setSaving(true)
     try {
       const recordData = {
         timestamp: new Date().toISOString(),
@@ -153,23 +152,23 @@ export function DietRecordForm({
         mealType,
         note,
         isEdited: true,
-      };
-
-      if (recordId) {
-        await updateRecord(recordId, recordData);
-      } else {
-        await addRecord(recordData);
       }
 
-      onSuccess?.();
-      router.back();
+      if (recordId) {
+        await updateRecord(recordId, recordData)
+      } else {
+        await addRecord(recordData)
+      }
+
+      onSuccess?.()
+      router.back()
     } catch (error) {
-      logger.error('[DietForm] 保存失败:', error);
-      showNotification(t('error.saveFailed'), 'error');
+      logger.error('[DietForm] 保存失败:', error)
+      showNotification(t('error.saveFailed'), 'error')
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   return (
     <KeyboardAvoidingView
@@ -180,29 +179,19 @@ export function DietRecordForm({
         {/* 餐次选择 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('diet.mealType')}</Text>
-          <MealTypeSelector
-            value={mealType}
-            onChange={setMealType}
-          />
+          <MealTypeSelector value={mealType} onChange={setMealType} />
         </View>
 
         {/* 食物列表 */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>{t('diet.foodList')}</Text>
-            <TouchableOpacity
-              style={styles.addButton}
-              onPress={handleAddFood}
-            >
+            <TouchableOpacity style={styles.addButton} onPress={handleAddFood}>
               <Icon name="add" size={20} color={theme.colors.primary.main} />
               <Text style={styles.addButtonText}>{t('diet.addFood')}</Text>
             </TouchableOpacity>
           </View>
-          <FoodList
-            foods={foods}
-            onEdit={handleEditFood}
-            onDelete={handleDeleteFood}
-          />
+          <FoodList foods={foods} onEdit={handleEditFood} onDelete={handleDeleteFood} />
         </View>
 
         {/* 营养成分汇总 */}
@@ -243,7 +232,7 @@ export function DietRecordForm({
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -307,4 +296,4 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: '#FFFFFF',
   },
-});
+})

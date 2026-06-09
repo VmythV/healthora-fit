@@ -1,243 +1,127 @@
 // app/settings/ai-config.tsx
-// AI 配置页面
+// AI 配置路由壳
+//
+// P3-50：拆出 AIConfigForm + AIConfigList 后，本文件只剩：
+//   - 状态：configs / activeConfig / editingConfig（3 个）
+//   - 副作用：useEffect loadConfigs、handleDelete 完整流程
+//   - 视图：isEditing ? <AIConfigForm /> : <AIConfigList /> + 帮助卡 + 空态
+// 移除了 6 个表单 useState、Alert 死引用。
 
-import { logger } from '@/utils/logger';
-import React, { useState, useEffect } from 'react';
+import { logger } from '@/utils/logger'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
-  Alert,
   ActivityIndicator,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { aiConfigQueries } from '@/database/queries/aiConfig';
-import { aiService } from '@/services/ai';
-import { AIConfig } from '@/types/ai';
-import { Icon, BackIcon, CheckIcon, EditIcon, DeleteIcon } from '@/components/icons';
-import { showNotification, showConfirm } from '@/components/ui';
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
+import { useI18n } from '@/hooks/useI18n'
+import { theme } from '@/constants/theme'
+import { AIConfig } from '@/types/ai'
+import { aiConfigQueries } from '@/database/queries/aiConfig'
+import { aiService } from '@/services/ai'
+import { Icon, BackIcon } from '@/components/icons'
+import { showNotification } from '@/components/ui'
+import { AIConfigForm } from '@/components/settings/AIConfigForm'
+import { AIConfigList } from '@/components/settings/AIConfigList'
 
 export default function AIConfigScreen() {
-  const { t } = useI18n();
-  const router = useRouter();
+  const { t } = useI18n()
+  const router = useRouter()
 
-  const [configs, setConfigs] = useState<AIConfig[]>([]);
-  const [activeConfig, setActiveConfig] = useState<AIConfig | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingConfig, setEditingConfig] = useState<AIConfig | null>(null);
-
-  // 表单状态
-  const [apiEndpoint, setApiEndpoint] = useState('');
-  const [apiKey, setApiKey] = useState('');
-  const [modelName, setModelName] = useState('');
-  const [apiType, setApiType] = useState<'auto' | 'chat-completions' | 'responses'>('auto');
-  const [isTesting, setIsTesting] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [showApiKey, setShowApiKey] = useState(false);
+  const [configs, setConfigs] = useState<AIConfig[]>([])
+  const [activeConfig, setActiveConfig] = useState<AIConfig | null>(null)
+  const [editingConfig, setEditingConfig] = useState<AIConfig | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   // 加载配置列表
-  useEffect(() => {
-    loadConfigs();
-  }, []);
-
   const loadConfigs = async () => {
     try {
-      logger.log('[AI Config] Loading configs...');
-      const allConfigs = await aiConfigQueries.getAll();
-      const active = await aiConfigQueries.getActive();
+      logger.log('[AI Config] Loading configs...')
+      const [allConfigs, active] = await Promise.all([
+        aiConfigQueries.getAll(),
+        aiConfigQueries.getActive(),
+      ])
 
-      logger.log('[AI Config] All configs:', allConfigs);
-      logger.log('[AI Config] Active config:', active);
+      logger.log('[AI Config] All configs:', allConfigs)
+      logger.log('[AI Config] Active config:', active)
 
-      setConfigs(allConfigs || []);
-      setActiveConfig(active);
-
-      // 如果有活跃配置，加载到表单
-      if (active && !isEditing) {
-        loadConfigToForm(active);
-      }
+      setConfigs(allConfigs || [])
+      setActiveConfig(active)
     } catch (error) {
-      logger.error('[AI Config] Failed to load configs:', error);
+      logger.error('[AI Config] Failed to load configs:', error)
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
-  // 加载配置到表单
-  const loadConfigToForm = (config: AIConfig) => {
-    logger.log('[AI Config] Loading config to form:', {
-      apiEndpoint: config.apiEndpoint,
-      modelName: config.modelName,
-      hasApiKey: !!config.apiKey,
-    });
+  useEffect(() => {
+    loadConfigs()
+  }, [])
 
-    setApiEndpoint(config.apiEndpoint || '');
-    setApiKey(config.apiKey || '');
-    setModelName(config.modelName || '');
-
-    // 检测 API 类型
-    if (config.apiEndpoint?.endsWith('/responses')) {
-      setApiType('responses');
-    } else if (config.apiEndpoint?.endsWith('/chat/completions')) {
-      setApiType('chat-completions');
-    } else {
-      setApiType('auto');
+  // 删除流程：完整在父页执行（list 不感知 aiService）
+  const handleDelete = async (config: AIConfig) => {
+    try {
+      await aiConfigQueries.delete(config.id)
+      await loadConfigs()
+      await aiService.loadConfig()
+      showNotification(t('settings.ai.deleteSuccess'), 'success')
+    } catch (error) {
+      logger.error('[AI Config] Delete failed:', error)
+      showNotification(t('settings.ai.deleteFailed'), 'error')
     }
+  }
 
-    logger.log('[AI Config] Form loaded successfully');
-  };
-
-  // 点击配置项
-  const handleConfigPress = (config: AIConfig) => {
-    logger.log('[AI Config] Config pressed:', config);
-    setEditingConfig(config);
-    loadConfigToForm(config);
-    setIsEditing(true);
-  };
+  // 点击配置项：进入编辑
+  const handleEdit = (config: AIConfig) => {
+    setEditingConfig(config)
+    setIsEditing(true)
+  }
 
   // 新增配置
   const handleAddNew = () => {
-    setEditingConfig(null);
-    setApiEndpoint('');
-    setApiKey('');
-    setModelName('');
-    setApiType('auto');
-    setIsEditing(true);
-  };
+    setEditingConfig(null)
+    setIsEditing(true)
+  }
+
+  // 保存完成（Form onSaved）：reload + 清空 editing
+  const handleSaved = async () => {
+    await loadConfigs()
+    await aiService.loadConfig()
+    setEditingConfig(null)
+    setIsEditing(false)
+  }
 
   // 取消编辑
   const handleCancel = () => {
-    setIsEditing(false);
-    setEditingConfig(null);
-    // 恢复活跃配置
-    if (activeConfig) {
-      loadConfigToForm(activeConfig);
-    }
-  };
+    setEditingConfig(null)
+    setIsEditing(false)
+  }
 
-  // 删除配置
-  const handleDelete = async (config: AIConfig) => {
-    const ok = await showConfirm({
-      title: t('common.confirm'),
-      message: t('settings.ai.deleteConfirm'),
-      type: 'danger',
-      confirmText: t('common.delete'),
-      cancelText: t('common.cancel'),
-    });
-    if (ok) {
-      try {
-        await aiConfigQueries.delete(config.id);
-        await loadConfigs();
-        await aiService.loadConfig();
-        showNotification(t('settings.ai.deleteSuccess'), 'success');
-      } catch (error) {
-        logger.error('[AI Config] Delete failed:', error);
-        showNotification(t('settings.ai.deleteFailed'), 'error');
-      }
-    }
-  };
+  // 是否在编辑模式（用独立 boolean state 避免 editingConfig=null 与 undefined 混淆）
+  const _isEditing = isEditing
 
-  // 保存配置
-  const handleSave = async () => {
-    if (!apiEndpoint.trim()) {
-      showNotification(t('settings.ai.endpointRequired'), 'error');
-      return;
-    }
-    if (!apiKey.trim()) {
-      showNotification(t('settings.ai.apiKeyRequired'), 'error');
-      return;
-    }
-    if (!modelName.trim()) {
-      showNotification(t('settings.ai.modelRequired'), 'error');
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      logger.log('[AI Config] Saving config...');
-
-      // 根据 API 类型处理端点
-      let finalEndpoint = apiEndpoint.trim();
-      if (apiType === 'responses' && !finalEndpoint.endsWith('/responses')) {
-        finalEndpoint = finalEndpoint.replace(/\/(chat\/completions)?$/, '') + '/responses';
-      } else if (apiType === 'chat-completions' && !finalEndpoint.endsWith('/chat/completions')) {
-        finalEndpoint = finalEndpoint.replace(/\/responses$/, '') + '/chat/completions';
-      }
-
-      logger.log('[AI Config] Final endpoint:', finalEndpoint);
-
-      if (editingConfig) {
-        // 更新现有配置
-        await aiConfigQueries.update(editingConfig.id, {
-          apiEndpoint: finalEndpoint,
-          apiKey: apiKey.trim(),
-          modelName: modelName.trim(),
-          isActive: true,
-        });
-      } else {
-        // 保存新配置
-        await aiConfigQueries.save({
-          apiEndpoint: finalEndpoint,
-          apiKey: apiKey.trim(),
-          modelName: modelName.trim(),
-        });
-      }
-
-      logger.log('[AI Config] Config saved successfully');
-
-      // 重新加载配置
-      await loadConfigs();
-      await aiService.loadConfig();
-
-      setIsEditing(false);
-      setEditingConfig(null);
-
-      showNotification(t('settings.ai.saveSuccess'), 'success');
-    } catch (error) {
-      logger.error('[AI Config] Save failed:', error);
-      showNotification(t('settings.ai.saveFailed'), 'error');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  // 测试连接
-  const handleTest = async () => {
-    try {
-      setIsTesting(true);
-      // P0.4：统一走 aiService.testConnection()（内部用 aiConnection 共享实现）
-      const result = await aiService.testConnection();
-      if (result.success) {
-        showNotification(t('settings.ai.testSuccess'), 'success');
-      } else {
-        showNotification(result.error || t('settings.ai.testFailed'), 'error');
-      }
-    } catch (error) {
-      showNotification(t('settings.ai.testFailed'), 'error');
-    } finally {
-      setIsTesting(false);
-    }
-  };
-
-  // 获取 API 类型显示名称
-  const getApiTypeName = (endpoint: string) => {
-    if (endpoint?.endsWith('/responses')) {
-      return 'Responses API';
-    } else if (endpoint?.endsWith('/chat/completions')) {
-      return 'Chat Completions';
-    }
-    return 'Auto';
-  };
-
-  // 隐藏 API Key
-  const maskApiKey = (key: string) => {
-    if (!key || key.length < 10) return '***';
-    return key.substring(0, 6) + '...' + key.substring(key.length - 4);
-  };
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container} edges={['bottom']}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <BackIcon size={24} color={theme.colors.text.primary} />
+          </TouchableOpacity>
+          <Text style={styles.title}>{t('settings.ai.title')}</Text>
+          <View style={styles.backButton} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary.main} />
+        </View>
+      </SafeAreaView>
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -247,163 +131,23 @@ export default function AIConfigScreen() {
         </TouchableOpacity>
         <Text style={styles.title}>{t('settings.ai.title')}</Text>
         {!isEditing && (
-          <TouchableOpacity onPress={handleAddNew} style={styles.addButton}>
+          <TouchableOpacity onPress={handleAddNew} style={styles.backButton}>
             <Icon name="add" size={24} color={theme.colors.primary.main} />
           </TouchableOpacity>
         )}
+        {isEditing && <View style={styles.backButton} />}
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {isEditing ? (
-          /* 编辑表单 */
-          <View style={styles.formCard}>
-            <Text style={styles.formTitle}>
-              {editingConfig ? t('settings.ai.editConfig') : t('settings.ai.addConfig')}
-            </Text>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('settings.ai.endpoint')}</Text>
-              <TextInput
-                style={styles.input}
-                value={apiEndpoint}
-                onChangeText={setApiEndpoint}
-                placeholder="https://api.openai.com/v1"
-                placeholderTextColor={theme.colors.text.tertiary}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              <Text style={styles.inputHint}>{t('settings.ai.endpointHint')}</Text>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('settings.ai.apiKey')}</Text>
-              <View style={styles.apiKeyContainer}>
-                <TextInput
-                  style={[styles.input, styles.apiKeyInput]}
-                  value={apiKey}
-                  onChangeText={setApiKey}
-                  placeholder="sk-..."
-                  placeholderTextColor={theme.colors.text.tertiary}
-                  secureTextEntry={!showApiKey}
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                />
-                <TouchableOpacity
-                  style={styles.showButton}
-                  onPress={() => setShowApiKey(!showApiKey)}
-                >
-                  <Icon
-                    name={showApiKey ? 'eye-off' : 'eye'}
-                    size={20}
-                    color={theme.colors.text.secondary}
-                  />
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.inputHint}>{t('settings.ai.apiKeyHint')}</Text>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('settings.ai.model')}</Text>
-              <TextInput
-                style={styles.input}
-                value={modelName}
-                onChangeText={setModelName}
-                placeholder="gpt-4o-mini"
-                placeholderTextColor={theme.colors.text.tertiary}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              <Text style={styles.inputHint}>{t('settings.ai.modelHint')}</Text>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>{t('settings.ai.apiType')}</Text>
-              <View style={styles.apiTypeContainer}>
-                <TouchableOpacity
-                  style={[
-                    styles.apiTypeButton,
-                    apiType === 'auto' && styles.apiTypeButtonActive,
-                  ]}
-                  onPress={() => setApiType('auto')}
-                >
-                  <Text
-                    style={[
-                      styles.apiTypeText,
-                      apiType === 'auto' && styles.apiTypeTextActive,
-                    ]}
-                  >
-                    {t('settings.ai.autoDetect')}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.apiTypeButton,
-                    apiType === 'chat-completions' && styles.apiTypeButtonActive,
-                  ]}
-                  onPress={() => setApiType('chat-completions')}
-                >
-                  <Text
-                    style={[
-                      styles.apiTypeText,
-                      apiType === 'chat-completions' && styles.apiTypeTextActive,
-                    ]}
-                  >
-                    {t('settings.ai.chatCompletions')}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.apiTypeButton,
-                    apiType === 'responses' && styles.apiTypeButtonActive,
-                  ]}
-                  onPress={() => setApiType('responses')}
-                >
-                  <Text
-                    style={[
-                      styles.apiTypeText,
-                      apiType === 'responses' && styles.apiTypeTextActive,
-                    ]}
-                  >
-                    {t('settings.ai.responses')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <Text style={styles.inputHint}>{t('settings.ai.apiTypeHint')}</Text>
-            </View>
-
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={[styles.button, styles.cancelButton]}
-                onPress={handleCancel}
-              >
-                <Text style={styles.cancelButtonText}>{t('common.cancel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, styles.testButton]}
-                onPress={handleTest}
-                disabled={isTesting}
-              >
-                {isTesting ? (
-                  <ActivityIndicator size="small" color={theme.colors.primary.main} />
-                ) : (
-                  <Text style={styles.testButtonText}>{t('settings.ai.testConnection')}</Text>
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.button, styles.saveButton]}
-                onPress={handleSave}
-                disabled={isSaving}
-              >
-                {isSaving ? (
-                  <ActivityIndicator size="small" color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.saveButtonText}>{t('common.save')}</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
+          /* 表单：编辑或新增 */
+          <AIConfigForm
+            initialConfig={editingConfig}
+            onSaved={handleSaved}
+            onCancel={handleCancel}
+          />
         ) : (
-          /* 配置列表 */
+          /* 列表：展示 + 空态 + 帮助 */
           <>
             {configs.length === 0 ? (
               <View style={styles.emptyCard}>
@@ -414,47 +158,12 @@ export default function AIConfigScreen() {
                 </TouchableOpacity>
               </View>
             ) : (
-              configs.map((config) => (
-                <TouchableOpacity
-                  key={config.id}
-                  style={[
-                    styles.configCard,
-                    activeConfig?.id === config.id && styles.configCardActive,
-                  ]}
-                  onPress={() => handleConfigPress(config)}
-                >
-                  <View style={styles.configHeader}>
-                    <View style={styles.configInfo}>
-                      <View style={styles.configTitleRow}>
-                        <Text style={styles.configModel}>{config.modelName}</Text>
-                        {activeConfig?.id === config.id && (
-                          <View style={styles.activeBadge}>
-                            <CheckIcon size={12} color={theme.colors.success} />
-                            <Text style={styles.activeText}>{t('settings.ai.active')}</Text>
-                          </View>
-                        )}
-                      </View>
-                      <Text style={styles.configEndpoint} numberOfLines={1}>
-                        {config.apiEndpoint}
-                      </Text>
-                      <Text style={styles.configKey}>
-                        API Key: {maskApiKey(config.apiKey)}
-                      </Text>
-                    </View>
-                    <View style={styles.configActions}>
-                      <Text style={styles.configType}>
-                        {getApiTypeName(config.apiEndpoint)}
-                      </Text>
-                      <TouchableOpacity
-                        style={styles.deleteButton}
-                        onPress={() => handleDelete(config)}
-                      >
-                        <DeleteIcon size={18} color={theme.colors.error} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              ))
+              <AIConfigList
+                configs={configs}
+                activeConfig={activeConfig}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             )}
 
             {/* 帮助信息 */}
@@ -483,7 +192,9 @@ export default function AIConfigScreen() {
                 </View>
                 <View style={styles.exampleItem}>
                   <Text style={styles.exampleLabel}>{t('settings.ai.volcengine')} Responses:</Text>
-                  <Text style={styles.exampleValue}>https://ark.cn-beijing.volces.com/api/v3/responses</Text>
+                  <Text style={styles.exampleValue}>
+                    https://ark.cn-beijing.volces.com/api/v3/responses
+                  </Text>
                 </View>
                 <View style={styles.exampleItem}>
                   <Text style={styles.exampleLabel}>{t('settings.ai.localModel')}:</Text>
@@ -495,7 +206,7 @@ export default function AIConfigScreen() {
         )}
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -522,89 +233,20 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.text.primary,
   },
-  addButton: {
-    width: 40,
-    height: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   content: {
     flex: 1,
     padding: theme.spacing.xl,
   },
-  // 配置列表样式
-  configCard: {
-    backgroundColor: theme.colors.background.primary,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.xl,
-    marginBottom: theme.spacing.md,
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-  configCardActive: {
-    borderColor: theme.colors.primary.main,
-  },
-  configHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  configInfo: {
+  loadingContainer: {
     flex: 1,
-    marginRight: theme.spacing.md,
-  },
-  configTitleRow: {
-    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.xs,
   },
-  configModel: {
-    fontSize: theme.fontSize.body,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text.primary,
-  },
-  activeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: theme.colors.success + '20',
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 2,
-    borderRadius: theme.borderRadius.full,
-  },
-  activeText: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.success,
-  },
-  configEndpoint: {
-    fontSize: theme.fontSize.bodySm,
-    color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.xs,
-  },
-  configKey: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.text.tertiary,
-  },
-  configActions: {
-    alignItems: 'flex-end',
-    gap: theme.spacing.sm,
-  },
-  configType: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.text.tertiary,
-    backgroundColor: theme.colors.background.secondary,
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 2,
-    borderRadius: theme.borderRadius.sm,
-  },
-  deleteButton: {
-    padding: theme.spacing.xs,
-  },
-  // 空状态样式
+  // 空状态
   emptyCard: {
     backgroundColor: theme.colors.background.primary,
     borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing['2xl'],
+    padding: theme.spacing.xl,
     alignItems: 'center',
     marginBottom: theme.spacing.xl,
   },
@@ -625,117 +267,7 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: '#FFFFFF',
   },
-  // 表单样式
-  formCard: {
-    backgroundColor: theme.colors.background.primary,
-    borderRadius: theme.borderRadius.lg,
-    padding: theme.spacing.xl,
-    marginBottom: theme.spacing.xl,
-  },
-  formTitle: {
-    fontSize: theme.fontSize.h3,
-    fontWeight: theme.fontWeight.semibold,
-    color: theme.colors.text.primary,
-    marginBottom: theme.spacing.xl,
-  },
-  inputGroup: {
-    marginBottom: theme.spacing.lg,
-  },
-  inputLabel: {
-    fontSize: theme.fontSize.body,
-    color: theme.colors.text.secondary,
-    marginBottom: theme.spacing.sm,
-  },
-  input: {
-    backgroundColor: theme.colors.background.secondary,
-    borderRadius: theme.borderRadius.base,
-    paddingHorizontal: theme.spacing.lg,
-    paddingVertical: theme.spacing.base,
-    fontSize: theme.fontSize.body,
-    color: theme.colors.text.primary,
-  },
-  inputHint: {
-    fontSize: theme.fontSize.caption,
-    color: theme.colors.text.tertiary,
-    marginTop: theme.spacing.xs,
-  },
-  apiKeyContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  apiKeyInput: {
-    flex: 1,
-    marginRight: theme.spacing.sm,
-  },
-  showButton: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.background.secondary,
-    borderRadius: theme.borderRadius.base,
-  },
-  apiTypeContainer: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-  },
-  apiTypeButton: {
-    flex: 1,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.base,
-    borderRadius: theme.borderRadius.base,
-    backgroundColor: theme.colors.background.secondary,
-    alignItems: 'center',
-  },
-  apiTypeButtonActive: {
-    backgroundColor: theme.colors.primary.main,
-  },
-  apiTypeText: {
-    fontSize: theme.fontSize.bodySm,
-    color: theme.colors.text.secondary,
-  },
-  apiTypeTextActive: {
-    color: '#FFFFFF',
-    fontWeight: theme.fontWeight.medium,
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
-  },
-  button: {
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.lg,
-    borderRadius: theme.borderRadius.base,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  cancelButton: {
-    backgroundColor: theme.colors.background.secondary,
-  },
-  cancelButtonText: {
-    fontSize: theme.fontSize.body,
-    color: theme.colors.text.secondary,
-  },
-  testButton: {
-    backgroundColor: theme.colors.background.secondary,
-    borderWidth: 1,
-    borderColor: theme.colors.primary.main,
-  },
-  testButtonText: {
-    fontSize: theme.fontSize.body,
-    color: theme.colors.primary.main,
-  },
-  saveButton: {
-    backgroundColor: theme.colors.primary.main,
-  },
-  saveButtonText: {
-    fontSize: theme.fontSize.body,
-    color: '#FFFFFF',
-    fontWeight: theme.fontWeight.medium,
-  },
-  // 帮助信息样式
+  // 帮助信息
   helpCard: {
     backgroundColor: theme.colors.background.primary,
     borderRadius: theme.borderRadius.lg,
@@ -784,4 +316,4 @@ const styles = StyleSheet.create({
     color: theme.colors.primary.main,
     flex: 1,
   },
-});
+})

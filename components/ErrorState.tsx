@@ -1,25 +1,20 @@
 // components/ErrorState.tsx
 // 错误状态组件
 
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '@/constants/theme';
-import { AnimatedButton } from './AnimatedButton';
-import { Icon } from '@/components/icons';
+import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import { theme } from '@/constants/theme'
+import { AnimatedButton } from './AnimatedButton'
+import { Icon } from '@/components/icons'
 
 interface ErrorStateProps {
-  title?: string;
-  message?: string;
-  retryTitle?: string;
-  onRetry?: () => void;
+  title?: string
+  message?: string
+  retryTitle?: string
+  onRetry?: () => void
 }
 
-export function ErrorState({
-  title,
-  message,
-  retryTitle,
-  onRetry,
-}: ErrorStateProps) {
+export function ErrorState({ title, message, retryTitle, onRetry }: ErrorStateProps) {
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
@@ -37,7 +32,7 @@ export function ErrorState({
         />
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -67,4 +62,4 @@ const styles = StyleSheet.create({
   button: {
     minWidth: 120,
   },
-});
+})

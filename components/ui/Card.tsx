@@ -1,21 +1,16 @@
 // components/ui/Card.tsx
 // 卡片组件
 
-import React from 'react';
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  ViewStyle,
-} from 'react-native';
-import { theme } from '@/constants/theme';
+import React from 'react'
+import { View, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native'
+import { theme } from '@/constants/theme'
 
 interface CardProps {
-  children: React.ReactNode;
-  onPress?: () => void;
-  style?: ViewStyle;
-  padding?: 'none' | 'sm' | 'md' | 'lg';
-  shadow?: 'none' | 'sm' | 'md' | 'lg';
+  children: React.ReactNode
+  onPress?: () => void
+  style?: ViewStyle
+  padding?: 'none' | 'sm' | 'md' | 'lg'
+  shadow?: 'none' | 'sm' | 'md' | 'lg'
 }
 
 /**
@@ -39,14 +34,8 @@ interface CardProps {
  * </Card>
  * ```
  */
-export function Card({
-  children,
-  onPress,
-  style,
-  padding = 'md',
-  shadow = 'sm',
-}: CardProps) {
-  const Container = onPress ? TouchableOpacity : View;
+export function Card({ children, onPress, style, padding = 'md', shadow = 'sm' }: CardProps) {
+  const Container = onPress ? TouchableOpacity : View
 
   return (
     <Container
@@ -61,7 +50,7 @@ export function Card({
     >
       {children}
     </Container>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -92,4 +81,4 @@ const styles = StyleSheet.create({
   shadow_lg: {
     ...theme.shadow.lg,
   },
-});
+})

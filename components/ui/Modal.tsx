@@ -1,7 +1,7 @@
 // components/ui/Modal.tsx
 // 弹窗组件
 
-import React from 'react';
+import React from 'react'
 import {
   View,
   Text,
@@ -10,32 +10,32 @@ import {
   StyleSheet,
   Dimensions,
   ViewStyle,
-} from 'react-native';
-import { theme } from '@/constants/theme';
-import { Button } from './Button';
-import { CloseIcon } from '@/components/icons';
+} from 'react-native'
+import { theme } from '@/constants/theme'
+import { Button } from './Button'
+import { CloseIcon } from '@/components/icons'
 
-type ModalType = 'alert' | 'bottom';
+type ModalType = 'alert' | 'bottom'
 
 interface ModalProps {
-  visible: boolean;
-  onClose: () => void;
-  type?: ModalType;
-  title?: string;
-  children?: React.ReactNode;
-  showClose?: boolean;
-  style?: ViewStyle;
+  visible: boolean
+  onClose: () => void
+  type?: ModalType
+  title?: string
+  children?: React.ReactNode
+  showClose?: boolean
+  style?: ViewStyle
 }
 
 interface ConfirmModalProps {
-  visible: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-  title: string;
-  message: string;
-  confirmText?: string;
-  cancelText?: string;
-  confirmVariant?: 'primary' | 'ghost' | 'danger';
+  visible: boolean
+  onClose: () => void
+  onConfirm: () => void
+  title: string
+  message: string
+  confirmText?: string
+  cancelText?: string
+  confirmVariant?: 'primary' | 'ghost' | 'danger'
 }
 
 /**
@@ -79,17 +79,10 @@ export function Modal({
       animationType={type === 'bottom' ? 'slide' : 'fade'}
       onRequestClose={onClose}
     >
-      <TouchableOpacity
-        style={styles.overlay}
-        activeOpacity={1}
-        onPress={onClose}
-      >
+      <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={onClose}>
         <TouchableOpacity
           activeOpacity={1}
-          style={[
-            type === 'alert' ? styles.alertContainer : styles.bottomContainer,
-            style,
-          ]}
+          style={[type === 'alert' ? styles.alertContainer : styles.bottomContainer, style]}
           onPress={(e) => e.stopPropagation()}
         >
           {/* 标题栏 */}
@@ -109,7 +102,7 @@ export function Modal({
         </TouchableOpacity>
       </TouchableOpacity>
     </RNModal>
-  );
+  )
 }
 
 /**
@@ -139,12 +132,7 @@ export function ConfirmModal({
   confirmVariant = 'primary',
 }: ConfirmModalProps) {
   return (
-    <Modal
-      visible={visible}
-      onClose={onClose}
-      type="alert"
-      showClose={false}
-    >
+    <Modal visible={visible} onClose={onClose} type="alert" showClose={false}>
       <Text style={styles.confirmTitle}>{title}</Text>
       <Text style={styles.confirmMessage}>{message}</Text>
 
@@ -159,8 +147,8 @@ export function ConfirmModal({
         <Button
           title={confirmText}
           onPress={() => {
-            onConfirm();
-            onClose();
+            onConfirm()
+            onClose()
           }}
           variant={confirmVariant}
           size="md"
@@ -168,10 +156,10 @@ export function ConfirmModal({
         />
       </View>
     </Modal>
-  );
+  )
 }
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window')
 
 const styles = StyleSheet.create({
   overlay: {
@@ -240,4 +228,4 @@ const styles = StyleSheet.create({
   confirmButton: {
     minWidth: 80,
   },
-});
+})

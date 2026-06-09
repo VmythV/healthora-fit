@@ -4,141 +4,171 @@
 // - 列表滚到顶继续下拉 → 月历展开
 // - 完全使用 Reanimated 4 + GestureHandler v2，Fabric 兼容
 
-import { logger } from '@/utils/logger';
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import Animated from 'react-native-reanimated';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useDietRecords } from '@/hooks/useDietRecords';
-import { useExerciseRecords } from '@/hooks/useExerciseRecords';
-import { useWeekStartDay } from '@/hooks/useWeekStartDay';
-import { dietQueries } from '@/database/queries/diet';
-import { exerciseQueries } from '@/database/queries/exercise';
-import { CollapsibleCalendar } from '@/components/calendar/CollapsibleCalendar';
-import { TimelineItem, TimelineItemData } from '@/components/calendar/TimelineItem';
-import { DaySummary } from '@/components/calendar/DaySummary';
-import { Modal } from '@/components/ui';
-import { DietRecordDetail } from '@/components/diet/DietRecordDetail';
-import { ExerciseRecordDetail } from '@/components/exercise/ExerciseRecordDetail';
-import { Icon } from '@/components/icons';
-import type { DietRecord } from '@/types/diet';
-import type { ExerciseRecord } from '@/types/exercise';
-import type { IconName } from '@/components/icons/Icon';
+import { logger } from '@/utils/logger'
+import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
+import Animated from 'react-native-reanimated'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useDietRecords } from '@/hooks/useDietRecords'
+import { useExerciseRecords } from '@/hooks/useExerciseRecords'
+import { useWeekStartDay } from '@/hooks/useWeekStartDay'
+import { dietQueries } from '@/database/queries/diet'
+import { exerciseQueries } from '@/database/queries/exercise'
+import { CollapsibleCalendar } from '@/components/calendar/CollapsibleCalendar'
+import { TimelineItem, TimelineItemData } from '@/components/calendar/TimelineItem'
+import { DaySummary } from '@/components/calendar/DaySummary'
+import { Modal } from '@/components/ui'
+import { DietRecordDetail } from '@/components/diet/DietRecordDetail'
+import { ExerciseRecordDetail } from '@/components/exercise/ExerciseRecordDetail'
+import { Icon } from '@/components/icons'
+import type { DietRecord } from '@/types/diet'
+import type { ExerciseRecord } from '@/types/exercise'
+import type { IconName } from '@/components/icons/Icon'
 
-const AnimatedFlatList = Animated.FlatList;
+const AnimatedFlatList = Animated.FlatList
 
 const RECORD_ICONS: Record<string, IconName> = {
   diet: 'bowl',
   exercise: 'running',
-};
+}
 
-const WEEKDAYS_ZH = ['日', '一', '二', '三', '四', '五', '六'];
-const WEEKDAYS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const MONTHS_ZH = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
-const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const WEEKDAYS_ZH = ['日', '一', '二', '三', '四', '五', '六']
+const WEEKDAYS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+const MONTHS_ZH = [
+  '1月',
+  '2月',
+  '3月',
+  '4月',
+  '5月',
+  '6月',
+  '7月',
+  '8月',
+  '9月',
+  '10月',
+  '11月',
+  '12月',
+]
+const MONTHS_EN = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+]
 
 export default function CalendarScreen() {
-  const { t, locale } = useI18n();
-  const { weekStartDay } = useWeekStartDay();
-  const router = useRouter();
+  const { t, locale } = useI18n()
+  const { weekStartDay } = useWeekStartDay()
+  const router = useRouter()
 
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const today = new Date()
+  const todayStr = today.toISOString().split('T')[0]
 
-  const [selectedDate, setSelectedDate] = useState(todayStr);
-  const [monthMarked, setMonthMarked] = useState<Set<string>>(new Set());
-  const [selectedItem, setSelectedItem] = useState<TimelineItemData | null>(null);
+  const [selectedDate, setSelectedDate] = useState(todayStr)
+  const [monthMarked, setMonthMarked] = useState<Set<string>>(new Set())
+  const [selectedItem, setSelectedItem] = useState<TimelineItemData | null>(null)
 
-  const { records: dietRecords } = useDietRecords(selectedDate);
-  const { records: exerciseRecords } = useExerciseRecords(selectedDate);
+  const { records: dietRecords } = useDietRecords(selectedDate)
+  const { records: exerciseRecords } = useExerciseRecords(selectedDate)
 
   // 加载某月标记日期
   // P0.5 加固：函数式更新里直接创建新 Set（不基于 prev 合并），
   // 保证跨月切换时历史月份一定被丢弃，set 只含当月 prefix 的日期。
   const loadMarkedDates = useCallback(async (year: number, month0: number) => {
     try {
-      const prefix = `${year}-${String(month0 + 1).padStart(2, '0')}-`;
-      const ms = `${prefix}01`;
-      const last = new Date(year, month0 + 1, 0).getDate();
-      const me = `${prefix}${String(last).padStart(2, '0')}`;
+      const prefix = `${year}-${String(month0 + 1).padStart(2, '0')}-`
+      const ms = `${prefix}01`
+      const last = new Date(year, month0 + 1, 0).getDate()
+      const me = `${prefix}${String(last).padStart(2, '0')}`
       const [dd, ed] = await Promise.all([
         dietQueries.getDatesWithRecords(ms, me),
         exerciseQueries.getDatesWithRecords(ms, me),
-      ]);
+      ])
       setMonthMarked(() => {
-        const next = new Set<string>();
+        const next = new Set<string>()
         // 防御性过滤：只接受当月 prefix 的日期，避免 SQL 查询返回意外数据
         dd.forEach((d) => {
-          if (d.startsWith(prefix)) next.add(d);
-        });
+          if (d.startsWith(prefix)) next.add(d)
+        })
         ed.forEach((d) => {
-          if (d.startsWith(prefix)) next.add(d);
-        });
-        return next;
-      });
+          if (d.startsWith(prefix)) next.add(d)
+        })
+        return next
+      })
     } catch (err) {
-      logger.error('[Calendar] 加载标记失败:', err);
+      logger.error('[Calendar] 加载标记失败:', err)
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
-    loadMarkedDates(today.getFullYear(), today.getMonth());
-  }, []);
+    loadMarkedDates(today.getFullYear(), today.getMonth())
+  }, [])
 
   const handleMonthChange = useCallback(
     (y: number, m0: number) => {
-      loadMarkedDates(y, m0);
+      loadMarkedDates(y, m0)
     },
     [loadMarkedDates]
-  );
+  )
 
   // ---------- 时间线数据 ----------
   const buildDietFields = useCallback(
     (record: DietRecord): { subtitle?: string; meta?: string } => {
-      let subtitle: string | undefined;
+      let subtitle: string | undefined
       if (record.foodsJson) {
         try {
-          const foods = JSON.parse(record.foodsJson);
+          const foods = JSON.parse(record.foodsJson)
           if (Array.isArray(foods) && foods.length > 0) {
-            subtitle = foods.slice(0, 3).map((f: any) => f.name).filter(Boolean).join('、');
+            subtitle = foods
+              .slice(0, 3)
+              .map((f: any) => f.name)
+              .filter(Boolean)
+              .join('、')
           }
         } catch {}
       }
-      const metaParts: string[] = [];
-      if (record.totalCalories) metaParts.push(`${record.totalCalories} ${t('home.kcal')}`);
-      if (record.totalProtein) metaParts.push(`${t('diet.protein')} ${record.totalProtein}g`);
-      return { subtitle, meta: metaParts.join(' · ') || undefined };
+      const metaParts: string[] = []
+      if (record.totalCalories) metaParts.push(`${record.totalCalories} ${t('home.kcal')}`)
+      if (record.totalProtein) metaParts.push(`${t('diet.protein')} ${record.totalProtein}g`)
+      return { subtitle, meta: metaParts.join(' · ') || undefined }
     },
     [t]
-  );
+  )
 
   const buildExerciseFields = useCallback(
     (record: ExerciseRecord): { subtitle?: string; meta?: string } => {
-      const subParts: string[] = [];
-      if (record.durationMinutes) subParts.push(`${record.durationMinutes} ${t('home.minutes')}`);
-      if (record.distanceKm) subParts.push(`${record.distanceKm} ${t('exercise.km')}`);
-      let meta: string | undefined;
+      const subParts: string[] = []
+      if (record.durationMinutes) subParts.push(`${record.durationMinutes} ${t('home.minutes')}`)
+      if (record.distanceKm) subParts.push(`${record.distanceKm} ${t('exercise.km')}`)
+      let meta: string | undefined
       if (record.caloriesBurned) {
-        meta = `${t('exercise.caloriesBurned')} ${record.caloriesBurned} ${t('home.kcal')}`;
+        meta = `${t('exercise.caloriesBurned')} ${record.caloriesBurned} ${t('home.kcal')}`
       }
-      return { subtitle: subParts.join(' · ') || undefined, meta };
+      return { subtitle: subParts.join(' · ') || undefined, meta }
     },
     [t]
-  );
+  )
 
   const formatTimeLabel = (timestamp: string): string => {
-    const d = new Date(timestamp);
-    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  };
+    const d = new Date(timestamp)
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  }
 
   const timelineItems = useMemo<TimelineItemData[]>(() => {
-    const items: TimelineItemData[] = [];
+    const items: TimelineItemData[] = []
     dietRecords.forEach((record) => {
-      const mealName = record.mealType ? t(`mealType.${record.mealType}`) : t('record.diet.title');
-      const { subtitle, meta } = buildDietFields(record);
+      const mealName = record.mealType ? t(`mealType.${record.mealType}`) : t('record.diet.title')
+      const { subtitle, meta } = buildDietFields(record)
       items.push({
         id: `diet-${record.id}`,
         type: 'diet',
@@ -150,11 +180,11 @@ export default function CalendarScreen() {
         note: record.note || undefined,
         iconName: RECORD_ICONS.diet,
         record,
-      });
-    });
+      })
+    })
     exerciseRecords.forEach((record) => {
-      const typeName = t(`exerciseType.${record.exerciseType}`);
-      const { subtitle, meta } = buildExerciseFields(record);
+      const typeName = t(`exerciseType.${record.exerciseType}`)
+      const { subtitle, meta } = buildExerciseFields(record)
       items.push({
         id: `exercise-${record.id}`,
         type: 'exercise',
@@ -166,11 +196,11 @@ export default function CalendarScreen() {
         note: record.note || undefined,
         iconName: RECORD_ICONS.exercise,
         record,
-      });
-    });
-    items.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
-    return items;
-  }, [dietRecords, exerciseRecords, buildDietFields, buildExerciseFields, t]);
+      })
+    })
+    items.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime())
+    return items
+  }, [dietRecords, exerciseRecords, buildDietFields, buildExerciseFields, t])
 
   // FlatList renderItem
   // P1-8 修正：依赖改 [timelineItems] 而非 [timelineItems.length]
@@ -185,11 +215,11 @@ export default function CalendarScreen() {
       />
     ),
     [timelineItems, setSelectedItem]
-  );
+  )
 
-  const keyExtractor = useCallback((item: TimelineItemData) => item.id, []);
+  const keyExtractor = useCallback((item: TimelineItemData) => item.id, [])
 
-  const ListHeader = useMemo(() => <DaySummary date={selectedDate} />, [selectedDate]);
+  const ListHeader = useMemo(() => <DaySummary date={selectedDate} />, [selectedDate])
 
   const ListEmpty = useMemo(
     () => (
@@ -209,10 +239,10 @@ export default function CalendarScreen() {
       </View>
     ),
     [t, router]
-  );
+  )
 
-  const monthNames = locale === 'zh-CN' ? MONTHS_ZH : MONTHS_EN;
-  const weekDayNames = locale === 'zh-CN' ? WEEKDAYS_ZH : WEEKDAYS_EN;
+  const monthNames = locale === 'zh-CN' ? MONTHS_ZH : MONTHS_EN
+  const weekDayNames = locale === 'zh-CN' ? WEEKDAYS_ZH : WEEKDAYS_EN
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -257,9 +287,7 @@ export default function CalendarScreen() {
         onClose={() => setSelectedItem(null)}
         type="bottom"
         title={
-          selectedItem?.type === 'diet'
-            ? t('timeline.dietDetail')
-            : t('timeline.exerciseDetail')
+          selectedItem?.type === 'diet' ? t('timeline.dietDetail') : t('timeline.exerciseDetail')
         }
       >
         <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
@@ -277,7 +305,7 @@ export default function CalendarScreen() {
         </ScrollView>
       </Modal>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -340,4 +368,4 @@ const styles = StyleSheet.create({
   modalContent: {
     maxHeight: 400,
   },
-});
+})

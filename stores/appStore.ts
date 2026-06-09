@@ -2,29 +2,26 @@
 // 应用全局状态
 //
 // P1-13：删除 locale 字段和 setLocale action（死代码 + 与 P1-13 i18n useSyncExternalStore 重叠）
+// P3-50：删除 theme 字段和 setTheme action（darkTheme 是死代码，theme 字段 0 消费方）
 // 已有 grep 验证 useAppStore 0 消费方，删除安全。
 
-import { create } from 'zustand';
+import { create } from 'zustand'
 
 interface AppState {
   // 加载状态
-  isLoading: boolean;
-  loadingMessage: string | null;
+  isLoading: boolean
+  loadingMessage: string | null
 
   // 当前 Tab
-  currentTab: string;
-
-  // 主题
-  theme: 'light' | 'dark' | 'system';
+  currentTab: string
 
   // 首次启动
-  isFirstLaunch: boolean;
+  isFirstLaunch: boolean
 
   // Actions
-  setLoading: (isLoading: boolean, message?: string) => void;
-  setCurrentTab: (tab: string) => void;
-  setTheme: (theme: 'light' | 'dark' | 'system') => void;
-  setFirstLaunch: (isFirst: boolean) => void;
+  setLoading: (isLoading: boolean, message?: string) => void
+  setCurrentTab: (tab: string) => void
+  setFirstLaunch: (isFirst: boolean) => void
 }
 
 /**
@@ -35,19 +32,12 @@ export const useAppStore = create<AppState>((set) => ({
   isLoading: false,
   loadingMessage: null,
   currentTab: 'home',
-  theme: 'system',
   isFirstLaunch: true,
 
   // Actions
-  setLoading: (isLoading, message = null) =>
-    set({ isLoading, loadingMessage: message }),
+  setLoading: (isLoading, message = null) => set({ isLoading, loadingMessage: message }),
 
-  setCurrentTab: (currentTab) =>
-    set({ currentTab }),
+  setCurrentTab: (currentTab) => set({ currentTab }),
 
-  setTheme: (theme) =>
-    set({ theme }),
-
-  setFirstLaunch: (isFirstLaunch) =>
-    set({ isFirstLaunch }),
-}));
+  setFirstLaunch: (isFirstLaunch) => set({ isFirstLaunch }),
+}))

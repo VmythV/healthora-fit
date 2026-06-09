@@ -3,64 +3,57 @@
 //
 // P3-44：原 RN Image → expo-image
 
-import { logger } from '@/utils/logger';
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
-import { Image } from 'expo-image';
-import * as ImagePicker from 'expo-image-picker';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { Card } from '@/components/ui';
-import { Icon } from '@/components/icons';
-import { ExerciseAnalysisResult } from '@/types/exercise';
-import { exerciseAnalysisService } from '@/services/exerciseAnalysis';
-import { aiService } from '@/services/ai';
-import { showNotification, showConfirm } from '@/components/ui';
+import { logger } from '@/utils/logger'
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { Image } from 'expo-image'
+import * as ImagePicker from 'expo-image-picker'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { Card } from '@/components/ui'
+import { Icon } from '@/components/icons'
+import { ExerciseAnalysisResult } from '@/types/exercise'
+import { exerciseAnalysisService } from '@/services/exerciseAnalysis'
+import { aiService } from '@/services/ai'
+import { showNotification } from '@/components/ui'
 
 interface ScreenshotPickerProps {
-  onAnalysisComplete: (result: ExerciseAnalysisResult, imageUri: string) => void;
-  onError?: (error: string) => void;
+  onAnalysisComplete: (result: ExerciseAnalysisResult, imageUri: string) => void
+  onError?: (error: string) => void
 }
 
 /**
  * 运动截图选择组件
  */
 export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPickerProps) {
-  const { t } = useI18n();
-  const [imageUri, setImageUri] = useState<string | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { t } = useI18n()
+  const [imageUri, setImageUri] = useState<string | null>(null)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // 组件挂载时加载 AI 配置
   useEffect(() => {
-    loadAiConfig();
-  }, []);
+    loadAiConfig()
+  }, [])
 
   // 加载 AI 配置
   const loadAiConfig = async () => {
     try {
-      logger.log('[AI] ScreenshotPicker - 组件挂载，加载配置...');
-      await aiService.loadConfig();
+      logger.log('[AI] ScreenshotPicker - 组件挂载，加载配置...')
+      await aiService.loadConfig()
     } catch (err) {
-      logger.error('[AI] ScreenshotPicker - 加载配置失败:', err);
+      logger.error('[AI] ScreenshotPicker - 加载配置失败:', err)
     }
-  };
+  }
 
   // 选择图片
   const pickImage = async () => {
     try {
       // 请求权限
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
       if (status !== 'granted') {
-        showNotification(t('exercise.permissionRequired'), 'error');
-        return;
+        showNotification(t('exercise.permissionRequired'), 'error')
+        return
       }
 
       // 选择图片
@@ -69,28 +62,28 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1.0,
-      });
+      })
 
       if (!result.canceled && result.assets[0]) {
-        const uri = result.assets[0].uri;
-        setImageUri(uri);
-        setError(null);
-        analyzeImage(uri);
+        const uri = result.assets[0].uri
+        setImageUri(uri)
+        setError(null)
+        analyzeImage(uri)
       }
     } catch (err) {
-      logger.error('[AI] 选择图片失败:', err);
-      showNotification(t('exercise.imagePickFailed'), 'error');
+      logger.error('[AI] 选择图片失败:', err)
+      showNotification(t('exercise.imagePickFailed'), 'error')
     }
-  };
+  }
 
   // 拍照
   const takePhoto = async () => {
     try {
       // 请求权限
-      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      const { status } = await ImagePicker.requestCameraPermissionsAsync()
       if (status !== 'granted') {
-        showNotification(t('exercise.permissionRequired'), 'error');
-        return;
+        showNotification(t('exercise.permissionRequired'), 'error')
+        return
       }
 
       // 拍照
@@ -98,56 +91,56 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1.0,
-      });
+      })
 
       if (!result.canceled && result.assets[0]) {
-        const uri = result.assets[0].uri;
-        setImageUri(uri);
-        setError(null);
-        analyzeImage(uri);
+        const uri = result.assets[0].uri
+        setImageUri(uri)
+        setError(null)
+        analyzeImage(uri)
       }
     } catch (err) {
-      logger.error('[AI] 拍照失败:', err);
-      showNotification(t('exercise.cameraFailed'), 'error');
+      logger.error('[AI] 拍照失败:', err)
+      showNotification(t('exercise.cameraFailed'), 'error')
     }
-  };
+  }
 
   // 分析图片
   const analyzeImage = async (uri: string) => {
-    logger.log('[AI] ScreenshotPicker - 开始分析:', uri);
-    setAnalyzing(true);
-    setError(null);
+    logger.log('[AI] ScreenshotPicker - 开始分析:', uri)
+    setAnalyzing(true)
+    setError(null)
 
     try {
       // 确保 AI 配置已加载
       if (!aiService.isConfigured()) {
-        logger.log('[AI] ScreenshotPicker - 配置未缓存，尝试加载...');
-        await aiService.loadConfig();
+        logger.log('[AI] ScreenshotPicker - 配置未缓存，尝试加载...')
+        await aiService.loadConfig()
       }
 
       if (!aiService.isConfigured()) {
-        logger.warn('[AI] ScreenshotPicker - 配置不可用');
-        throw new Error(t('exercise.aiNotConfigured'));
+        logger.warn('[AI] ScreenshotPicker - 配置不可用')
+        throw new Error(t('exercise.aiNotConfigured'))
       }
 
-      const result = await exerciseAnalysisService.analyzeScreenshot(uri);
-      logger.log('[AI] ScreenshotPicker - 分析完成:', JSON.stringify(result));
-      onAnalysisComplete(result, uri);
+      const result = await exerciseAnalysisService.analyzeScreenshot(uri)
+      logger.log('[AI] ScreenshotPicker - 分析完成:', JSON.stringify(result))
+      onAnalysisComplete(result, uri)
     } catch (err) {
-      const message = err instanceof Error ? err.message : t('exercise.analysisFailed');
-      logger.error('[AI] ScreenshotPicker - 分析失败:', err);
-      setError(message);
-      onError?.(message);
+      const message = err instanceof Error ? err.message : t('exercise.analysisFailed')
+      logger.error('[AI] ScreenshotPicker - 分析失败:', err)
+      setError(message)
+      onError?.(message)
     } finally {
-      setAnalyzing(false);
+      setAnalyzing(false)
     }
-  };
+  }
 
   // 清除图片
   const clearImage = () => {
-    setImageUri(null);
-    setError(null);
-  };
+    setImageUri(null)
+    setError(null)
+  }
 
   return (
     <Card style={styles.container}>
@@ -202,7 +195,7 @@ export function ScreenshotPicker({ onAnalysisComplete, onError }: ScreenshotPick
         </TouchableOpacity>
       </View>
     </Card>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -306,4 +299,4 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: '#FFFFFF',
   },
-});
+})

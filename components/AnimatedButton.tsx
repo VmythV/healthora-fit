@@ -1,7 +1,7 @@
 // components/AnimatedButton.tsx
 // 动画按钮组件
 
-import React, { useRef } from 'react';
+import React, { useRef } from 'react'
 import {
   TouchableOpacity,
   Text,
@@ -10,19 +10,19 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
-} from 'react-native';
-import { theme } from '@/constants/theme';
+} from 'react-native'
+import { theme } from '@/constants/theme'
 
 interface AnimatedButtonProps {
-  title: string;
-  onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'ghost';
-  size?: 'small' | 'medium' | 'large';
-  loading?: boolean;
-  disabled?: boolean;
-  icon?: React.ReactNode;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
+  title: string
+  onPress: () => void
+  variant?: 'primary' | 'secondary' | 'ghost'
+  size?: 'small' | 'medium' | 'large'
+  loading?: boolean
+  disabled?: boolean
+  icon?: React.ReactNode
+  style?: ViewStyle
+  textStyle?: TextStyle
 }
 
 export function AnimatedButton({
@@ -36,65 +36,65 @@ export function AnimatedButton({
   style,
   textStyle,
 }: AnimatedButtonProps) {
-  const scaleValue = useRef(new Animated.Value(1)).current;
+  const scaleValue = useRef(new Animated.Value(1)).current
 
   const handlePressIn = () => {
     Animated.spring(scaleValue, {
       toValue: 0.95,
       useNativeDriver: true,
-    }).start();
-  };
+    }).start()
+  }
 
   const handlePressOut = () => {
     Animated.spring(scaleValue, {
       toValue: 1,
       useNativeDriver: true,
-    }).start();
-  };
+    }).start()
+  }
 
   const getVariantStyle = (): ViewStyle => {
     switch (variant) {
       case 'primary':
-        return styles.primaryButton;
+        return styles.primaryButton
       case 'secondary':
-        return styles.secondaryButton;
+        return styles.secondaryButton
       case 'ghost':
-        return styles.ghostButton;
+        return styles.ghostButton
     }
-  };
+  }
 
   const getVariantTextStyle = (): TextStyle => {
     switch (variant) {
       case 'primary':
-        return styles.primaryText;
+        return styles.primaryText
       case 'secondary':
-        return styles.secondaryText;
+        return styles.secondaryText
       case 'ghost':
-        return styles.ghostText;
+        return styles.ghostText
     }
-  };
+  }
 
   const getSizeStyle = (): ViewStyle => {
     switch (size) {
       case 'small':
-        return styles.smallButton;
+        return styles.smallButton
       case 'medium':
-        return styles.mediumButton;
+        return styles.mediumButton
       case 'large':
-        return styles.largeButton;
+        return styles.largeButton
     }
-  };
+  }
 
   const getSizeTextStyle = (): TextStyle => {
     switch (size) {
       case 'small':
-        return styles.smallText;
+        return styles.smallText
       case 'medium':
-        return styles.mediumText;
+        return styles.mediumText
       case 'large':
-        return styles.largeText;
+        return styles.largeText
     }
-  };
+  }
 
   return (
     <TouchableOpacity
@@ -137,7 +137,7 @@ export function AnimatedButton({
         )}
       </Animated.View>
     </TouchableOpacity>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -198,4 +198,4 @@ const styles = StyleSheet.create({
   largeText: {
     fontSize: theme.fontSize.bodyLg,
   },
-});
+})

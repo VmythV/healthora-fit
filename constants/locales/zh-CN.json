@@ -381,7 +381,12 @@
     "aiFailed": "AI 识别失败，请重试或手动输入",
     "saveFailed": "保存失败，请重试",
     "loadFailed": "加载失败，请下拉刷新",
-    "permission": "需要权限才能使用此功能"
+    "permission": "需要权限才能使用此功能",
+    "dbInitFailed": "数据库初始化失败"
+  },
+  "app": {
+    "initializing": "正在初始化...",
+    "initFailed": "初始化失败"
   },
   "confirm": {
     "delete": {

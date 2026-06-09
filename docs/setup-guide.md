@@ -7,16 +7,16 @@
 
 ## 📋 软件清单总览
 
-| 软件 | 版本要求 | 用途 | 必装 |
-|------|---------|------|------|
-| Node.js | 18.x 或 20.x | JavaScript 运行时 | ✅ |
-| npm / yarn / pnpm | 最新版 | 包管理器 | ✅ |
-| Git | 最新版 | 版本控制 | ✅ |
-| VS Code | 最新版 | 代码编辑器 | 推荐 |
-| Android Studio | 最新版 | Android 开发 | ✅ |
-| Xcode | 15+ | iOS 开发 | ✅（macOS） |
-| npx expo | 内置 | Expo 开发工具 | ✅ |
-| Expo Go App | 最新版 | 真机调试 | 推荐 |
+| 软件              | 版本要求     | 用途              | 必装        |
+| ----------------- | ------------ | ----------------- | ----------- |
+| Node.js           | 18.x 或 20.x | JavaScript 运行时 | ✅          |
+| npm / yarn / pnpm | 最新版       | 包管理器          | ✅          |
+| Git               | 最新版       | 版本控制          | ✅          |
+| VS Code           | 最新版       | 代码编辑器        | 推荐        |
+| Android Studio    | 最新版       | Android 开发      | ✅          |
+| Xcode             | 15+          | iOS 开发          | ✅（macOS） |
+| npx expo          | 内置         | Expo 开发工具     | ✅          |
+| Expo Go App       | 最新版       | 真机调试          | 推荐        |
 
 ---
 
@@ -463,30 +463,30 @@ sudo gem install cocoapods
 
 ### 核心依赖
 
-| 包名 | 用途 |
-|------|------|
-| expo | Expo 核心框架 |
-| expo-router | 文件系统路由 |
-| expo-sqlite | SQLite 数据库 |
-| expo-camera | 相机功能 |
-| expo-image-picker | 图片选择 |
-| expo-file-system | 文件系统操作 |
-| expo-linear-gradient | 渐变效果 |
-| react-native-reanimated | 动画库 |
-| react-native-gesture-handler | 手势处理 |
-| react-native-safe-area-context | 安全区域 |
-| react-native-screens | 原生屏幕 |
-| zustand | 状态管理 |
-| date-fns | 日期处理 |
+| 包名                           | 用途          |
+| ------------------------------ | ------------- |
+| expo                           | Expo 核心框架 |
+| expo-router                    | 文件系统路由  |
+| expo-sqlite                    | SQLite 数据库 |
+| expo-camera                    | 相机功能      |
+| expo-image-picker              | 图片选择      |
+| expo-file-system               | 文件系统操作  |
+| expo-linear-gradient           | 渐变效果      |
+| react-native-reanimated        | 动画库        |
+| react-native-gesture-handler   | 手势处理      |
+| react-native-safe-area-context | 安全区域      |
+| react-native-screens           | 原生屏幕      |
+| zustand                        | 状态管理      |
+| date-fns                       | 日期处理      |
 
 ### 可选依赖（后续安装）
 
-| 包名 | 用途 | 安装时机 |
-|------|------|---------|
-| react-native-health | iOS HealthKit | Phase 13 |
-| expo-health-connect | Android Health Connect | Phase 13 |
-| @shopify/flash-list | 高性能列表 | 性能优化时 |
-| victory-native | 图表库 | Phase 11 |
+| 包名                | 用途                   | 安装时机   |
+| ------------------- | ---------------------- | ---------- |
+| react-native-health | iOS HealthKit          | Phase 13   |
+| expo-health-connect | Android Health Connect | Phase 13   |
+| @shopify/flash-list | 高性能列表             | 性能优化时 |
+| victory-native      | 图表库                 | Phase 11   |
 
 ---
 
@@ -495,11 +495,13 @@ sudo gem install cocoapods
 完成以下检查，确保环境就绪：
 
 ### 基础环境
+
 - [ ] Node.js 18+ 已安装
 - [ ] npm/pnpm 已安装
 - [ ] Git 已安装并配置
 
 ### Android 开发
+
 - [ ] Android Studio 已安装
 - [ ] Android SDK (API 34) 已安装
 - [ ] ANDROID_HOME 环境变量已设置
@@ -507,21 +509,24 @@ sudo gem install cocoapods
 - [ ] adb 命令可用
 
 ### iOS 开发（macOS）
+
 - [ ] Xcode 15+ 已安装
 - [ ] iOS 模拟器已下载
 - [ ] CocoaPods 已安装
 
 ### 开发工具
+
 - [ ] VS Code 已安装
 - [ ] 必装插件已安装
 - [ ] npx expo 可用（无需全局安装）
 
 ### 调试设备
+
 - [ ] Android 模拟器可启动
 - [ ] iOS 模拟器可启动
 - [ ] 或 Expo Go 已安装在手机上
 
 ---
 
-*文档版本：v1.0*
-*最后更新：2026-06-03*
+_文档版本：v1.0_
+_最后更新：2026-06-03_

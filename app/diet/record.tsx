@@ -1,134 +1,122 @@
 // app/diet/record.tsx
 // 饮食记录页面
 
-import { logger } from '@/utils/logger';
-import React, { useState, useEffect, useLayoutEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { aiService } from '@/services/ai';
-import { DietRecordForm } from '@/components/diet';
-import { FoodItem } from '@/types/diet';
-import { Icon } from '@/components/icons';
-import { showNotification, showConfirm } from '@/components/ui';
+import { logger } from '@/utils/logger'
+import React, { useState, useLayoutEffect } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter, useLocalSearchParams } from 'expo-router'
+import { useNavigation } from '@react-navigation/native'
+import * as ImagePicker from 'expo-image-picker'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { aiService } from '@/services/ai'
+import { DietRecordForm } from '@/components/diet'
+import { FoodItem } from '@/types/diet'
+import { Icon } from '@/components/icons'
+import { showNotification, showConfirm } from '@/components/ui'
 
 export default function DietRecordScreen() {
-  const { t } = useI18n();
-  const router = useRouter();
+  const { t } = useI18n()
+  const router = useRouter()
+  const navigation = useNavigation()
   // P3-42：i18n headerTitle（modal 屏内部用 setOptions 跟随语言切换）
+  // expo-router 6.x：useRouter() 不再有 setOptions，改用 useNavigation() from @react-navigation/native
   useLayoutEffect(() => {
-    router.setOptions({ title: t('diet.recordTitle') });
-  }, [router, t]);
+    navigation.setOptions({ title: t('diet.recordTitle') })
+  }, [navigation, t])
   const params = useLocalSearchParams<{
-    photoUri?: string;
-    foods?: string;
-  }>();
+    photoUri?: string
+    foods?: string
+  }>()
 
-  const [photoUri, setPhotoUri] = useState<string | undefined>(params.photoUri);
-  const [foods, setFoods] = useState<FoodItem[]>(
-    params.foods ? JSON.parse(params.foods) : []
-  );
-  const [analyzing, setAnalyzing] = useState(false);
+  const [photoUri, setPhotoUri] = useState<string | undefined>(params.photoUri)
+  const [foods, setFoods] = useState<FoodItem[]>(params.foods ? JSON.parse(params.foods) : [])
+  const [analyzing, setAnalyzing] = useState(false)
 
   // 拍照
   const handleTakePhoto = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    const { status } = await ImagePicker.requestCameraPermissionsAsync()
     if (status !== 'granted') {
-      showNotification(t('error.permission'), 'error');
-      return;
+      showNotification(t('error.permission'), 'error')
+      return
     }
 
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ['images'],
       quality: 0.8,
-    });
+    })
 
     if (!result.canceled && result.assets[0]) {
-      setPhotoUri(result.assets[0].uri);
-      await analyzeImage(result.assets[0].uri);
+      setPhotoUri(result.assets[0].uri)
+      await analyzeImage(result.assets[0].uri)
     }
-  };
+  }
 
   // 从相册选择
   const handlePickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
     if (status !== 'granted') {
-      showNotification(t('error.permission'), 'error');
-      return;
+      showNotification(t('error.permission'), 'error')
+      return
     }
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       quality: 0.8,
-    });
+    })
 
     if (!result.canceled && result.assets[0]) {
-      setPhotoUri(result.assets[0].uri);
-      await analyzeImage(result.assets[0].uri);
+      setPhotoUri(result.assets[0].uri)
+      await analyzeImage(result.assets[0].uri)
     }
-  };
+  }
 
   // AI 分析
   const analyzeImage = async (uri: string) => {
-    logger.log('[AI] diet/record - 开始分析图片:', uri);
+    logger.log('[AI] diet/record - 开始分析图片:', uri)
     // 确保配置已加载
     if (!aiService.isConfigured()) {
-      logger.log('[AI] diet/record - 配置未缓存，尝试加载...');
-      await aiService.loadConfig();
+      logger.log('[AI] diet/record - 配置未缓存，尝试加载...')
+      await aiService.loadConfig()
     }
     if (!aiService.isConfigured()) {
-      logger.warn('[AI] diet/record - 配置加载后仍不可用');
+      logger.warn('[AI] diet/record - 配置加载后仍不可用')
       const ok = await showConfirm({
         title: t('settings.ai.title'),
         message: t('settings.ai.notConfigured'),
         confirmText: t('common.ok'),
         cancelText: t('common.cancel'),
-      });
+      })
       if (ok) {
-        router.push('/settings/ai-config');
+        router.push('/settings/ai-config')
       }
-      return;
+      return
     }
 
-    setAnalyzing(true);
+    setAnalyzing(true)
     try {
-      const result = await aiService.analyzeFood(uri);
-      logger.log('[AI] diet/record - 分析结果:', JSON.stringify(result));
-      setFoods(result.foods);
+      const result = await aiService.analyzeFood(uri)
+      logger.log('[AI] diet/record - 分析结果:', JSON.stringify(result))
+      setFoods(result.foods)
     } catch (error) {
-      logger.error('[AI] diet/record - 分析失败:', error);
-      showNotification(t('error.aiFailed'), 'error');
+      logger.error('[AI] diet/record - 分析失败:', error)
+      showNotification(t('error.aiFailed'), 'error')
     } finally {
-      setAnalyzing(false);
+      setAnalyzing(false)
     }
-  };
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       {/* 图片选择区域 */}
       {!photoUri && (
         <View style={styles.imageSection}>
-          <TouchableOpacity
-            style={styles.imageButton}
-            onPress={handleTakePhoto}
-          >
+          <TouchableOpacity style={styles.imageButton} onPress={handleTakePhoto}>
             <Icon name="camera" size={32} color={theme.colors.primary.main} />
             <Text style={styles.imageButtonText}>{t('diet.takePhoto')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.imageButton}
-            onPress={handlePickImage}
-          >
+          <TouchableOpacity style={styles.imageButton} onPress={handlePickImage}>
             <Icon name="add" size={32} color={theme.colors.secondary.main} />
             <Text style={styles.imageButtonText}>{t('diet.fromGallery')}</Text>
           </TouchableOpacity>
@@ -144,12 +132,9 @@ export default function DietRecordScreen() {
       )}
 
       {/* 表单 */}
-      <DietRecordForm
-        photoUri={photoUri}
-        initialFoods={foods}
-      />
+      <DietRecordForm photoUri={photoUri} initialFoods={foods} />
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -187,4 +172,4 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     marginTop: theme.spacing.base,
   },
-});
+})

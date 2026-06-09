@@ -1,13 +1,13 @@
 // components/icons/ChevronDownIcon.tsx
 // 下尖角图标 - 展开/折叠状态指示
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Path } from 'react-native-svg'
 
 interface ChevronDownIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -31,7 +31,7 @@ export function ChevronDownIcon({ size = 24, color = '#000000' }: ChevronDownIco
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -39,4 +39,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

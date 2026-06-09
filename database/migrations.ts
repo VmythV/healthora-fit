@@ -1,8 +1,8 @@
 // database/migrations.ts
 // 数据库迁移管理
 
-import { logger } from '@/utils/logger';
-import { SQLite } from 'expo-sqlite';
+import { logger } from '@/utils/logger'
+import { SQLite } from 'expo-sqlite'
 import {
   DB_VERSION,
   CREATE_TABLES_SQL,
@@ -10,15 +10,15 @@ import {
   CREATE_TRIGGERS_SQL,
   CREATE_MIGRATION_TABLE_SQL,
   ALTER_AI_CONFIG_V2_SQL,
-} from './schema';
+} from './schema'
 
 /**
  * 迁移接口
  */
 interface Migration {
-  version: number;
-  description: string;
-  up: (db: SQLite.SQLiteDatabase) => Promise<void>;
+  version: number
+  description: string
+  up: (db: SQLite.SQLiteDatabase) => Promise<void>
 }
 
 /**
@@ -30,13 +30,13 @@ const migrations: Migration[] = [
     description: '创建初始表结构',
     up: async (db) => {
       // 创建表
-      await db.execAsync(CREATE_TABLES_SQL);
+      await db.execAsync(CREATE_TABLES_SQL)
 
       // 创建索引
-      await db.execAsync(CREATE_INDEXES_SQL);
+      await db.execAsync(CREATE_INDEXES_SQL)
 
       // 创建触发器
-      await db.execAsync(CREATE_TRIGGERS_SQL);
+      await db.execAsync(CREATE_TRIGGERS_SQL)
     },
   },
   {
@@ -45,7 +45,7 @@ const migrations: Migration[] = [
     up: async (db) => {
       // SQLite 的 ALTER TABLE ADD COLUMN 不支持 IF NOT EXISTS，
       // 但 schema_version 表保证 version=2 只会执行一次
-      await db.execAsync(ALTER_AI_CONFIG_V2_SQL);
+      await db.execAsync(ALTER_AI_CONFIG_V2_SQL)
     },
   },
   // 未来版本的迁移在这里添加
@@ -56,7 +56,7 @@ const migrations: Migration[] = [
   //     await db.execAsync(`ALTER TABLE diet_records ADD COLUMN new_field TEXT;`);
   //   },
   // },
-];
+]
 
 /**
  * 获取当前数据库版本
@@ -66,19 +66,19 @@ async function getCurrentVersion(db: SQLite.SQLiteDatabase): Promise<number> {
     // 检查 schema_version 表是否存在
     const tableExists = await db.getFirstAsync<{ count: number }>(
       "SELECT COUNT(*) as count FROM sqlite_master WHERE type='table' AND name='schema_version'"
-    );
+    )
 
     if (!tableExists || tableExists.count === 0) {
-      return 0;
+      return 0
     }
 
     const result = await db.getFirstAsync<{ version: number }>(
       'SELECT MAX(version) as version FROM schema_version'
-    );
+    )
 
-    return result?.version || 0;
+    return result?.version || 0
   } catch (error) {
-    return 0;
+    return 0
   }
 }
 
@@ -87,47 +87,47 @@ async function getCurrentVersion(db: SQLite.SQLiteDatabase): Promise<number> {
  */
 export async function runMigrations(db: SQLite.SQLiteDatabase): Promise<void> {
   try {
-    logger.log('[Migration] 开始检查数据库迁移...');
+    logger.log('[Migration] 开始检查数据库迁移...')
 
     // 创建迁移版本表
-    await db.execAsync(CREATE_MIGRATION_TABLE_SQL);
+    await db.execAsync(CREATE_MIGRATION_TABLE_SQL)
 
     // 获取当前版本
-    const currentVersion = await getCurrentVersion(db);
-    logger.log(`[Migration] 当前数据库版本: ${currentVersion}, 目标版本: ${DB_VERSION}`);
+    const currentVersion = await getCurrentVersion(db)
+    logger.log(`[Migration] 当前数据库版本: ${currentVersion}, 目标版本: ${DB_VERSION}`)
 
     // 如果已经是最新版本，直接返回
     if (currentVersion >= DB_VERSION) {
-      logger.log('[Migration] 数据库已是最新版本');
-      return;
+      logger.log('[Migration] 数据库已是最新版本')
+      return
     }
 
     // 执行未执行的迁移
     for (const migration of migrations) {
       if (migration.version > currentVersion) {
-        logger.log(`[Migration] 执行迁移 v${migration.version}: ${migration.description}`);
+        logger.log(`[Migration] 执行迁移 v${migration.version}: ${migration.description}`)
 
         try {
-          await migration.up(db);
+          await migration.up(db)
 
           // 记录迁移
-          await db.runAsync(
-            'INSERT INTO schema_version (version, description) VALUES (?, ?)',
-            [migration.version, migration.description]
-          );
+          await db.runAsync('INSERT INTO schema_version (version, description) VALUES (?, ?)', [
+            migration.version,
+            migration.description,
+          ])
 
-          logger.log(`[Migration] 迁移 v${migration.version} 完成`);
+          logger.log(`[Migration] 迁移 v${migration.version} 完成`)
         } catch (error) {
-          logger.error(`[Migration] 迁移 v${migration.version} 失败:`, error);
-          throw error;
+          logger.error(`[Migration] 迁移 v${migration.version} 失败:`, error)
+          throw error
         }
       }
     }
 
-    logger.log('[Migration] 所有迁移执行完成');
+    logger.log('[Migration] 所有迁移执行完成')
   } catch (error) {
-    logger.error('[Migration] 迁移执行失败:', error);
-    throw error;
+    logger.error('[Migration] 迁移执行失败:', error)
+    throw error
   }
 }
 
@@ -138,17 +138,19 @@ export async function getMigrationHistory(
   db: SQLite.SQLiteDatabase
 ): Promise<{ version: number; description: string; appliedAt: string }[]> {
   try {
-    const result = await db.getAllAsync<{ version: number; description: string; applied_at: string }>(
-      'SELECT version, description, applied_at FROM schema_version ORDER BY version ASC'
-    );
+    const result = await db.getAllAsync<{
+      version: number
+      description: string
+      applied_at: string
+    }>('SELECT version, description, applied_at FROM schema_version ORDER BY version ASC')
 
     return result.map((row) => ({
       version: row.version,
       description: row.description,
       appliedAt: row.applied_at,
-    }));
+    }))
   } catch (error) {
-    return [];
+    return []
   }
 }
 
@@ -156,7 +158,7 @@ export async function getMigrationHistory(
  * 重置数据库（危险操作）
  */
 export async function resetDatabase(db: SQLite.SQLiteDatabase): Promise<void> {
-  logger.log('[Migration] 正在重置数据库...');
+  logger.log('[Migration] 正在重置数据库...')
 
   // 删除所有表
   await db.execAsync(`
@@ -167,10 +169,10 @@ export async function resetDatabase(db: SQLite.SQLiteDatabase): Promise<void> {
     DROP TABLE IF EXISTS exercise_records;
     DROP TABLE IF EXISTS diet_records;
     DROP TABLE IF EXISTS schema_version;
-  `);
+  `)
 
   // 重新执行迁移
-  await runMigrations(db);
+  await runMigrations(db)
 
-  logger.log('[Migration] 数据库重置完成');
+  logger.log('[Migration] 数据库重置完成')
 }

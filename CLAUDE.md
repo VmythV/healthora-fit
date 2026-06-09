@@ -21,6 +21,7 @@ npx expo start --clear      # Clear cache and start
 ## Architecture
 
 ### Tech Stack
+
 - **Framework**: Expo SDK 54, React Native 0.81.5, React 19.1.0
 - **Navigation**: Expo Router (file-based routing)
 - **Database**: expo-sqlite (local SQLite)
@@ -28,6 +29,7 @@ npx expo start --clear      # Clear cache and start
 - **Language**: TypeScript (strict mode)
 
 ### Path Aliases (tsconfig.json)
+
 ```
 @/*           → ./*
 @components/* → ./components/*
@@ -41,6 +43,7 @@ npx expo start --clear      # Clear cache and start
 ```
 
 ### Directory Structure
+
 ```
 app/                    # Expo Router pages (file-based routing)
 ├── (tabs)/            # Bottom tab navigation screens
@@ -74,6 +77,7 @@ services/               # AI, Health Connect, export (pending)
 5. **Internationalization (i18n)**: All user-facing text must use i18n. See [Internationalization Guidelines](#internationalization-guidelines).
 
 ### Database Tables
+
 - `diet_records` - Food intake with nutrition data (JSON foods field)
 - `exercise_records` - Exercise with type, duration, calories
 - `weight_records` - Weight measurements over time
@@ -84,6 +88,7 @@ services/               # AI, Health Connect, export (pending)
 ## Development Workflow
 
 Use `/iterate` skill for structured development cycles:
+
 1. Reviews TODOLIST for next task
 2. Confirms scope with user
 3. Implements code
@@ -106,6 +111,7 @@ Use `/iterate` skill for structured development cycles:
    - Keep translations in `constants/locales/` directory
 
 2. **Translation file structure**
+
    ```
    constants/
    ├── i18n.ts           # i18n configuration
@@ -115,6 +121,7 @@ Use `/iterate` skill for structured development cycles:
    ```
 
 3. **How to use i18n in components**
+
    ```typescript
    import { useI18n } from '@/hooks/useI18n';
 
@@ -164,23 +171,54 @@ Use `/iterate` skill for structured development cycles:
    - 类型定义：`IconName`
 
 2. **使用方法**
+
    ```tsx
-   import { Icon } from '@/components/icons';
-   
+   import { Icon } from '@/components/icons'
+
    // 基本使用
-   <Icon name="home" size={24} color="#10B981" />
-   
+   ;<Icon name="home" size={24} color="#10B981" />
+
    // 支持的图标名称
-   type IconName = 
-     | 'home' | 'calendar' | 'add' | 'chart' | 'settings'
-     | 'food' | 'exercise' | 'weight' | 'camera' | 'edit'
-     | 'delete' | 'back' | 'sunrise' | 'moon' | 'cookie'
-     | 'bowl' | 'plate' | 'running' | 'walking' | 'cycling'
-     | 'swimming' | 'strength' | 'yoga' | 'hiit' | 'other-exercise'
-     | 'note' | 'search' | 'tips' | 'help' | 'ai'
-     | 'chart-bar' | 'fire' | 'connected' | 'disconnected'
-     | 'trend-up' | 'trend-down' | 'trend-flat'
-     | 'eye' | 'eye-off';
+   type IconName =
+     | 'home'
+     | 'calendar'
+     | 'add'
+     | 'chart'
+     | 'settings'
+     | 'food'
+     | 'exercise'
+     | 'weight'
+     | 'camera'
+     | 'edit'
+     | 'delete'
+     | 'back'
+     | 'sunrise'
+     | 'moon'
+     | 'cookie'
+     | 'bowl'
+     | 'plate'
+     | 'running'
+     | 'walking'
+     | 'cycling'
+     | 'swimming'
+     | 'strength'
+     | 'yoga'
+     | 'hiit'
+     | 'other-exercise'
+     | 'note'
+     | 'search'
+     | 'tips'
+     | 'help'
+     | 'ai'
+     | 'chart-bar'
+     | 'fire'
+     | 'connected'
+     | 'disconnected'
+     | 'trend-up'
+     | 'trend-down'
+     | 'trend-flat'
+     | 'eye'
+     | 'eye-off'
    ```
 
 3. **新增图标规范**
@@ -208,10 +246,12 @@ Use `/iterate` skill for structured development cycles:
 ### 选择项布局规则
 
 **平铺到主菜单**：
+
 - 选择项 ≤ 3 个
 - 示例：语言设置（简体中文、English）
 
 **放到二级菜单**：
+
 - 选择项 > 3 个
 - 主菜单显示当前选中值
 - 点击进入二级菜单选择
@@ -221,6 +261,7 @@ Use `/iterate` skill for structured development cycles:
 ### 二级菜单设计规范
 
 **主菜单显示**：
+
 ```
 ┌─────────────────────────────────┐
 │ 📅 星期开始日          周一 →  │
@@ -228,6 +269,7 @@ Use `/iterate` skill for structured development cycles:
 ```
 
 **二级菜单显示**：
+
 ```
 ┌─────────────────────────────────┐
 │ ← 返回         星期开始日      │

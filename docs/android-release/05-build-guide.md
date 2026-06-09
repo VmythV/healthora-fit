@@ -38,6 +38,7 @@ npx eas-cli build:configure
 ### 方式二：本地签名
 
 1. **生成签名密钥库**
+
    ```bash
    ./scripts/generate-keystore.sh
    ```
@@ -64,6 +65,7 @@ npx eas-cli build --platform android --profile development
 ```
 
 **用途：**
+
 - 开发测试
 - 内部测试分发
 - 功能验证
@@ -75,6 +77,7 @@ npx eas-cli build --platform android --profile preview
 ```
 
 **用途：**
+
 - 内部测试
 - 小范围分发
 - 收集反馈
@@ -86,6 +89,7 @@ npx eas-cli build --platform android --profile production
 ```
 
 **用途：**
+
 - Google Play 发布
 - 正式版本
 
@@ -126,6 +130,7 @@ cd android
 ```
 
 **APK 位置：**
+
 ```
 android/app/build/outputs/apk/release/app-release.apk
 ```
@@ -144,6 +149,7 @@ cd android
 ```
 
 **AAB 位置：**
+
 ```
 android/app/build/outputs/bundle/release/app-release.aab
 ```
@@ -264,6 +270,7 @@ adb install app-release.apk
 ### Q1: 构建失败怎么办？
 
 **A:** 检查以下常见问题：
+
 1. 依赖版本冲突
 2. 签名配置错误
 3. 网络连接问题
@@ -272,6 +279,7 @@ adb install app-release.apk
 ### Q2: 如何查看构建日志？
 
 **A:**
+
 ```bash
 # EAS Build 日志
 npx eas-cli build:view [BUILD_ID]
@@ -283,12 +291,14 @@ cd android && ./gradlew assembleRelease --info
 ### Q3: APK 和 AAB 应该选哪个？
 
 **A:**
+
 - **APK：** 用于测试和直接分发
 - **AAB：** 用于 Google Play 发布
 
 ### Q4: 如何更新版本号？
 
 **A:** 编辑 `app.json`：
+
 ```json
 {
   "expo": {
@@ -323,5 +333,5 @@ cd android && ./gradlew assembleRelease --info
 
 ---
 
-*文档版本：v1.0*
-*创建日期：2026-06-04*
+_文档版本：v1.0_
+_创建日期：2026-06-04_

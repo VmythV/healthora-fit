@@ -1,23 +1,17 @@
 // components/AnimatedListItem.tsx
 // 动画列表项组件
 
-import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  StyleSheet,
-  Animated,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
-import { theme } from '@/constants/theme';
+import React, { useEffect, useRef } from 'react'
+import { StyleSheet, Animated, TouchableOpacity, ViewStyle } from 'react-native'
+import { theme } from '@/constants/theme'
 
 interface AnimatedListItemProps {
-  children: React.ReactNode;
-  index?: number;
-  style?: ViewStyle;
-  onPress?: () => void;
-  onLongPress?: () => void;
-  animationType?: 'fadeIn' | 'slideUp' | 'slideIn';
+  children: React.ReactNode
+  index?: number
+  style?: ViewStyle
+  onPress?: () => void
+  onLongPress?: () => void
+  animationType?: 'fadeIn' | 'slideUp' | 'slideIn'
 }
 
 export function AnimatedListItem({
@@ -28,12 +22,12 @@ export function AnimatedListItem({
   onLongPress,
   animationType = 'fadeIn',
 }: AnimatedListItemProps) {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateX = useRef(new Animated.Value(-20)).current;
-  const translateY = useRef(new Animated.Value(20)).current;
+  const opacity = useRef(new Animated.Value(0)).current
+  const translateX = useRef(new Animated.Value(-20)).current
+  const translateY = useRef(new Animated.Value(20)).current
 
   useEffect(() => {
-    const delay = index * 50; // 每个列表项延迟 50ms
+    const delay = index * 50 // 每个列表项延迟 50ms
 
     switch (animationType) {
       case 'fadeIn':
@@ -42,8 +36,8 @@ export function AnimatedListItem({
           duration: 300,
           delay,
           useNativeDriver: true,
-        }).start();
-        break;
+        }).start()
+        break
 
       case 'slideUp':
         Animated.parallel([
@@ -59,8 +53,8 @@ export function AnimatedListItem({
             delay,
             useNativeDriver: true,
           }),
-        ]).start();
-        break;
+        ]).start()
+        break
 
       case 'slideIn':
         Animated.parallel([
@@ -76,10 +70,10 @@ export function AnimatedListItem({
             delay,
             useNativeDriver: true,
           }),
-        ]).start();
-        break;
+        ]).start()
+        break
     }
-  }, []);
+  }, [])
 
   const animatedStyle = {
     opacity,
@@ -87,27 +81,21 @@ export function AnimatedListItem({
       { translateX: animationType === 'slideIn' ? translateX : 0 },
       { translateY: animationType === 'slideUp' ? translateY : 0 },
     ],
-  };
+  }
 
   const content = (
-    <Animated.View style={[styles.item, animatedStyle, style]}>
-      {children}
-    </Animated.View>
-  );
+    <Animated.View style={[styles.item, animatedStyle, style]}>{children}</Animated.View>
+  )
 
   if (onPress || onLongPress) {
     return (
-      <TouchableOpacity
-        onPress={onPress}
-        onLongPress={onLongPress}
-        activeOpacity={0.7}
-      >
+      <TouchableOpacity onPress={onPress} onLongPress={onLongPress} activeOpacity={0.7}>
         {content}
       </TouchableOpacity>
-    );
+    )
   }
 
-  return content;
+  return content
 }
 
 const styles = StyleSheet.create({
@@ -116,4 +104,4 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border.light,
   },
-});
+})

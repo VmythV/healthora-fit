@@ -1,19 +1,12 @@
 // app/icons-preview.tsx
 // 图标预览工具
 
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Stack } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { Icon, IconName } from '@/components/icons';
+import React, { useState } from 'react'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { Stack } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { Icon, IconName } from '@/components/icons'
 
 // 所有图标列表
 const ICON_LIST: { name: IconName; label: string; description: string }[] = [
@@ -29,7 +22,7 @@ const ICON_LIST: { name: IconName; label: string; description: string }[] = [
   { name: 'edit', label: '编辑', description: '编辑操作图标' },
   { name: 'delete', label: '删除', description: '删除操作图标' },
   { name: 'back', label: '返回', description: '返回操作图标' },
-];
+]
 
 // 预设颜色
 const PRESET_COLORS = [
@@ -41,10 +34,10 @@ const PRESET_COLORS = [
   { name: '错误', value: theme.colors.error },
   { name: '成功', value: theme.colors.success },
   { name: '白色', value: '#FFFFFF' },
-];
+]
 
 // 预设尺寸
-const PRESET_SIZES = [16, 20, 24, 32, 40, 48];
+const PRESET_SIZES = [16, 20, 24, 32, 40, 48]
 
 /**
  * 图标预览工具
@@ -52,16 +45,16 @@ const PRESET_SIZES = [16, 20, 24, 32, 40, 48];
  * 访问路径：/icons-preview
  */
 export default function IconsPreviewScreen() {
-  const [selectedColor, setSelectedColor] = useState(theme.colors.primary.main);
-  const [selectedSize, setSelectedSize] = useState(24);
-  const [customColor, setCustomColor] = useState('');
-  const [customSize, setCustomSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState(theme.colors.primary.main)
+  const [selectedSize, setSelectedSize] = useState(24)
+  const [customColor, setCustomColor] = useState('')
+  const [customSize, setCustomSize] = useState('')
 
   // 获取当前使用的颜色
-  const currentColor = customColor || selectedColor;
+  const currentColor = customColor || selectedColor
 
   // 获取当前使用的尺寸
-  const currentSize = customSize ? parseInt(customSize) || 24 : selectedSize;
+  const currentSize = customSize ? parseInt(customSize) || 24 : selectedSize
 
   return (
     <SafeAreaView style={styles.container}>
@@ -87,8 +80,8 @@ export default function IconsPreviewScreen() {
                     selectedColor === color.value && !customColor && styles.colorButtonSelected,
                   ]}
                   onPress={() => {
-                    setSelectedColor(color.value);
-                    setCustomColor('');
+                    setSelectedColor(color.value)
+                    setCustomColor('')
                   }}
                 >
                   <Text
@@ -123,8 +116,8 @@ export default function IconsPreviewScreen() {
                   selectedSize === size && !customSize && styles.sizeButtonSelected,
                 ]}
                 onPress={() => {
-                  setSelectedSize(size);
-                  setCustomSize('');
+                  setSelectedSize(size)
+                  setCustomSize('')
                 }}
               >
                 <Text
@@ -162,11 +155,7 @@ export default function IconsPreviewScreen() {
           {ICON_LIST.map((icon) => (
             <TouchableOpacity key={icon.name} style={styles.iconCard}>
               <View style={styles.iconPreview}>
-                <Icon
-                  name={icon.name}
-                  size={currentSize}
-                  color={currentColor}
-                />
+                <Icon name={icon.name} size={currentSize} color={currentColor} />
               </View>
               <Text style={styles.iconLabel}>{icon.label}</Text>
               <Text style={styles.iconName}>{icon.name}</Text>
@@ -193,7 +182,7 @@ import { HomeIcon } from '@/components/icons';
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -334,4 +323,4 @@ const styles = StyleSheet.create({
     fontFamily: 'monospace',
     lineHeight: 20,
   },
-});
+})

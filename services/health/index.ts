@@ -1,12 +1,11 @@
 // services/health/index.ts
 // 健康数据服务入口
 
-import { Platform } from 'react-native';
-import { HealthDataService } from './types';
-import { MockHealthDataService } from './mock';
+import { HealthDataService } from './types'
+import { MockHealthDataService } from './mock'
 
 // 单例实例
-let healthService: HealthDataService | null = null;
+let healthService: HealthDataService | null = null
 
 /**
  * 获取健康数据服务实例
@@ -22,16 +21,16 @@ export function getHealthService(): HealthDataService {
     // } else {
     //   healthService = new MockHealthDataService();
     // }
-    healthService = new MockHealthDataService();
+    healthService = new MockHealthDataService()
   }
-  return healthService;
+  return healthService
 }
 
 /**
  * 重置服务实例（用于测试）
  */
 export function resetHealthService(): void {
-  healthService = null;
+  healthService = null
 }
 
-export * from './types';
+export * from './types'

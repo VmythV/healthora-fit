@@ -3,68 +3,59 @@
 //
 // P3-44：原 RN Image → expo-image（更优内存缓存、过渡动画、占位符）
 
-import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import { Image } from 'expo-image';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useDietRecords } from '@/hooks/useDietRecords';
-import { DietRecord, FoodItem, ParsedDietRecord } from '@/types/diet';
-import { NutritionSummary } from './NutritionSummary';
-import { Card } from '@/components/ui';
-import { Icon } from '@/components/icons';
-import { showNotification, showConfirm } from '@/components/ui';
+import React from 'react'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { Image } from 'expo-image'
+import { useRouter } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useDietRecords } from '@/hooks/useDietRecords'
+import { DietRecord, FoodItem } from '@/types/diet'
+import { NutritionSummary } from './NutritionSummary'
+import { Card } from '@/components/ui'
+import { Icon } from '@/components/icons'
+import { showNotification, showConfirm } from '@/components/ui'
 
 interface DietRecordDetailProps {
-  record: DietRecord;
-  onDelete?: () => void;
+  record: DietRecord
+  onDelete?: () => void
 }
 
 /**
  * 饮食记录详情
  */
 export function DietRecordDetail({ record, onDelete }: DietRecordDetailProps) {
-  const { t } = useI18n();
-  const router = useRouter();
-  const { deleteRecord } = useDietRecords();
+  const { t } = useI18n()
+  const router = useRouter()
+  const { deleteRecord } = useDietRecords()
 
   // 解析食物列表
-  const foods: FoodItem[] = record.foodsJson
-    ? JSON.parse(record.foodsJson)
-    : [];
+  const foods: FoodItem[] = record.foodsJson ? JSON.parse(record.foodsJson) : []
 
   // 格式化时间
   const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
+    const date = new Date(timestamp)
     return date.toLocaleTimeString('zh-CN', {
       hour: '2-digit',
       minute: '2-digit',
-    });
-  };
+    })
+  }
 
   // 格式化日期
   const formatDate = (timestamp: string) => {
-    const date = new Date(timestamp);
+    const date = new Date(timestamp)
     return date.toLocaleDateString('zh-CN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    });
-  };
+    })
+  }
 
   // 获取餐次标签
   const getMealTypeLabel = (mealType?: string) => {
-    if (!mealType) return '';
-    return t(`mealType.${mealType}`);
-  };
+    if (!mealType) return ''
+    return t(`mealType.${mealType}`)
+  }
 
   // 编辑
   const handleEdit = () => {
@@ -76,8 +67,8 @@ export function DietRecordDetail({ record, onDelete }: DietRecordDetailProps) {
         mealType: record.mealType,
         note: record.note,
       },
-    });
-  };
+    })
+  }
 
   // 删除
   const handleDelete = async () => {
@@ -87,16 +78,16 @@ export function DietRecordDetail({ record, onDelete }: DietRecordDetailProps) {
       type: 'danger',
       confirmText: t('common.delete'),
       cancelText: t('common.cancel'),
-    });
-    if (!ok) return;
+    })
+    if (!ok) return
 
     try {
-      await deleteRecord(record.id);
-      onDelete?.();
+      await deleteRecord(record.id)
+      onDelete?.()
     } catch (error) {
-      showNotification(t('error.saveFailed'), 'error');
+      showNotification(t('error.saveFailed'), 'error')
     }
-  };
+  }
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -109,9 +100,7 @@ export function DietRecordDetail({ record, onDelete }: DietRecordDetailProps) {
           </View>
           {record.mealType && (
             <View style={styles.mealBadge}>
-              <Text style={styles.mealText}>
-                {getMealTypeLabel(record.mealType)}
-              </Text>
+              <Text style={styles.mealText}>{getMealTypeLabel(record.mealType)}</Text>
             </View>
           )}
         </View>
@@ -149,7 +138,8 @@ export function DietRecordDetail({ record, onDelete }: DietRecordDetailProps) {
                 {food.calories} {t('diet.calories')}
               </Text>
               <Text style={styles.foodDetail}>
-                {t('diet.protein')}: {food.protein}g | {t('diet.carbs')}: {food.carbs}g | {t('diet.fat')}: {food.fat}g
+                {t('diet.protein')}: {food.protein}g | {t('diet.carbs')}: {food.carbs}g |{' '}
+                {t('diet.fat')}: {food.fat}g
               </Text>
             </View>
           </Card>
@@ -168,23 +158,17 @@ export function DietRecordDetail({ record, onDelete }: DietRecordDetailProps) {
 
       {/* 操作按钮 */}
       <View style={styles.actions}>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.editButton]}
-          onPress={handleEdit}
-        >
+        <TouchableOpacity style={[styles.actionButton, styles.editButton]} onPress={handleEdit}>
           <Icon name="edit" size={20} color="#FFFFFF" />
           <Text style={styles.editButtonText}>{t('common.edit')}</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.actionButton, styles.deleteButton]}
-          onPress={handleDelete}
-        >
+        <TouchableOpacity style={[styles.actionButton, styles.deleteButton]} onPress={handleDelete}>
           <Icon name="delete" size={20} color="#FFFFFF" />
           <Text style={styles.deleteButtonText}>{t('common.delete')}</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -312,4 +296,4 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: '#FFFFFF',
   },
-});
+})

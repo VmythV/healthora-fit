@@ -1,26 +1,26 @@
 // components/home/QuickActions.tsx
 // 快捷操作
 
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { Icon } from '@/components/icons';
-import { IconName } from '@/components/icons/Icon';
+import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { useRouter } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { Icon } from '@/components/icons'
+import { IconName } from '@/components/icons/Icon'
 
 /**
  * 快捷操作
  */
 export function QuickActions() {
-  const { t } = useI18n();
-  const router = useRouter();
+  const { t } = useI18n()
+  const router = useRouter()
 
-  const actions: Array<{
-    icon: IconName;
-    label: string;
-    onPress: () => void;
-  }> = [
+  const actions: {
+    icon: IconName
+    label: string
+    onPress: () => void
+  }[] = [
     {
       icon: 'bowl',
       label: t('record.diet.title'),
@@ -36,7 +36,7 @@ export function QuickActions() {
       label: t('record.weight.title'),
       onPress: () => router.push('/weight/record'),
     },
-  ];
+  ]
 
   return (
     <View style={styles.container}>
@@ -54,7 +54,7 @@ export function QuickActions() {
         </TouchableOpacity>
       ))}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -79,4 +79,4 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.medium,
     color: theme.colors.text.secondary,
   },
-});
+})

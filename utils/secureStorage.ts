@@ -12,11 +12,11 @@
 //
 // 历史明文数据（is_encrypted=0）直接返回，调用方按用户决定不迁移。
 
-import * as SecureStore from 'expo-secure-store';
-import { getRandomBytes } from 'expo-crypto';
-import { logger } from '@/utils/logger';
+import * as SecureStore from 'expo-secure-store'
+import { getRandomBytes } from 'expo-crypto'
+import { logger } from '@/utils/logger'
 
-const HANDLE_PREFIX = 'ai_key_';
+const HANDLE_PREFIX = 'ai_key_'
 
 /**
  * 生成 SecureStore 句柄。
@@ -24,14 +24,14 @@ const HANDLE_PREFIX = 'ai_key_';
  * 不含敏感信息，可以安全写进 DB。
  */
 function generateHandle(): string {
-  const ts = Date.now().toString(36);
-  const rand = getRandomBytes(6);
+  const ts = Date.now().toString(36)
+  const rand = getRandomBytes(6)
   // 转 base36 缩短长度
-  let randStr = '';
+  let randStr = ''
   for (let i = 0; i < rand.length; i++) {
-    randStr += (rand[i] ?? 0).toString(36).padStart(2, '0');
+    randStr += (rand[i] ?? 0).toString(36).padStart(2, '0')
   }
-  return `${HANDLE_PREFIX}${ts}_${randStr}`;
+  return `${HANDLE_PREFIX}${ts}_${randStr}`
 }
 
 /**
@@ -39,9 +39,9 @@ function generateHandle(): string {
  */
 export async function isSecureStoreAvailable(): Promise<boolean> {
   try {
-    return await SecureStore.isAvailableAsync();
+    return await SecureStore.isAvailableAsync()
   } catch {
-    return false;
+    return false
   }
 }
 
@@ -51,12 +51,12 @@ export async function isSecureStoreAvailable(): Promise<boolean> {
  * 失败时抛出错误（让调用方决定是否降级到明文）。
  */
 export async function secureStoreApiKey(plaintext: string): Promise<string> {
-  const handle = generateHandle();
+  const handle = generateHandle()
   await SecureStore.setItemAsync(handle, plaintext, {
     requireAuthentication: false,
     keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK,
-  });
-  return handle;
+  })
+  return handle
 }
 
 /**
@@ -65,13 +65,13 @@ export async function secureStoreApiKey(plaintext: string): Promise<string> {
  * 句柄不存在或读取失败时返回空字符串（不抛），调用方按 UI 错误处理。
  */
 export async function readApiKey(handle: string): Promise<string> {
-  if (!handle) return '';
+  if (!handle) return ''
   try {
-    const value = await SecureStore.getItemAsync(handle);
-    return value ?? '';
+    const value = await SecureStore.getItemAsync(handle)
+    return value ?? ''
   } catch (err) {
-    logger.error('[secureStorage] readApiKey 失败:', err);
-    return '';
+    logger.error('[secureStorage] readApiKey 失败:', err)
+    return ''
   }
 }
 
@@ -80,12 +80,12 @@ export async function readApiKey(handle: string): Promise<string> {
  * 用于配置删除/覆盖场景。
  */
 export async function deleteApiKey(handle: string): Promise<void> {
-  if (!handle) return;
+  if (!handle) return
   try {
-    await SecureStore.deleteItemAsync(handle);
+    await SecureStore.deleteItemAsync(handle)
   } catch (err) {
     // 删除失败只记 log，不阻塞主流程
-    logger.warn('[secureStorage] deleteApiKey 失败:', err);
+    logger.warn('[secureStorage] deleteApiKey 失败:', err)
   }
 }
 
@@ -94,5 +94,5 @@ export async function deleteApiKey(handle: string): Promise<void> {
  * 历史明文数据是任意字符串，新建的全部以 "ai_key_" 开头。
  */
 export function isSecureHandle(value: string | null | undefined): boolean {
-  return !!value && value.startsWith(HANDLE_PREFIX);
+  return !!value && value.startsWith(HANDLE_PREFIX)
 }

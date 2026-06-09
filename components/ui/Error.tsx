@@ -1,19 +1,19 @@
 // components/ui/Error.tsx
 // 错误状态组件
 
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '@/constants/theme';
-import { Button } from './Button';
-import { Icon } from '@/components/icons';
-import { IconName } from '@/components/icons/Icon';
+import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import { theme } from '@/constants/theme'
+import { Button } from './Button'
+import { Icon } from '@/components/icons'
+import { IconName } from '@/components/icons/Icon'
 
 interface ErrorProps {
-  icon?: IconName;
-  title?: string;
-  message: string;
-  retryText?: string;
-  onRetry?: () => void;
+  icon?: IconName
+  title?: string
+  message: string
+  retryText?: string
+  onRetry?: () => void
 }
 
 /**
@@ -35,13 +35,7 @@ interface ErrorProps {
  * />
  * ```
  */
-export function Error({
-  icon = 'tips',
-  title,
-  message,
-  retryText = '重试',
-  onRetry,
-}: ErrorProps) {
+export function Error({ icon = 'tips', title, message, retryText = '重试', onRetry }: ErrorProps) {
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
@@ -62,7 +56,7 @@ export function Error({
         />
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -90,4 +84,4 @@ const styles = StyleSheet.create({
   button: {
     minWidth: 120,
   },
-});
+})

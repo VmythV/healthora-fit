@@ -1,29 +1,24 @@
 // components/diet/NutritionSummary.tsx
 // 营养成分汇总
 
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { Card } from '@/components/ui';
+import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { Card } from '@/components/ui'
 
 interface NutritionSummaryProps {
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
+  calories: number
+  protein: number
+  carbs: number
+  fat: number
 }
 
 /**
  * 营养成分汇总
  */
-export function NutritionSummary({
-  calories,
-  protein,
-  carbs,
-  fat,
-}: NutritionSummaryProps) {
-  const { t } = useI18n();
+export function NutritionSummary({ calories, protein, carbs, fat }: NutritionSummaryProps) {
+  const { t } = useI18n()
 
   return (
     <Card style={styles.container}>
@@ -52,7 +47,7 @@ export function NutritionSummary({
         </View>
       </View>
     </Card>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -104,4 +99,4 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: theme.colors.text.primary,
   },
-});
+})

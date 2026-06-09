@@ -7,7 +7,22 @@
       "Bash(npx eas-cli *)",
       "Bash(npx expo *)",
       "Bash(awk -F\"'\" '{print $2}')",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "WebFetch(domain:docs.expo.dev)",
+      "Bash(sed -n '192,225p' database/queries/weight.ts)",
+      "Bash(sed -n '82,115p' database/queries/goals.ts)",
+      "Bash(sed -n '38,60p' database/queries/aiConfig.ts)",
+      "Bash(sed -n '65,90p' database/queries/diet.ts)",
+      "Bash(sed -n '77,95p' database/queries/weight.ts)",
+      "Bash(sed -n '25,60p' database/queries/aiConfig.ts)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('calendar', {}\\), ensure_ascii=False, indent=2\\)\\); print\\('---common---'\\); print\\(json.dumps\\(d.get\\('common', {}\\), ensure_ascii=False, indent=2\\)\\); print\\('---timeline---'\\); print\\(json.dumps\\(d.get\\('timeline', {}\\), ensure_ascii=False, indent=2\\)\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(npm view *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('main:', d.get\\('main'\\)\\); print\\('types:', d.get\\('types'\\)\\); print\\('peerDeps:', d.get\\('peerDependencies'\\)\\)\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('exampleSnippet:', d.get\\('snippet'\\)\\)\")",
+      "Bash(npx expo-doctor *)",
+      "Bash(npm uninstall *)"
     ]
   }
 }

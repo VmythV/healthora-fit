@@ -1,13 +1,13 @@
 // components/icons/CyclingIcon.tsx
 // 骑行图标
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Path, Circle } from 'react-native-svg'
 
 interface CyclingIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -68,7 +68,7 @@ export function CyclingIcon({ size = 24, color = '#000000' }: CyclingIconProps) 
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -76,4 +76,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

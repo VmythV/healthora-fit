@@ -3,8 +3,8 @@
 //
 // P2-21：用 DateTimeStepper 替换内嵌 100+ 行 RNModal 时间选择器
 
-import { logger } from '@/utils/logger';
-import React, { useState, useEffect } from 'react';
+import { logger } from '@/utils/logger'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -14,28 +14,28 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useExerciseRecords } from '@/hooks/useExerciseRecords';
-import { ExerciseTypeSelector } from './ExerciseTypeSelector';
-import { DurationInput } from './DurationInput';
-import { ScreenshotPicker } from './ScreenshotPicker';
-import { DateTimeStepper } from './DateTimeStepper';
-import { Card } from '@/components/ui';
-import { Icon } from '@/components/icons';
-import { ExerciseAnalysisResult } from '@/types/exercise';
-import { showNotification } from '@/components/ui';
+} from 'react-native'
+import { useRouter } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useExerciseRecords } from '@/hooks/useExerciseRecords'
+import { ExerciseTypeSelector } from './ExerciseTypeSelector'
+import { DurationInput } from './DurationInput'
+import { ScreenshotPicker } from './ScreenshotPicker'
+import { DateTimeStepper } from './DateTimeStepper'
+import { Card } from '@/components/ui'
+import { Icon } from '@/components/icons'
+import { ExerciseAnalysisResult } from '@/types/exercise'
+import { showNotification } from '@/components/ui'
 
 interface ExerciseRecordFormProps {
-  initialType?: string;
-  initialDuration?: number;
-  initialCalories?: number;
-  initialDistance?: number;
-  initialNote?: string;
-  recordId?: number; // 编辑模式
-  onSuccess?: () => void;
+  initialType?: string
+  initialDuration?: number
+  initialCalories?: number
+  initialDistance?: number
+  initialNote?: string
+  recordId?: number // 编辑模式
+  onSuccess?: () => void
 }
 
 // 卡路里估算（每分钟）
@@ -48,7 +48,7 @@ const CALORIES_PER_MINUTE: Record<string, number> = {
   yoga: 4,
   hiit: 12,
   other: 6,
-};
+}
 
 /**
  * 运动记录表单
@@ -62,74 +62,74 @@ export function ExerciseRecordForm({
   recordId,
   onSuccess,
 }: ExerciseRecordFormProps) {
-  const { t } = useI18n();
-  const router = useRouter();
-  const { addRecord, updateRecord } = useExerciseRecords();
+  const { t } = useI18n()
+  const router = useRouter()
+  const { addRecord, updateRecord } = useExerciseRecords()
 
-  const [exerciseType, setExerciseType] = useState(initialType);
-  const [duration, setDuration] = useState(initialDuration);
+  const [exerciseType, setExerciseType] = useState(initialType)
+  const [duration, setDuration] = useState(initialDuration)
   const [calories, setCalories] = useState(
     initialCalories || estimateCalories(initialType, initialDuration)
-  );
-  const [distance, setDistance] = useState(initialDistance || 0);
-  const [note, setNote] = useState(initialNote);
-  const [saving, setSaving] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState<ExerciseAnalysisResult | null>(null);
-  const [aiSuccessMessage, setAiSuccessMessage] = useState<string | null>(null);
-  const [screenshotUri, setScreenshotUri] = useState<string | null>(null);
-  const [recordTimestamp, setRecordTimestamp] = useState(new Date());
+  )
+  const [distance, setDistance] = useState(initialDistance || 0)
+  const [note, setNote] = useState(initialNote)
+  const [saving, setSaving] = useState(false)
+  const [analysisResult, setAnalysisResult] = useState<ExerciseAnalysisResult | null>(null)
+  const [aiSuccessMessage, setAiSuccessMessage] = useState<string | null>(null)
+  const [screenshotUri, setScreenshotUri] = useState<string | null>(null)
+  const [recordTimestamp, setRecordTimestamp] = useState(new Date())
 
   // AI 识别成功消息自动消失
   useEffect(() => {
     if (aiSuccessMessage) {
-      const timer = setTimeout(() => setAiSuccessMessage(null), 3000);
-      return () => clearTimeout(timer);
+      const timer = setTimeout(() => setAiSuccessMessage(null), 3000)
+      return () => clearTimeout(timer)
     }
-  }, [aiSuccessMessage]);
+  }, [aiSuccessMessage])
 
   // 估算卡路里
   function estimateCalories(type: string, minutes: number): number {
-    const rate = CALORIES_PER_MINUTE[type] || 6;
-    return Math.round(rate * minutes);
+    const rate = CALORIES_PER_MINUTE[type] || 6
+    return Math.round(rate * minutes)
   }
 
   // 更新运动类型
   const handleTypeChange = (type: string) => {
-    setExerciseType(type);
-    setCalories(estimateCalories(type, duration));
-  };
+    setExerciseType(type)
+    setCalories(estimateCalories(type, duration))
+  }
 
   // 更新时长
   const handleDurationChange = (minutes: number) => {
-    setDuration(minutes);
-    setCalories(estimateCalories(exerciseType, minutes));
-  };
+    setDuration(minutes)
+    setCalories(estimateCalories(exerciseType, minutes))
+  }
 
   // 截图分析完成 - 直接填充表单
   const handleAnalysisComplete = (result: ExerciseAnalysisResult, imageUri: string) => {
-    setAnalysisResult(result);
-    setScreenshotUri(imageUri);
-    setExerciseType(result.exerciseType);
-    setDuration(result.durationMinutes);
-    setCalories(result.caloriesBurned);
+    setAnalysisResult(result)
+    setScreenshotUri(imageUri)
+    setExerciseType(result.exerciseType)
+    setDuration(result.durationMinutes)
+    setCalories(result.caloriesBurned)
     if (result.distanceKm) {
-      setDistance(result.distanceKm);
+      setDistance(result.distanceKm)
     }
     // 如果 AI 识别到了时间，使用识别的时间
     if (result.timestamp) {
-      setRecordTimestamp(new Date(result.timestamp));
+      setRecordTimestamp(new Date(result.timestamp))
     }
-    setAiSuccessMessage(t('exercise.aiRecognitionSuccess'));
-  };
+    setAiSuccessMessage(t('exercise.aiRecognitionSuccess'))
+  }
 
   // 保存
   const handleSave = async () => {
     if (duration <= 0) {
-      showNotification(t('exercise.invalidDuration'), 'error');
-      return;
+      showNotification(t('exercise.invalidDuration'), 'error')
+      return
     }
 
-    setSaving(true);
+    setSaving(true)
     try {
       const recordData = {
         timestamp: recordTimestamp.toISOString(),
@@ -141,23 +141,23 @@ export function ExerciseRecordForm({
         screenshotUri: screenshotUri || undefined,
         rawData: analysisResult?.rawText,
         note,
-      };
-
-      if (recordId) {
-        await updateRecord(recordId, recordData);
-      } else {
-        await addRecord(recordData);
       }
 
-      onSuccess?.();
-      router.back();
+      if (recordId) {
+        await updateRecord(recordId, recordData)
+      } else {
+        await addRecord(recordData)
+      }
+
+      onSuccess?.()
+      router.back()
     } catch (error) {
-      logger.error('[ExerciseForm] 保存失败:', error);
-      showNotification(t('error.saveFailed'), 'error');
+      logger.error('[ExerciseForm] 保存失败:', error)
+      showNotification(t('error.saveFailed'), 'error')
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   return (
     <KeyboardAvoidingView
@@ -178,8 +178,8 @@ export function ExerciseRecordForm({
           <ScreenshotPicker
             onAnalysisComplete={handleAnalysisComplete}
             onError={(error) => {
-              setAnalysisResult(null);
-              logger.error('[ExerciseForm] 截图分析错误:', error);
+              setAnalysisResult(null)
+              logger.error('[ExerciseForm] 截图分析错误:', error)
             }}
           />
         </View>
@@ -187,28 +187,19 @@ export function ExerciseRecordForm({
         {/* 运动时间 —— 用 DateTimeStepper 替代内嵌 RNModal */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('exercise.recordTime')}</Text>
-          <DateTimeStepper
-            value={recordTimestamp}
-            onChange={setRecordTimestamp}
-          />
+          <DateTimeStepper value={recordTimestamp} onChange={setRecordTimestamp} />
         </View>
 
         {/* 运动类型 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('exercise.exerciseType')}</Text>
-          <ExerciseTypeSelector
-            value={exerciseType}
-            onChange={handleTypeChange}
-          />
+          <ExerciseTypeSelector value={exerciseType} onChange={handleTypeChange} />
         </View>
 
         {/* 运动时长 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('exercise.duration')}</Text>
-          <DurationInput
-            value={duration}
-            onChange={handleDurationChange}
-          />
+          <DurationInput value={duration} onChange={handleDurationChange} />
         </View>
 
         {/* 卡路里 */}
@@ -283,7 +274,7 @@ export function ExerciseRecordForm({
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -407,4 +398,4 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.medium,
     color: '#FFFFFF',
   },
-});
+})

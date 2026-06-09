@@ -1,30 +1,26 @@
 // components/ui/AlertModal.tsx
 // 确认弹窗组件
 
-import React, { useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-} from 'react-native';
-import { theme } from '@/constants/theme';
-import { Modal } from './Modal';
-import { Button } from './Button';
-import { WarningIcon, InfoIcon } from '@/components/icons';
+import React, { useCallback } from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import { theme } from '@/constants/theme'
+import { Modal } from './Modal'
+import { Button } from './Button'
+import { WarningIcon, InfoIcon } from '@/components/icons'
 
-export type AlertType = 'danger' | 'default';
+export type AlertType = 'danger' | 'default'
 
 export interface AlertModalConfig {
-  title: string;
-  message: string;
-  type?: AlertType;
-  confirmText?: string;
-  cancelText?: string;
+  title: string
+  message: string
+  type?: AlertType
+  confirmText?: string
+  cancelText?: string
 }
 
 export interface AlertModalInstance {
-  config: AlertModalConfig;
-  resolve: (confirmed: boolean) => void;
+  config: AlertModalConfig
+  resolve: (confirmed: boolean) => void
 }
 
 /**
@@ -36,36 +32,33 @@ export function AlertModalView({
   instance,
   onDismiss,
 }: {
-  instance: AlertModalInstance;
-  onDismiss: (confirmed: boolean) => void;
+  instance: AlertModalInstance
+  onDismiss: (confirmed: boolean) => void
 }) {
-  const { config } = instance;
-  const type = config.type || 'default';
-  const isDanger = type === 'danger';
+  const { config } = instance
+  const type = config.type || 'default'
+  const isDanger = type === 'danger'
 
   const handleConfirm = useCallback(() => {
-    onDismiss(true);
-  }, [onDismiss]);
+    onDismiss(true)
+  }, [onDismiss])
 
   const handleCancel = useCallback(() => {
-    onDismiss(false);
-  }, [onDismiss]);
+    onDismiss(false)
+  }, [onDismiss])
 
-  const iconColor = isDanger ? theme.colors.error : theme.colors.primary.main;
-  const Icon = isDanger ? WarningIcon : InfoIcon;
+  const iconColor = isDanger ? theme.colors.error : theme.colors.primary.main
+  const Icon = isDanger ? WarningIcon : InfoIcon
 
   return (
-    <Modal
-      visible={true}
-      onClose={handleCancel}
-      type="alert"
-      showClose={false}
-    >
+    <Modal visible={true} onClose={handleCancel} type="alert" showClose={false}>
       <View style={styles.iconWrapper}>
-        <View style={[
-          styles.iconCircle,
-          { backgroundColor: isDanger ? theme.colors.error + '15' : theme.colors.primary.light },
-        ]}>
+        <View
+          style={[
+            styles.iconCircle,
+            { backgroundColor: isDanger ? theme.colors.error + '15' : theme.colors.primary.light },
+          ]}
+        >
           <Icon size={28} color={iconColor} />
         </View>
       </View>
@@ -90,20 +83,20 @@ export function AlertModalView({
         />
       </View>
     </Modal>
-  );
+  )
 }
 
 // ===== 全局确认弹窗管理 =====
 
-type ConfirmHandler = (config: AlertModalConfig) => Promise<boolean>;
+type ConfirmHandler = (config: AlertModalConfig) => Promise<boolean>
 
-let globalConfirm: ConfirmHandler | null = null;
+let globalConfirm: ConfirmHandler | null = null
 
 /**
  * 注册全局确认弹窗函数（由 NotificationProvider 调用）
  */
 export function setGlobalConfirm(handler: ConfirmHandler | null) {
-  globalConfirm = handler;
+  globalConfirm = handler
 }
 
 /**
@@ -118,10 +111,10 @@ export function setGlobalConfirm(handler: ConfirmHandler | null) {
  */
 export function showConfirm(config: AlertModalConfig): Promise<boolean> {
   if (globalConfirm) {
-    return globalConfirm(config);
+    return globalConfirm(config)
   }
   // 降级：返回 false
-  return Promise.resolve(false);
+  return Promise.resolve(false)
 }
 
 const styles = StyleSheet.create({
@@ -158,4 +151,4 @@ const styles = StyleSheet.create({
   button: {
     minWidth: 90,
   },
-});
+})

@@ -1,33 +1,27 @@
 // app/settings/week-start.tsx
 // 星期开始日设置页面
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useWeekStartDay, WEEK_START_OPTIONS } from '@/hooks/useWeekStartDay';
-import { Icon } from '@/components/icons';
+import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useWeekStartDay, WEEK_START_OPTIONS } from '@/hooks/useWeekStartDay'
+import { Icon } from '@/components/icons'
 
 /**
  * 星期开始日设置页面
  */
 export default function WeekStartScreen() {
-  const router = useRouter();
-  const { t } = useI18n();
-  const { weekStartDay, setWeekStartDay } = useWeekStartDay();
+  const router = useRouter()
+  const { t } = useI18n()
+  const { weekStartDay, setWeekStartDay } = useWeekStartDay()
 
   const handleSelect = async (day: number) => {
-    await setWeekStartDay(day);
-    router.back();
-  };
+    await setWeekStartDay(day)
+    router.back()
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -62,7 +56,7 @@ export default function WeekStartScreen() {
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -122,4 +116,4 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.body,
     color: theme.colors.text.primary,
   },
-});
+})

@@ -3,32 +3,32 @@
 //
 // P2-29：默认 width 用 useWindowDimensions 响应屏幕旋转/分屏
 
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, useWindowDimensions } from 'react-native';
-import Svg, { Rect, Line, Text as SvgText } from 'react-native-svg';
-import { theme } from '@/constants/theme';
+import React, { useEffect, useRef } from 'react'
+import { View, Text, StyleSheet, Animated, useWindowDimensions } from 'react-native'
+import Svg, { Rect, Line, Text as SvgText } from 'react-native-svg'
+import { theme } from '@/constants/theme'
 
 interface DataPoint {
-  label: string;
-  value: number;
-  color?: string;
+  label: string
+  value: number
+  color?: string
 }
 
 interface BarChartProps {
-  data: DataPoint[];
-  width?: number;
-  height?: number;
-  color?: string;
-  showValues?: boolean;
-  showGrid?: boolean;
-  showLabels?: boolean;
-  targetLine?: number;
-  targetLabel?: string;
-  unit?: string;
-  animated?: boolean;
-  duration?: number;
-  barRadius?: number;
-  barWidth?: number;
+  data: DataPoint[]
+  width?: number
+  height?: number
+  color?: string
+  showValues?: boolean
+  showGrid?: boolean
+  showLabels?: boolean
+  targetLine?: number
+  targetLabel?: string
+  unit?: string
+  animated?: boolean
+  duration?: number
+  barRadius?: number
+  barWidth?: number
 }
 
 /**
@@ -81,54 +81,54 @@ export function BarChart({
   barRadius = 4,
   barWidth,
 }: BarChartProps) {
-  const { width: screenWidth } = useWindowDimensions();
-  const width = widthProp ?? screenWidth - 48;
-  const animatedValue = useRef(new Animated.Value(0)).current;
+  const { width: screenWidth } = useWindowDimensions()
+  const width = widthProp ?? screenWidth - 48
+  const animatedValue = useRef(new Animated.Value(0)).current
 
-  if (!data || data.length === 0) {
-    return (
-      <View style={[styles.container, { width, height }]}>
-        <Text style={styles.noDataText}>暂无数据</Text>
-      </View>
-    );
-  }
-
-  // 计算数据范围
-  const values = data.map((d) => d.value);
-  const maxValue = Math.max(...values, targetLine || 0);
-  const valueRange = maxValue || 1;
-
-  // 图表边距
-  const paddingLeft = 40;
-  const paddingRight = 20;
-  const paddingTop = 20;
-  const paddingBottom = 30;
-
-  // 计算绘图区域
-  const chartWidth = width - paddingLeft - paddingRight;
-  const chartHeight = height - paddingTop - paddingBottom;
-
-  // 计算柱子宽度
-  const gap = chartWidth * 0.2 / (data.length + 1);
-  const calculatedBarWidth = barWidth || (chartWidth - gap * (data.length + 1)) / data.length;
-
-  // 动画效果
+  // 动画效果 —— 必须放在 early return 之前，避免 hooks 顺序错乱
   useEffect(() => {
     if (animated) {
       Animated.timing(animatedValue, {
         toValue: 1,
         useNativeDriver: false,
         duration,
-      }).start();
+      }).start()
     } else {
-      animatedValue.setValue(1);
+      animatedValue.setValue(1)
     }
-  }, [animated, duration]);
+  }, [animated, duration])
+
+  if (!data || data.length === 0) {
+    return (
+      <View style={[styles.container, { width, height }]}>
+        <Text style={styles.noDataText}>暂无数据</Text>
+      </View>
+    )
+  }
+
+  // 计算数据范围
+  const values = data.map((d) => d.value)
+  const maxValue = Math.max(...values, targetLine || 0)
+  const valueRange = maxValue || 1
+
+  // 图表边距
+  const paddingLeft = 40
+  const paddingRight = 20
+  const paddingTop = 20
+  const paddingBottom = 30
+
+  // 计算绘图区域
+  const chartWidth = width - paddingLeft - paddingRight
+  const chartHeight = height - paddingTop - paddingBottom
+
+  // 计算柱子宽度
+  const gap = (chartWidth * 0.2) / (data.length + 1)
+  const calculatedBarWidth = barWidth || (chartWidth - gap * (data.length + 1)) / data.length
 
   // 计算目标线位置
   const targetY = targetLine
     ? paddingTop + ((maxValue - targetLine) / valueRange) * chartHeight
-    : null;
+    : null
 
   return (
     <View style={[styles.container, { width, height }]}>
@@ -137,8 +137,8 @@ export function BarChart({
         {showGrid && (
           <>
             {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
-              const y = paddingTop + ratio * chartHeight;
-              const value = maxValue - ratio * valueRange;
+              const y = paddingTop + ratio * chartHeight
+              const value = maxValue - ratio * valueRange
               return (
                 <React.Fragment key={ratio}>
                   <Line
@@ -162,7 +162,7 @@ export function BarChart({
                     </SvgText>
                   )}
                 </React.Fragment>
-              );
+              )
             })}
           </>
         )}
@@ -195,10 +195,10 @@ export function BarChart({
 
         {/* 柱子 */}
         {data.map((d, i) => {
-          const barHeight = (d.value / valueRange) * chartHeight;
-          const x = paddingLeft + gap + i * (calculatedBarWidth + gap);
-          const y = paddingTop + chartHeight - barHeight;
-          const barColor = d.color || color;
+          const barHeight = (d.value / valueRange) * chartHeight
+          const x = paddingLeft + gap + i * (calculatedBarWidth + gap)
+          const y = paddingTop + chartHeight - barHeight
+          const barColor = d.color || color
 
           return (
             <React.Fragment key={i}>
@@ -221,7 +221,8 @@ export function BarChart({
                   fontSize={10}
                   fill={theme.colors.text.secondary}
                 >
-                  {d.value}{unit}
+                  {d.value}
+                  {unit}
                 </SvgText>
               )}
 
@@ -238,11 +239,11 @@ export function BarChart({
                 </SvgText>
               )}
             </React.Fragment>
-          );
+          )
         })}
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -254,4 +255,4 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.body,
     color: theme.colors.text.tertiary,
   },
-});
+})

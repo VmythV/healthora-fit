@@ -1,43 +1,37 @@
 // components/exercise/DurationInput.tsx
 // 运动时长输入
 
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
+import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
 
 interface DurationInputProps {
-  value: number; // 分钟
-  onChange: (minutes: number) => void;
+  value: number // 分钟
+  onChange: (minutes: number) => void
 }
 
-const PRESETS = [15, 30, 45, 60, 90, 120];
+const PRESETS = [15, 30, 45, 60, 90, 120]
 
 /**
  * 运动时长输入
  */
 export function DurationInput({ value, onChange }: DurationInputProps) {
-  const { t } = useI18n();
+  const { t } = useI18n()
 
   const handleIncrement = (delta: number) => {
-    const newValue = Math.max(1, value + delta);
-    onChange(newValue);
-  };
+    const newValue = Math.max(1, value + delta)
+    onChange(newValue)
+  }
 
   return (
     <View style={styles.container}>
       {/* 数值调节 */}
       <View style={styles.adjuster}>
-        <TouchableOpacity
-          style={styles.adjustButton}
-          onPress={() => handleIncrement(-5)}
-        >
+        <TouchableOpacity style={styles.adjustButton} onPress={() => handleIncrement(-5)}>
           <Text style={styles.adjustButtonText}>-5</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.adjustButton}
-          onPress={() => handleIncrement(-1)}
-        >
+        <TouchableOpacity style={styles.adjustButton} onPress={() => handleIncrement(-1)}>
           <Text style={styles.adjustButtonText}>-1</Text>
         </TouchableOpacity>
 
@@ -46,16 +40,10 @@ export function DurationInput({ value, onChange }: DurationInputProps) {
           <Text style={styles.unit}>{t('exercise.minutes')}</Text>
         </View>
 
-        <TouchableOpacity
-          style={styles.adjustButton}
-          onPress={() => handleIncrement(1)}
-        >
+        <TouchableOpacity style={styles.adjustButton} onPress={() => handleIncrement(1)}>
           <Text style={styles.adjustButtonText}>+1</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.adjustButton}
-          onPress={() => handleIncrement(5)}
-        >
+        <TouchableOpacity style={styles.adjustButton} onPress={() => handleIncrement(5)}>
           <Text style={styles.adjustButtonText}>+5</Text>
         </TouchableOpacity>
       </View>
@@ -65,25 +53,17 @@ export function DurationInput({ value, onChange }: DurationInputProps) {
         {PRESETS.map((preset) => (
           <TouchableOpacity
             key={preset}
-            style={[
-              styles.presetButton,
-              value === preset && styles.presetButtonActive,
-            ]}
+            style={[styles.presetButton, value === preset && styles.presetButtonActive]}
             onPress={() => onChange(preset)}
           >
-            <Text
-              style={[
-                styles.presetText,
-                value === preset && styles.presetTextActive,
-              ]}
-            >
+            <Text style={[styles.presetText, value === preset && styles.presetTextActive]}>
               {preset}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -144,4 +124,4 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: theme.fontWeight.semibold,
   },
-});
+})

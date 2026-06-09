@@ -52,41 +52,46 @@ An intelligent health tracking app that helps you effortlessly track diet, exerc
 ## ✨ Features
 
 ### 🍽️ Diet Tracking
+
 - Snap a photo to identify food with AI nutrition analysis
 - Track calories, protein, carbs, and fat per meal
 - Manual editing for correction
 
 ### 🏃 Exercise Logging
+
 - Support multiple exercise types (running, cycling, swimming, strength training, etc.)
 - Screenshot recognition for exercise data
 - Automatic calorie burn calculation
 
 ### ⚖️ Weight Management
+
 - Record daily weight changes
 - Set target weight and track progress
 - Weight trend visualization
 
 ### 📊 Data Analysis
+
 - Weekly/Monthly/Yearly trend views
 - Nutrition breakdown charts
 - Exercise type distribution
 
 ### 🤖 AI Configuration
+
 - OpenAI-compatible API support
 - Configurable endpoint, API key, and model
 - Flexible integration with various AI services
 
 ## 🛠️ Tech Stack
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Expo | SDK 54 | Development Framework |
-| React Native | 0.81.5 | Mobile Framework |
-| React | 19.1.0 | UI Library |
-| TypeScript | 5.9.2 | Type Safety |
-| Expo Router | 6.0.24 | File-based Routing |
-| SQLite | 16.0.10 | Local Storage |
-| Zustand | 5.0.14 | State Management |
+| Technology   | Version | Purpose               |
+| ------------ | ------- | --------------------- |
+| Expo         | SDK 54  | Development Framework |
+| React Native | 0.81.5  | Mobile Framework      |
+| React        | 19.1.0  | UI Library            |
+| TypeScript   | 5.9.2   | Type Safety           |
+| Expo Router  | 6.0.24  | File-based Routing    |
+| SQLite       | 16.0.10 | Local Storage         |
+| Zustand      | 5.0.14  | State Management      |
 
 ## 🚀 Quick Start
 
@@ -167,14 +172,14 @@ healthora-fit/
 Local SQLite storage with typed queries:
 
 ```typescript
-import { database } from '@/database';
-import { dietQueries } from '@/database/queries';
+import { database } from '@/database'
+import { dietQueries } from '@/database/queries'
 
 // Initialize database
-await database.initialize();
+await database.initialize()
 
 // Query today's diet records
-const todayRecords = await dietQueries.getToday();
+const todayRecords = await dietQueries.getToday()
 ```
 
 ### Theming

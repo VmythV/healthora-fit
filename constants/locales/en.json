@@ -382,7 +382,12 @@
     "aiFailed": "AI recognition failed, please retry or input manually",
     "saveFailed": "Save failed, please retry",
     "loadFailed": "Load failed, please pull down to refresh",
-    "permission": "Permission required to use this feature"
+    "permission": "Permission required to use this feature",
+    "dbInitFailed": "Database initialization failed"
+  },
+  "app": {
+    "initializing": "Initializing...",
+    "initFailed": "Initialization failed"
   },
   "confirm": {
     "delete": {

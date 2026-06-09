@@ -1,28 +1,22 @@
 // components/EmptyState.tsx
 // 空状态组件
 
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '@/constants/theme';
-import { AnimatedButton } from './AnimatedButton';
-import { Icon } from '@/components/icons';
-import { IconName } from '@/components/icons/Icon';
+import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import { theme } from '@/constants/theme'
+import { AnimatedButton } from './AnimatedButton'
+import { Icon } from '@/components/icons'
+import { IconName } from '@/components/icons/Icon'
 
 interface EmptyStateProps {
-  icon: IconName;
-  title: string;
-  message?: string;
-  actionTitle?: string;
-  onAction?: () => void;
+  icon: IconName
+  title: string
+  message?: string
+  actionTitle?: string
+  onAction?: () => void
 }
 
-export function EmptyState({
-  icon,
-  title,
-  message,
-  actionTitle,
-  onAction,
-}: EmptyStateProps) {
+export function EmptyState({ icon, title, message, actionTitle, onAction }: EmptyStateProps) {
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>
@@ -40,7 +34,7 @@ export function EmptyState({
         />
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -70,4 +64,4 @@ const styles = StyleSheet.create({
   button: {
     minWidth: 150,
   },
-});
+})

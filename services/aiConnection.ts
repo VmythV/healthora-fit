@@ -9,20 +9,20 @@
 // - 火山引擎等（使用简单聊天请求测试）
 // - Responses API（使用 /responses 端点）
 
-import { logger } from '@/utils/logger';
+import { logger } from '@/utils/logger'
 
-export type ApiType = 'chat-completions' | 'responses';
+export type ApiType = 'chat-completions' | 'responses'
 
 export interface ActiveConfig {
-  endpoint: string;
-  apiKey: string;
-  model: string;
-  apiType?: ApiType;
+  endpoint: string
+  apiKey: string
+  model: string
+  apiType?: ApiType
 }
 
 export interface TestResult {
-  success: boolean;
-  error?: string;
+  success: boolean
+  error?: string
 }
 
 /**
@@ -34,39 +34,42 @@ export interface TestResult {
  */
 export async function testActiveConfig(config: ActiveConfig): Promise<TestResult> {
   if (!config.endpoint || !config.apiKey) {
-    return { success: false, error: 'AI 服务未配置' };
+    return { success: false, error: 'AI 服务未配置' }
   }
 
   try {
     // 1) 尝试 /models 端点（OpenAI 兼容 API 走这条最快）
-    const baseUrl = config.endpoint.replace(/\/(chat\/completions|responses)$/, '');
+    const baseUrl = config.endpoint.replace(/\/(chat\/completions|responses)$/, '')
     try {
       const modelsResponse = await fetch(`${baseUrl}/models`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${config.apiKey}`,
+          Authorization: `Bearer ${config.apiKey}`,
           'Content-Type': 'application/json',
         },
-      });
+      })
       if (modelsResponse.ok) {
-        return { success: true };
+        return { success: true }
       }
     } catch {
       // /models 端点不可用，继续尝试 POST 测试
     }
 
     // 2) 根据 API 类型发送测试请求
-    const isResponses = config.apiType === 'responses'
-      || config.endpoint.endsWith('/responses');
+    const isResponses = config.apiType === 'responses' || config.endpoint.endsWith('/responses')
 
     const apiEndpoint = isResponses
-      ? (config.endpoint.endsWith('/responses') ? config.endpoint : `${config.endpoint}/responses`)
-      : (config.endpoint.endsWith('/chat/completions') ? config.endpoint : `${config.endpoint}/chat/completions`);
+      ? config.endpoint.endsWith('/responses')
+        ? config.endpoint
+        : `${config.endpoint}/responses`
+      : config.endpoint.endsWith('/chat/completions')
+        ? config.endpoint
+        : `${config.endpoint}/chat/completions`
 
     const headers = {
-      'Authorization': `Bearer ${config.apiKey}`,
+      Authorization: `Bearer ${config.apiKey}`,
       'Content-Type': 'application/json',
-    };
+    }
 
     const body = isResponses
       ? {
@@ -83,32 +86,30 @@ export async function testActiveConfig(config: ActiveConfig): Promise<TestResult
           model: config.model,
           messages: [{ role: 'user', content: 'Hi' }],
           max_tokens: 5,
-        };
+        }
 
     const testResponse = await fetch(apiEndpoint, {
       method: 'POST',
       headers,
       body: JSON.stringify(body),
-    });
+    })
 
     if (testResponse.ok) {
-      return { success: true };
+      return { success: true }
     }
 
     // 解析错误信息
-    let errorMessage = '连接失败';
+    let errorMessage = '连接失败'
     try {
-      const errorData = await testResponse.json();
-      errorMessage = errorData.error?.message
-        || errorData.message
-        || `HTTP ${testResponse.status}`;
+      const errorData = await testResponse.json()
+      errorMessage = errorData.error?.message || errorData.message || `HTTP ${testResponse.status}`
     } catch {
-      errorMessage = `HTTP ${testResponse.status}`;
+      errorMessage = `HTTP ${testResponse.status}`
     }
-    return { success: false, error: errorMessage };
+    return { success: false, error: errorMessage }
   } catch (err) {
-    logger.error('[aiConnection] testActiveConfig 失败:', err);
-    const message = err instanceof Error ? err.message : '网络连接失败';
-    return { success: false, error: message };
+    logger.error('[aiConnection] testActiveConfig 失败:', err)
+    const message = err instanceof Error ? err.message : '网络连接失败'
+    return { success: false, error: message }
   }
 }

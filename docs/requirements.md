@@ -2,22 +2,22 @@
 
 ## 📌 产品概述
 
-| 项目 | 说明 |
-|------|------|
-| **应用名称** | Healthora Fit |
-| **品牌含义** | Health + Aura（健康光环） |
-| **定位** | 个人健康管理助手，记录饮食、运动、体重 |
-| **目标平台** | Android + iOS（同时支持） |
+| 项目         | 说明                                           |
+| ------------ | ---------------------------------------------- |
+| **应用名称** | Healthora Fit                                  |
+| **品牌含义** | Health + Aura（健康光环）                      |
+| **定位**     | 个人健康管理助手，记录饮食、运动、体重         |
+| **目标平台** | Android + iOS（同时支持）                      |
 | **当前阶段** | 个人使用，后续考虑上架 Google Play / App Store |
 
 ---
 
 ## 🎨 设计风格
 
-| 项目 | 说明 |
-|------|------|
-| **整体风格** | 简约但不简单，精致有品质感 |
-| **图标风格** | 线条极简风，细线条、几何感，独特不落俗 |
+| 项目         | 说明                                     |
+| ------------ | ---------------------------------------- |
+| **整体风格** | 简约但不简单，精致有品质感               |
+| **图标风格** | 线条极简风，细线条、几何感，独特不落俗   |
 | **品牌色系** | 待定（建议围绕"光环"概念，可考虑渐变色） |
 
 ---
@@ -47,17 +47,17 @@
 
 ### 技术栈详情
 
-| 层级 | 技术选型 | 说明 |
-|------|---------|------|
-| 框架 | React Native + Expo | 跨平台开发 |
-| 语言 | TypeScript | 类型安全 |
-| 导航 | Expo Router | 文件系统路由 |
-| 存储 | expo-sqlite | 本地数据库 |
-| 相机 | expo-camera / expo-image-picker | 拍照功能 |
-| AI | OpenAI 兼容 API | 可配置 |
-| 健康数据 | react-native-health (iOS) / expo-health-connect (Android) | 健康平台集成 |
-| 图表 | react-native-chart-kit 或 victory-native | 数据可视化 |
-| 状态管理 | Zustand | 轻量级状态管理 |
+| 层级     | 技术选型                                                  | 说明           |
+| -------- | --------------------------------------------------------- | -------------- |
+| 框架     | React Native + Expo                                       | 跨平台开发     |
+| 语言     | TypeScript                                                | 类型安全       |
+| 导航     | Expo Router                                               | 文件系统路由   |
+| 存储     | expo-sqlite                                               | 本地数据库     |
+| 相机     | expo-camera / expo-image-picker                           | 拍照功能       |
+| AI       | OpenAI 兼容 API                                           | 可配置         |
+| 健康数据 | react-native-health (iOS) / expo-health-connect (Android) | 健康平台集成   |
+| 图表     | react-native-chart-kit 或 victory-native                  | 数据可视化     |
+| 状态管理 | Zustand                                                   | 轻量级状态管理 |
 
 ---
 
@@ -81,12 +81,14 @@
 ### 模块 1：首页（Dashboard）
 
 **功能：**
+
 - 显示今日状态评分（1-5 星）
 - 今日摘要（饮食记录数、运动情况、当前体重）
 - 快捷入口（记录饮食、记录运动、记录体重）
 - 与目标体重的差距趋势
 
 **今日状态算法：**
+
 ```
 状态 = f(饮食质量, 运动量, 目标达成度)
 
@@ -105,15 +107,16 @@
 
 **评分规则（详细）：**
 
-| 维度 | 权重 | 评分逻辑 |
-|------|------|---------|
-| 饮食规律 | 30% | 三餐全记录 100%，两餐 70%，一餐 40%，无记录 0% |
-| 营养均衡 | 20% | 蛋白质占比 25-35% 为佳，偏离越远扣分越多 |
-| 卡路里控制 | 20% | 在目标范围内 100%，超出按比例扣分 |
-| 运动完成 | 20% | 有运动 100%，无运动 0%，可按目标时长细化 |
-| 体重趋势 | 10% | 趋势向目标方向 100%，持平 50%，反向 0% |
+| 维度       | 权重 | 评分逻辑                                       |
+| ---------- | ---- | ---------------------------------------------- |
+| 饮食规律   | 30%  | 三餐全记录 100%，两餐 70%，一餐 40%，无记录 0% |
+| 营养均衡   | 20%  | 蛋白质占比 25-35% 为佳，偏离越远扣分越多       |
+| 卡路里控制 | 20%  | 在目标范围内 100%，超出按比例扣分              |
+| 运动完成   | 20%  | 有运动 100%，无运动 0%，可按目标时长细化       |
+| 体重趋势   | 10%  | 趋势向目标方向 100%，持平 50%，反向 0%         |
 
 **界面设计：**
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  Healthora Fit                    [设置]            │
@@ -153,6 +156,7 @@
 ### 模块 2：日历
 
 **功能：**
+
 - 月视图 / 日视图，可自由切换
 - 月视图：显示每天有无记录的标记
 - 日视图：时间线形式展示当日所有记录
@@ -160,6 +164,7 @@
 - 支持左右滑动切换月份/日期
 
 **月视图设计：**
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  2026年6月                      [◀] [日视图] [▶]    │
@@ -184,6 +189,7 @@
 ```
 
 **日视图设计：**
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  6月3日 周三                     [◀] [月视图] [▶]   │
@@ -228,11 +234,13 @@
 #### 3.1 饮食记录
 
 **流程：**
+
 ```
 拍照 → AI 即时分析 → 显示结果 → 用户确认/编辑 → 保存
 ```
 
 **详细流程：**
+
 1. 用户点击「记录饮食」或底部 ➕ 按钮
 2. 打开相机或从相册选择照片
 3. 照片上传至 AI API 进行分析
@@ -242,23 +250,24 @@
 
 **数据字段：**
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | INTEGER | 主键 |
-| timestamp | DATETIME | 记录时间（可修改） |
-| photo_uri | TEXT | 照片存储路径 |
-| foods_json | TEXT | AI 识别的食物列表 JSON |
-| total_calories | REAL | 总卡路里 |
-| total_protein | REAL | 总蛋白质（克） |
-| total_carbs | REAL | 总碳水（克） |
-| total_fat | REAL | 总脂肪（克） |
-| meal_type | TEXT | 餐次：breakfast/lunch/dinner/snack |
-| note | TEXT | 用户备注 |
-| is_edited | BOOLEAN | 用户是否手动修正过 |
-| created_at | DATETIME | 创建时间 |
-| updated_at | DATETIME | 更新时间 |
+| 字段           | 类型     | 说明                               |
+| -------------- | -------- | ---------------------------------- |
+| id             | INTEGER  | 主键                               |
+| timestamp      | DATETIME | 记录时间（可修改）                 |
+| photo_uri      | TEXT     | 照片存储路径                       |
+| foods_json     | TEXT     | AI 识别的食物列表 JSON             |
+| total_calories | REAL     | 总卡路里                           |
+| total_protein  | REAL     | 总蛋白质（克）                     |
+| total_carbs    | REAL     | 总碳水（克）                       |
+| total_fat      | REAL     | 总脂肪（克）                       |
+| meal_type      | TEXT     | 餐次：breakfast/lunch/dinner/snack |
+| note           | TEXT     | 用户备注                           |
+| is_edited      | BOOLEAN  | 用户是否手动修正过                 |
+| created_at     | DATETIME | 创建时间                           |
+| updated_at     | DATETIME | 更新时间                           |
 
 **foods_json 结构：**
+
 ```json
 [
   {
@@ -281,6 +290,7 @@
 ```
 
 **AI Prompt 设计：**
+
 ```
 你是一个专业的营养师和食物识别专家。请分析这张食物照片，识别其中的食物并估算营养成分。
 
@@ -314,6 +324,7 @@
 ```
 
 **界面设计：**
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  记录饮食                        [取消] [保存]      │
@@ -363,28 +374,29 @@
 
 **支持三种方式：**
 
-| 方式 | 说明 | 优先级 |
-|------|------|--------|
-| **手动输入** | 选择运动类型 + 输入时长 + 系统估算卡路里 | P0 |
-| **截图识别** | 截图小米运动健康 App → AI 提取运动数据 | P1 |
-| **自动同步** | 从小米运动健康 App 通过 Health Connect 同步 | P2 |
+| 方式         | 说明                                        | 优先级 |
+| ------------ | ------------------------------------------- | ------ |
+| **手动输入** | 选择运动类型 + 输入时长 + 系统估算卡路里    | P0     |
+| **截图识别** | 截图小米运动健康 App → AI 提取运动数据      | P1     |
+| **自动同步** | 从小米运动健康 App 通过 Health Connect 同步 | P2     |
 
 **数据字段：**
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | INTEGER | 主键 |
-| timestamp | DATETIME | 运动时间 |
-| exercise_type | TEXT | 运动类型 |
-| duration_minutes | INTEGER | 运动时长（分钟） |
-| calories_burned | REAL | 消耗卡路里 |
-| source | TEXT | 来源：manual/screenshot/health_connect |
-| screenshot_uri | TEXT | 截图存储路径 |
-| raw_data | TEXT | 原始同步数据（JSON） |
-| created_at | DATETIME | 创建时间 |
-| updated_at | DATETIME | 更新时间 |
+| 字段             | 类型     | 说明                                   |
+| ---------------- | -------- | -------------------------------------- |
+| id               | INTEGER  | 主键                                   |
+| timestamp        | DATETIME | 运动时间                               |
+| exercise_type    | TEXT     | 运动类型                               |
+| duration_minutes | INTEGER  | 运动时长（分钟）                       |
+| calories_burned  | REAL     | 消耗卡路里                             |
+| source           | TEXT     | 来源：manual/screenshot/health_connect |
+| screenshot_uri   | TEXT     | 截图存储路径                           |
+| raw_data         | TEXT     | 原始同步数据（JSON）                   |
+| created_at       | DATETIME | 创建时间                               |
+| updated_at       | DATETIME | 更新时间                               |
 
 **运动类型列表：**
+
 ```typescript
 const EXERCISE_TYPES = [
   { id: 'running', name: '跑步', caloriesPerMinute: 10 },
@@ -395,10 +407,11 @@ const EXERCISE_TYPES = [
   { id: 'yoga', name: '瑜伽', caloriesPerMinute: 4 },
   { id: 'hiit', name: 'HIIT', caloriesPerMinute: 12 },
   { id: 'other', name: '其他', caloriesPerMinute: 6 },
-];
+]
 ```
 
 **AI 截图识别 Prompt：**
+
 ```
 你是一个运动数据分析专家。请分析这张运动 App 截图，提取运动数据。
 
@@ -420,6 +433,7 @@ const EXERCISE_TYPES = [
 ```
 
 **手动输入界面：**
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  记录运动                        [取消] [保存]      │
@@ -455,22 +469,23 @@ const EXERCISE_TYPES = [
 
 **支持两种方式：**
 
-| 方式 | 说明 | 优先级 |
-|------|------|--------|
-| **手动输入** | 直接输入体重数字 | P0 |
-| **自动同步** | 从小米体重计通过 Health Connect 同步 | P2 |
+| 方式         | 说明                                 | 优先级 |
+| ------------ | ------------------------------------ | ------ |
+| **手动输入** | 直接输入体重数字                     | P0     |
+| **自动同步** | 从小米体重计通过 Health Connect 同步 | P2     |
 
 **数据字段：**
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| id | INTEGER | 主键 |
-| timestamp | DATETIME | 记录时间 |
-| weight | REAL | 体重（公斤，精确到 0.1） |
-| source | TEXT | 来源：manual/health_connect |
-| created_at | DATETIME | 创建时间 |
+| 字段       | 类型     | 说明                        |
+| ---------- | -------- | --------------------------- |
+| id         | INTEGER  | 主键                        |
+| timestamp  | DATETIME | 记录时间                    |
+| weight     | REAL     | 体重（公斤，精确到 0.1）    |
+| source     | TEXT     | 来源：manual/health_connect |
+| created_at | DATETIME | 创建时间                    |
 
 **界面设计：**
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  记录体重                        [取消] [保存]      │
@@ -503,6 +518,7 @@ const EXERCISE_TYPES = [
 ### 模块 4：分析
 
 **时间范围选择：**
+
 - 按周（本周 / 上周 / 选择周）
 - 按月（本月 / 上月 / 选择月）
 - 按年（今年 / 去年 / 选择年）
@@ -511,6 +527,7 @@ const EXERCISE_TYPES = [
 **展示内容：**
 
 **体重趋势图：**
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  体重趋势                    [周] [月] [年] [自定义] │
@@ -536,6 +553,7 @@ const EXERCISE_TYPES = [
 ```
 
 **饮食趋势图：**
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  饮食趋势                                            │
@@ -568,6 +586,7 @@ const EXERCISE_TYPES = [
 ```
 
 **运动趋势图：**
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  运动趋势                                            │
@@ -603,6 +622,7 @@ const EXERCISE_TYPES = [
 ### 模块 5：设置
 
 **界面设计：**
+
 ```
 ┌─────────────────────────────────────────────────────┐
 │  设置                                               │
@@ -737,6 +757,7 @@ CREATE INDEX idx_weight_timestamp ON weight_records(timestamp);
 ### Android - Health Connect
 
 **需要的权限：**
+
 ```xml
 <uses-permission android:name="android.permission.health.READ_WEIGHT" />
 <uses-permission android:name="android.permission.health.READ_EXERCISE" />
@@ -747,15 +768,16 @@ CREATE INDEX idx_weight_timestamp ON weight_records(timestamp);
 **数据类型映射：**
 
 | 本应用数据 | Health Connect API |
-|-----------|-------------------|
-| 体重 | `Weight` |
-| 运动记录 | `ExerciseSession` |
-| 步数 | `Steps` |
-| 心率 | `HeartRate` |
+| ---------- | ------------------ |
+| 体重       | `Weight`           |
+| 运动记录   | `ExerciseSession`  |
+| 步数       | `Steps`            |
+| 心率       | `HeartRate`        |
 
 ### iOS - HealthKit
 
 **需要的权限：**
+
 ```typescript
 const permissions = {
   read: [
@@ -764,10 +786,11 @@ const permissions = {
     HKQuantityType.heartRate,
     HKWorkoutType.workout,
   ],
-};
+}
 ```
 
 **注意事项：**
+
 - 小米运动健康 App 需要开启「同步到 Health Connect/HealthKit」功能
 - 首次使用需要用户授权
 - 数据同步可能有延迟
@@ -808,6 +831,7 @@ const permissions = {
 ```
 
 **导入说明：**
+
 - 只能导入本 App 导出的 JSON 文件
 - 导入时会合并数据（基于 id 去重）
 - 已存在的记录会更新，不存在的会新增
@@ -817,21 +841,25 @@ const permissions = {
 ## 🚀 非功能需求
 
 ### 性能要求
+
 - 应用启动时间 < 2 秒
 - AI 分析响应时间 < 10 秒（取决于网络）
 - 页面切换流畅，无明显卡顿
 
 ### 数据安全
+
 - API Key 本地加密存储
 - 照片存储在应用私有目录
 - 导出文件不包含 API Key
 
 ### 兼容性
+
 - Android: API 26+ (Android 8.0+)
 - iOS: iOS 13+
 - 支持竖屏和横屏
 
 ### 离线能力
+
 - 无网络时可查看历史记录
 - 无网络时可手动录入数据
 - AI 分析需要网络连接
@@ -840,15 +868,15 @@ const permissions = {
 
 ## 📝 术语表
 
-| 术语 | 说明 |
-|------|------|
-| Health Connect | Android 健康数据平台 |
-| HealthKit | iOS 健康数据平台 |
-| OpenAI 协议 | 兼容 OpenAI API 格式的接口协议 |
-| 大卡 | 千卡（kcal），食物能量单位 |
-| MVP | 最小可行产品 |
+| 术语           | 说明                           |
+| -------------- | ------------------------------ |
+| Health Connect | Android 健康数据平台           |
+| HealthKit      | iOS 健康数据平台               |
+| OpenAI 协议    | 兼容 OpenAI API 格式的接口协议 |
+| 大卡           | 千卡（kcal），食物能量单位     |
+| MVP            | 最小可行产品                   |
 
 ---
 
-*文档版本：v1.0*
-*最后更新：2026-06-03*
+_文档版本：v1.0_
+_最后更新：2026-06-03_

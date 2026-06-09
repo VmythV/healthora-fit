@@ -1,19 +1,19 @@
 // components/ui/Empty.tsx
 // 空状态组件
 
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { theme } from '@/constants/theme';
-import { Button } from './Button';
-import { Icon } from '@/components/icons';
-import { IconName } from '@/components/icons/Icon';
+import React from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import { theme } from '@/constants/theme'
+import { Button } from './Button'
+import { Icon } from '@/components/icons'
+import { IconName } from '@/components/icons/Icon'
 
 interface EmptyProps {
-  icon?: IconName;
-  title: string;
-  description?: string;
-  actionTitle?: string;
-  onAction?: () => void;
+  icon?: IconName
+  title: string
+  description?: string
+  actionTitle?: string
+  onAction?: () => void
 }
 
 /**
@@ -30,13 +30,7 @@ interface EmptyProps {
  * />
  * ```
  */
-export function Empty({
-  icon,
-  title,
-  description,
-  actionTitle,
-  onAction,
-}: EmptyProps) {
+export function Empty({ icon, title, description, actionTitle, onAction }: EmptyProps) {
   return (
     <View style={styles.container}>
       {icon && (
@@ -47,9 +41,7 @@ export function Empty({
 
       <Text style={styles.title}>{title}</Text>
 
-      {description && (
-        <Text style={styles.description}>{description}</Text>
-      )}
+      {description && <Text style={styles.description}>{description}</Text>}
 
       {actionTitle && onAction && (
         <Button
@@ -61,7 +53,7 @@ export function Empty({
         />
       )}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -89,4 +81,4 @@ const styles = StyleSheet.create({
   button: {
     minWidth: 120,
   },
-});
+})

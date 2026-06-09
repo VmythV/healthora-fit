@@ -3,27 +3,27 @@
 //
 // P2-29：默认 width 用 useWindowDimensions 响应屏幕旋转/分屏
 
-import React from 'react';
-import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
-import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
-import { theme } from '@/constants/theme';
+import React from 'react'
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native'
+import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg'
+import { theme } from '@/constants/theme'
 
 interface DataPoint {
-  date: string;
-  value: number;
+  date: string
+  value: number
 }
 
 interface LineChartProps {
-  data: DataPoint[];
-  width?: number;
-  height?: number;
-  color?: string;
-  showDots?: boolean;
-  showGrid?: boolean;
-  showLabels?: boolean;
-  targetLine?: number;
-  targetLabel?: string;
-  unit?: string;
+  data: DataPoint[]
+  width?: number
+  height?: number
+  color?: string
+  showDots?: boolean
+  showGrid?: boolean
+  showLabels?: boolean
+  targetLine?: number
+  targetLabel?: string
+  unit?: string
 }
 
 /**
@@ -59,59 +59,57 @@ export function LineChart({
   showLabels = true,
   targetLine,
   targetLabel,
-  unit = '',
+  unit: _unit = '',
 }: LineChartProps) {
-  const { width: screenWidth } = useWindowDimensions();
-  const width = widthProp ?? screenWidth - 48;
+  const { width: screenWidth } = useWindowDimensions()
+  const width = widthProp ?? screenWidth - 48
   if (!data || data.length === 0) {
     return (
       <View style={[styles.container, { width, height }]}>
         <Text style={styles.noDataText}>暂无数据</Text>
       </View>
-    );
+    )
   }
 
   // 过滤掉无效值，防止 NaN 进入 SVG path
-  const validData = data.filter((d) => Number.isFinite(d.value));
+  const validData = data.filter((d) => Number.isFinite(d.value))
   if (validData.length === 0) {
     return (
       <View style={[styles.container, { width, height }]}>
         <Text style={styles.noDataText}>暂无数据</Text>
       </View>
-    );
+    )
   }
 
   // 计算数据范围
-  const values = validData.map((d) => d.value);
-  const minValue = Math.min(...values, targetLine || Infinity);
-  const maxValue = Math.max(...values);
-  const valueRange = maxValue - minValue || 1;
+  const values = validData.map((d) => d.value)
+  const minValue = Math.min(...values, targetLine || Infinity)
+  const maxValue = Math.max(...values)
+  const valueRange = maxValue - minValue || 1
 
   // 图表边距
-  const paddingLeft = 40;
-  const paddingRight = 20;
-  const paddingTop = 20;
-  const paddingBottom = 30;
+  const paddingLeft = 40
+  const paddingRight = 20
+  const paddingTop = 20
+  const paddingBottom = 30
 
   // 计算绘图区域
-  const chartWidth = width - paddingLeft - paddingRight;
-  const chartHeight = height - paddingTop - paddingBottom;
+  const chartWidth = width - paddingLeft - paddingRight
+  const chartHeight = height - paddingTop - paddingBottom
 
   // 计算点的位置
   const points = validData.map((d, i) => ({
     x: paddingLeft + (validData.length > 1 ? i / (validData.length - 1) : 0.5) * chartWidth,
     y: paddingTop + ((maxValue - d.value) / valueRange) * chartHeight,
-  }));
+  }))
 
   // 生成路径
-  const linePath = points
-    .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`)
-    .join(' ');
+  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
 
   // 计算目标线位置
   const targetY = targetLine
     ? paddingTop + ((maxValue - targetLine) / valueRange) * chartHeight
-    : null;
+    : null
 
   return (
     <View style={[styles.container, { width, height }]}>
@@ -120,8 +118,8 @@ export function LineChart({
         {showGrid && (
           <>
             {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
-              const y = paddingTop + ratio * chartHeight;
-              const value = maxValue - ratio * valueRange;
+              const y = paddingTop + ratio * chartHeight
+              const value = maxValue - ratio * valueRange
               return (
                 <React.Fragment key={ratio}>
                   <Line
@@ -145,7 +143,7 @@ export function LineChart({
                     </SvgText>
                   )}
                 </React.Fragment>
-              );
+              )
             })}
           </>
         )}
@@ -200,7 +198,7 @@ export function LineChart({
           validData.map((d, i) => {
             // 只显示部分标签，避免重叠
             if (validData.length > 7 && i % Math.ceil(validData.length / 7) !== 0) {
-              return null;
+              return null
             }
             return (
               <SvgText
@@ -213,11 +211,11 @@ export function LineChart({
               >
                 {d.date}
               </SvgText>
-            );
+            )
           })}
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -229,4 +227,4 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.body,
     color: theme.colors.text.tertiary,
   },
-});
+})

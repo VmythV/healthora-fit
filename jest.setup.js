@@ -20,6 +20,7 @@ jest.mock('expo-secure-store');
 jest.mock('expo-crypto');
 jest.mock('expo-file-system');
 jest.mock('expo-sqlite');
+jest.mock('expo-localization');
 
 // 关闭原生模块的 console 噪音
 jest.spyOn(console, 'warn').mockImplementation(() => {});

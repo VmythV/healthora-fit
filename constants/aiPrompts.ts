@@ -48,6 +48,6 @@ export const AI_PROMPTS = {
 4. 卡路里必须是数字
 5. timestamp 是截图中显示的运动开始时间，不是截图时间。如果截图中没有时间信息，则设为 null
 6. 只返回 JSON，不要有其他文字`,
-} as const;
+} as const
 
-export type AiPromptKey = keyof typeof AI_PROMPTS;
+export type AiPromptKey = keyof typeof AI_PROMPTS

@@ -4,46 +4,53 @@
 // P2-21：从 ExerciseRecordForm 抽出，封装 +/- 5min、+/- 1day、"现在"快捷键。
 // 可在未来其他表单（饮食/体重）复用。
 
-import React, { useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Modal as RNModal,
-  Platform,
-} from 'react-native';
-import { Card } from '@/components/ui';
-import { Icon } from '@/components/icons';
-import { theme } from '@/constants/theme';
+import React, { useCallback } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Modal as RNModal } from 'react-native'
+import { Card } from '@/components/ui'
+import { Icon } from '@/components/icons'
+import { theme } from '@/constants/theme'
 
 interface DateTimeStepperProps {
-  value: Date;
-  onChange: (date: Date) => void;
+  value: Date
+  onChange: (date: Date) => void
   /** "+/-" 按钮的步进（分钟）。默认 5 */
-  minuteStep?: number;
+  minuteStep?: number
   /** "+/-" 按钮的步进（天）。默认 1 */
-  dayStep?: number;
+  dayStep?: number
 }
 
 function pad(n: number): string {
-  return String(n).padStart(2, '0');
+  return String(n).padStart(2, '0')
 }
 
 function formatDateTime(d: Date): string {
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
-function shiftDate(value: Date, field: 'year' | 'month' | 'day' | 'hour' | 'minute', delta: number): Date {
-  const d = new Date(value);
+function shiftDate(
+  value: Date,
+  field: 'year' | 'month' | 'day' | 'hour' | 'minute',
+  delta: number
+): Date {
+  const d = new Date(value)
   switch (field) {
-    case 'year': d.setFullYear(d.getFullYear() + delta); break;
-    case 'month': d.setMonth(d.getMonth() + delta); break;
-    case 'day': d.setDate(d.getDate() + delta); break;
-    case 'hour': d.setHours(d.getHours() + delta); break;
-    case 'minute': d.setMinutes(d.getMinutes() + delta); break;
+    case 'year':
+      d.setFullYear(d.getFullYear() + delta)
+      break
+    case 'month':
+      d.setMonth(d.getMonth() + delta)
+      break
+    case 'day':
+      d.setDate(d.getDate() + delta)
+      break
+    case 'hour':
+      d.setHours(d.getHours() + delta)
+      break
+    case 'minute':
+      d.setMinutes(d.getMinutes() + delta)
+      break
   }
-  return d;
+  return d
 }
 
 /**
@@ -59,18 +66,18 @@ export function DateTimeStepper({
   minuteStep = 5,
   dayStep = 1,
 }: DateTimeStepperProps) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(false)
 
   const adjust = useCallback(
     (field: 'year' | 'month' | 'day' | 'hour' | 'minute', delta: number) => {
-      onChange(shiftDate(value, field, delta));
+      onChange(shiftDate(value, field, delta))
     },
     [value, onChange]
-  );
+  )
 
   const setNow = useCallback(() => {
-    onChange(new Date());
-  }, [onChange]);
+    onChange(new Date())
+  }, [onChange])
 
   return (
     <>
@@ -88,11 +95,7 @@ export function DateTimeStepper({
         animationType="fade"
         onRequestClose={() => setOpen(false)}
       >
-        <TouchableOpacity
-          style={styles.overlay}
-          activeOpacity={1}
-          onPress={() => setOpen(false)}
-        >
+        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setOpen(false)}>
           <TouchableOpacity
             style={styles.container}
             activeOpacity={1}
@@ -103,19 +106,13 @@ export function DateTimeStepper({
             <View style={styles.row}>
               <Text style={styles.label}>日期</Text>
               <View style={styles.adjust}>
-                <TouchableOpacity
-                  style={styles.btn}
-                  onPress={() => adjust('day', -dayStep)}
-                >
+                <TouchableOpacity style={styles.btn} onPress={() => adjust('day', -dayStep)}>
                   <Text style={styles.btnText}>-</Text>
                 </TouchableOpacity>
                 <Text style={styles.value}>
                   {`${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`}
                 </Text>
-                <TouchableOpacity
-                  style={styles.btn}
-                  onPress={() => adjust('day', dayStep)}
-                >
+                <TouchableOpacity style={styles.btn} onPress={() => adjust('day', dayStep)}>
                   <Text style={styles.btnText}>+</Text>
                 </TouchableOpacity>
               </View>
@@ -124,19 +121,13 @@ export function DateTimeStepper({
             <View style={styles.row}>
               <Text style={styles.label}>时间</Text>
               <View style={styles.adjust}>
-                <TouchableOpacity
-                  style={styles.btn}
-                  onPress={() => adjust('minute', -minuteStep)}
-                >
+                <TouchableOpacity style={styles.btn} onPress={() => adjust('minute', -minuteStep)}>
                   <Text style={styles.btnText}>-{minuteStep}m</Text>
                 </TouchableOpacity>
                 <Text style={styles.value}>
                   {`${pad(value.getHours())}:${pad(value.getMinutes())}`}
                 </Text>
-                <TouchableOpacity
-                  style={styles.btn}
-                  onPress={() => adjust('minute', minuteStep)}
-                >
+                <TouchableOpacity style={styles.btn} onPress={() => adjust('minute', minuteStep)}>
                   <Text style={styles.btnText}>+{minuteStep}m</Text>
                 </TouchableOpacity>
               </View>
@@ -148,17 +139,14 @@ export function DateTimeStepper({
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              style={styles.confirmBtn}
-              onPress={() => setOpen(false)}
-            >
+            <TouchableOpacity style={styles.confirmBtn} onPress={() => setOpen(false)}>
               <Text style={styles.confirmText}>确定</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         </TouchableOpacity>
       </RNModal>
     </>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -260,4 +248,4 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: '#FFFFFF',
   },
-});
+})

@@ -1,9 +1,9 @@
 // utils/logger.ts
 // 可配置的日志工具，支持全局开关
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const DEBUG_MODE_KEY = '@healthora:debugMode';
+const DEBUG_MODE_KEY = '@healthora:debugMode'
 
 /**
  * 日志工具类
@@ -27,9 +27,9 @@ const DEBUG_MODE_KEY = '@healthora:debugMode';
  * ```
  */
 class Logger {
-  private enabled: boolean = true;
+  private enabled: boolean = true
   // P3-45：写盘防抖 timer
-  private writeTimer: ReturnType<typeof setTimeout> | null = null;
+  private writeTimer: ReturnType<typeof setTimeout> | null = null
 
   /**
    * 从 AsyncStorage 加载调试模式状态
@@ -37,9 +37,9 @@ class Logger {
    */
   async init(): Promise<void> {
     try {
-      const stored = await AsyncStorage.getItem(DEBUG_MODE_KEY);
+      const stored = await AsyncStorage.getItem(DEBUG_MODE_KEY)
       // stored === 'false' 时关闭，其他情况（null/missing/true）默认开启
-      this.enabled = stored !== 'false';
+      this.enabled = stored !== 'false'
     } catch {
       // AsyncStorage 读取失败时保持默认值，不抛出异常
     }
@@ -56,21 +56,21 @@ class Logger {
    * 不需要手动释放。
    */
   async setEnabled(enabled: boolean): Promise<void> {
-    this.enabled = enabled;
-    if (this.writeTimer) clearTimeout(this.writeTimer);
+    this.enabled = enabled
+    if (this.writeTimer) clearTimeout(this.writeTimer)
     this.writeTimer = setTimeout(() => {
       AsyncStorage.setItem(DEBUG_MODE_KEY, String(enabled)).catch(() => {
         // 写盘失败时静默处理
-      });
-      this.writeTimer = null;
-    }, 300);
+      })
+      this.writeTimer = null
+    }, 300)
   }
 
   /**
    * 获取当前调试模式状态
    */
   isEnabled(): boolean {
-    return this.enabled;
+    return this.enabled
   }
 
   /**
@@ -78,7 +78,7 @@ class Logger {
    */
   log(...args: unknown[]): void {
     if (this.enabled) {
-      console.log(...args);
+      console.log(...args)
     }
   }
 
@@ -87,7 +87,7 @@ class Logger {
    */
   warn(...args: unknown[]): void {
     if (this.enabled) {
-      console.warn(...args);
+      console.warn(...args)
     }
   }
 
@@ -96,9 +96,9 @@ class Logger {
    */
   error(...args: unknown[]): void {
     if (this.enabled) {
-      console.error(...args);
+      console.error(...args)
     }
   }
 }
 
-export const logger = new Logger();
+export const logger = new Logger()

@@ -1,13 +1,13 @@
 // 餐次类型定义
 
 export interface MealType {
-  id: string;
-  name: string;
-  icon: string;
+  id: string
+  name: string
+  icon: string
   timeRange: {
-    start: number; // 小时 (0-23)
-    end: number;
-  };
+    start: number // 小时 (0-23)
+    end: number
+  }
 }
 
 export const MEAL_TYPES: MealType[] = [
@@ -35,21 +35,21 @@ export const MEAL_TYPES: MealType[] = [
     icon: 'cookie',
     timeRange: { start: 0, end: 23 },
   },
-];
+]
 
 export function getMealType(id: string): MealType | undefined {
-  return MEAL_TYPES.find((type) => type.id === id);
+  return MEAL_TYPES.find((type) => type.id === id)
 }
 
 export function suggestMealType(): string {
-  const hour = new Date().getHours();
+  const hour = new Date().getHours()
 
   for (const type of MEAL_TYPES) {
-    if (type.id === 'snack') continue; // 跳过加餐
+    if (type.id === 'snack') continue // 跳过加餐
     if (hour >= type.timeRange.start && hour <= type.timeRange.end) {
-      return type.id;
+      return type.id
     }
   }
 
-  return 'snack'; // 默认返回加餐
+  return 'snack' // 默认返回加餐
 }

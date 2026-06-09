@@ -3,6 +3,7 @@
 ## 🔐 签名说明
 
 Android 应用必须使用数字证书签名后才能发布到 Google Play。签名用于：
+
 - 验证应用来源
 - 确保应用完整性
 - 支持应用更新
@@ -14,6 +15,7 @@ Android 应用必须使用数字证书签名后才能发布到 Google Play。签
 ### 方式一：EAS Build（推荐）
 
 **优势：**
+
 - 云端管理签名密钥
 - 自动处理签名流程
 - 支持团队协作
@@ -22,11 +24,13 @@ Android 应用必须使用数字证书签名后才能发布到 Google Play。签
 **配置步骤：**
 
 1. **登录 EAS**
+
    ```bash
    npx eas-cli login
    ```
 
 2. **配置 EAS 签名**
+
    ```bash
    npx eas-cli build:configure
    ```
@@ -39,6 +43,7 @@ Android 应用必须使用数字证书签名后才能发布到 Google Play。签
 ### 方式二：本地签名
 
 **适用场景：**
+
 - 需要完全控制签名密钥
 - 离线构建
 - 企业内部分发
@@ -52,11 +57,13 @@ keytool -genkeypair -v -storetype PKCS12 -keystore healthora-fit.keystore -alias
 ```
 
 **参数说明：**
+
 - `healthora-fit.keystore`：密钥库文件名
 - `healthora-fit`：密钥别名
 - `validity 10000`：有效期（天）
 
 **交互输入：**
+
 ```
 Enter keystore password: [输入密码]
 Re-enter new password: [确认密码]
@@ -80,6 +87,7 @@ storeFile=healthora-fit.keystore
 ```
 
 **⚠️ 安全提示：**
+
 - 不要将 `keystore.properties` 提交到 Git
 - 将 `*.keystore` 文件添加到 `.gitignore`
 
@@ -90,7 +98,7 @@ storeFile=healthora-fit.keystore
 ```gradle
 android {
     ...
-    
+
     signingConfigs {
         release {
             if (project.hasProperty('keystore.properties')) {
@@ -103,7 +111,7 @@ android {
             }
         }
     }
-    
+
     buildTypes {
         release {
             signingConfig signingConfigs.release
@@ -248,6 +256,7 @@ jarsigner -verify -verbose -certs your-app.aab
 ### Q1: 忘记密钥密码怎么办？
 
 **A:** 如果使用 EAS Build，可以重置密钥。如果是本地签名，密码无法恢复，需要：
+
 1. 生成新密钥
 2. 作为新应用发布（丢失所有用户和评分）
 
@@ -258,6 +267,7 @@ jarsigner -verify -verbose -certs your-app.aab
 ### Q3: 如何迁移到 EAS 签名？
 
 **A:**
+
 1. 使用现有密钥库配置 EAS
 2. 上传密钥库到 EAS
 3. 后续构建自动使用 EAS 签名
@@ -274,5 +284,5 @@ jarsigner -verify -verbose -certs your-app.aab
 
 ---
 
-*文档版本：v1.0*
-*创建日期：2026-06-04*
+_文档版本：v1.0_
+_创建日期：2026-06-04_

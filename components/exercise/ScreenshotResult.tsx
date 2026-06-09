@@ -1,30 +1,25 @@
 // components/exercise/ScreenshotResult.tsx
 // 运动截图识别结果组件
 
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { Card } from '@/components/ui';
-import { Icon } from '@/components/icons';
-import { ExerciseAnalysisResult } from '@/types/exercise';
+import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { Card } from '@/components/ui'
+import { Icon } from '@/components/icons'
+import { ExerciseAnalysisResult } from '@/types/exercise'
 
 interface ScreenshotResultProps {
-  result: ExerciseAnalysisResult;
-  onAccept: () => void;
-  onRetry: () => void;
+  result: ExerciseAnalysisResult
+  onAccept: () => void
+  onRetry: () => void
 }
 
 /**
  * 运动截图识别结果组件
  */
 export function ScreenshotResult({ result, onAccept, onRetry }: ScreenshotResultProps) {
-  const { t } = useI18n();
+  const { t } = useI18n()
 
   // 获取运动类型图标
   const getExerciseIcon = (type: string) => {
@@ -37,9 +32,9 @@ export function ScreenshotResult({ result, onAccept, onRetry }: ScreenshotResult
       yoga: 'yoga',
       hiit: 'hiit',
       other: 'other-exercise',
-    };
-    return icons[type] || 'other-exercise';
-  };
+    }
+    return icons[type] || 'other-exercise'
+  }
 
   // 获取运动类型名称
   const getExerciseName = (type: string) => {
@@ -52,44 +47,49 @@ export function ScreenshotResult({ result, onAccept, onRetry }: ScreenshotResult
       yoga: t('exerciseType.yoga'),
       hiit: t('exerciseType.hiit'),
       other: t('exerciseType.other'),
-    };
-    return names[type] || t('exerciseType.other');
-  };
+    }
+    return names[type] || t('exerciseType.other')
+  }
 
   // 获取置信度颜色
   const getConfidenceColor = (confidence: string) => {
     switch (confidence) {
       case 'high':
-        return theme.colors.success;
+        return theme.colors.success
       case 'medium':
-        return theme.colors.warning;
+        return theme.colors.warning
       case 'low':
-        return theme.colors.error;
+        return theme.colors.error
       default:
-        return theme.colors.text.tertiary;
+        return theme.colors.text.tertiary
     }
-  };
+  }
 
   // 获取置信度文本
   const getConfidenceText = (confidence: string) => {
     switch (confidence) {
       case 'high':
-        return t('exercise.confidenceHigh');
+        return t('exercise.confidenceHigh')
       case 'medium':
-        return t('exercise.confidenceMedium');
+        return t('exercise.confidenceMedium')
       case 'low':
-        return t('exercise.confidenceLow');
+        return t('exercise.confidenceLow')
       default:
-        return '';
+        return ''
     }
-  };
+  }
 
   return (
     <Card style={styles.container}>
       <View style={styles.header}>
         <Icon name="ai" size={20} color={theme.colors.primary.main} />
         <Text style={styles.title}>{t('exercise.analysisResult')}</Text>
-        <View style={[styles.confidenceBadge, { backgroundColor: getConfidenceColor(result.confidence) + '20' }]}>
+        <View
+          style={[
+            styles.confidenceBadge,
+            { backgroundColor: getConfidenceColor(result.confidence) + '20' },
+          ]}
+        >
           <Text style={[styles.confidenceText, { color: getConfidenceColor(result.confidence) }]}>
             {getConfidenceText(result.confidence)}
           </Text>
@@ -99,7 +99,11 @@ export function ScreenshotResult({ result, onAccept, onRetry }: ScreenshotResult
       {/* 运动类型 */}
       <View style={styles.row}>
         <View style={styles.labelContainer}>
-          <Icon name={getExerciseIcon(result.exerciseType) as any} size={16} color={theme.colors.text.secondary} />
+          <Icon
+            name={getExerciseIcon(result.exerciseType) as any}
+            size={16}
+            color={theme.colors.text.secondary}
+          />
           <Text style={styles.label}>{t('exercise.exerciseType')}</Text>
         </View>
         <Text style={styles.value}>{getExerciseName(result.exerciseType)}</Text>
@@ -111,7 +115,9 @@ export function ScreenshotResult({ result, onAccept, onRetry }: ScreenshotResult
           <Icon name="fire" size={16} color={theme.colors.text.secondary} />
           <Text style={styles.label}>{t('exercise.duration')}</Text>
         </View>
-        <Text style={styles.value}>{result.durationMinutes} {t('home.minutes')}</Text>
+        <Text style={styles.value}>
+          {result.durationMinutes} {t('home.minutes')}
+        </Text>
       </View>
 
       {/* 消耗卡路里 */}
@@ -120,7 +126,9 @@ export function ScreenshotResult({ result, onAccept, onRetry }: ScreenshotResult
           <Icon name="fire" size={16} color={theme.colors.text.secondary} />
           <Text style={styles.label}>{t('exercise.caloriesBurned')}</Text>
         </View>
-        <Text style={styles.value}>{result.caloriesBurned} {t('home.kcal')}</Text>
+        <Text style={styles.value}>
+          {result.caloriesBurned} {t('home.kcal')}
+        </Text>
       </View>
 
       {/* 距离（如果有） */}
@@ -130,7 +138,9 @@ export function ScreenshotResult({ result, onAccept, onRetry }: ScreenshotResult
             <Icon name="running" size={16} color={theme.colors.text.secondary} />
             <Text style={styles.label}>{t('exercise.distance')}</Text>
           </View>
-          <Text style={styles.value}>{result.distanceKm.toFixed(2)} {t('exercise.km')}</Text>
+          <Text style={styles.value}>
+            {result.distanceKm.toFixed(2)} {t('exercise.km')}
+          </Text>
         </View>
       )}
 
@@ -155,7 +165,7 @@ export function ScreenshotResult({ result, onAccept, onRetry }: ScreenshotResult
         </TouchableOpacity>
       </View>
     </Card>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -234,4 +244,4 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: '#FFFFFF',
   },
-});
+})

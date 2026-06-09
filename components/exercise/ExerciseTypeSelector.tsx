@@ -3,28 +3,28 @@
 //
 // P2-27：复用 @/constants/exerciseTypes 的 EXERCISE_TYPES（含 id + icon + caloriesPerMinute）
 
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { EXERCISE_TYPES } from '@/constants/exerciseTypes';
-import { Icon } from '@/components/icons';
-import { IconName } from '@/components/icons/Icon';
+import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { EXERCISE_TYPES } from '@/constants/exerciseTypes'
+import { Icon } from '@/components/icons'
+import { IconName } from '@/components/icons/Icon'
 
 interface ExerciseTypeSelectorProps {
-  value: string;
-  onChange: (type: string) => void;
+  value: string
+  onChange: (type: string) => void
 }
 
 function iconFor(name: string): IconName {
-  return name as IconName;
+  return name as IconName
 }
 
 /**
  * 运动类型选择器
  */
 export function ExerciseTypeSelector({ value, onChange }: ExerciseTypeSelectorProps) {
-  const { t } = useI18n();
+  const { t } = useI18n()
 
   return (
     <ScrollView
@@ -35,10 +35,7 @@ export function ExerciseTypeSelector({ value, onChange }: ExerciseTypeSelectorPr
       {EXERCISE_TYPES.map((type) => (
         <TouchableOpacity
           key={type.id}
-          style={[
-            styles.item,
-            value === type.id && styles.itemActive,
-          ]}
+          style={[styles.item, value === type.id && styles.itemActive]}
           onPress={() => onChange(type.id)}
         >
           <View style={styles.iconContainer}>
@@ -48,18 +45,13 @@ export function ExerciseTypeSelector({ value, onChange }: ExerciseTypeSelectorPr
               color={value === type.id ? theme.colors.primary.main : theme.colors.text.secondary}
             />
           </View>
-          <Text
-            style={[
-              styles.label,
-              value === type.id && styles.labelActive,
-            ]}
-          >
+          <Text style={[styles.label, value === type.id && styles.labelActive]}>
             {t(`exerciseType.${type.id}`)}
           </Text>
         </TouchableOpacity>
       ))}
     </ScrollView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -93,4 +85,4 @@ const styles = StyleSheet.create({
     color: theme.colors.primary.main,
     fontWeight: theme.fontWeight.semibold,
   },
-});
+})

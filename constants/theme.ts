@@ -1,4 +1,7 @@
 // Healthora Fit 主题系统
+//
+// P3-50：删除 darkTheme 死代码（已 grep 验证 0 消费方）。
+// 深色模式作为独立 P0 任务后续实装。
 
 // 品牌色
 export const COLORS = {
@@ -9,7 +12,7 @@ export const COLORS = {
     200: '#A7F3D0',
     300: '#6EE7B7',
     400: '#34D399',
-    500: '#10B981',  // 主色
+    500: '#10B981', // 主色
     600: '#059669',
     700: '#047857',
     800: '#065F46',
@@ -50,7 +53,7 @@ export const COLORS = {
   warningLight: '#FEF3C7',
   error: '#EF4444',
   info: '#3B82F6',
-};
+}
 
 // 浅色主题
 export const lightTheme = {
@@ -186,56 +189,10 @@ export const lightTheme = {
       elevation: 5,
     },
   },
-};
-
-// 深色主题
-export const darkTheme = {
-  ...lightTheme,
-  colors: {
-    ...lightTheme.colors,
-    background: {
-      primary: '#111827',
-      secondary: '#1F2937',
-      tertiary: '#374151',
-    },
-    text: {
-      primary: '#F9FAFB',
-      secondary: '#D1D5DB',
-      tertiary: '#9CA3AF',
-      inverse: '#111827',
-    },
-    border: {
-      light: '#374151',
-      main: '#4B5563',
-      dark: '#6B7280',
-    },
-    primary: {
-      main: COLORS.primary[400],
-      light: COLORS.primary[900],
-      dark: COLORS.primary[300],
-      text: '#111827',
-    },
-    secondary: {
-      main: COLORS.secondary[400],
-      light: COLORS.secondary[900],
-      dark: COLORS.secondary[300],
-      text: '#111827',
-    },
-    card: {
-      background: '#1F2937',
-      border: '#374151',
-    },
-    tab: {
-      background: '#1F2937',
-      active: COLORS.primary[400],
-      inactive: COLORS.gray[500],
-      border: '#374151',
-    },
-  },
-};
+}
 
 // 主题类型
-export type Theme = typeof lightTheme;
+export type Theme = typeof lightTheme
 
 // 导出默认主题
-export const theme = lightTheme;
+export const theme = lightTheme

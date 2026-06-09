@@ -6,19 +6,19 @@
 // - callVisionApi：构造请求 body（按 apiType 分支）、调用 fetch、解析响应、提取首个 {…} JSON
 // - 两个 service 各自负责 prompt 拼装与业务映射，不重复实现网络层
 
-import { File } from 'expo-file-system';
-import { logger } from '@/utils/logger';
+import { File } from 'expo-file-system'
+import { logger } from '@/utils/logger'
 
-export type ApiType = 'chat-completions' | 'responses';
+export type ApiType = 'chat-completions' | 'responses'
 
 export interface CallVisionApiParams {
-  apiType: ApiType;
-  endpoint: string;
-  apiKey: string;
-  model: string;
-  base64: string;
-  prompt: string;
-  maxTokens: number;
+  apiType: ApiType
+  endpoint: string
+  apiKey: string
+  model: string
+  base64: string
+  prompt: string
+  maxTokens: number
 }
 
 /**
@@ -27,11 +27,11 @@ export interface CallVisionApiParams {
  */
 export async function imageToBase64(uri: string): Promise<string> {
   try {
-    const file = new File(uri);
-    return await file.base64();
+    const file = new File(uri)
+    return await file.base64()
   } catch (err) {
-    logger.error('[vision] imageToBase64 失败:', err);
-    throw new Error('图片读取失败');
+    logger.error('[vision] imageToBase64 失败:', err)
+    throw new Error('图片读取失败')
   }
 }
 
@@ -41,17 +41,17 @@ export async function imageToBase64(uri: string): Promise<string> {
  */
 function extractContent(data: any, apiType: ApiType): string | undefined {
   if (apiType === 'responses') {
-    return data.output?.[0]?.content?.[0]?.text || data.choices?.[0]?.message?.content;
+    return data.output?.[0]?.content?.[0]?.text || data.choices?.[0]?.message?.content
   }
-  return data.choices?.[0]?.message?.content;
+  return data.choices?.[0]?.message?.content
 }
 
 /**
  * 构造请求体（按 apiType 分支）
  */
 function buildRequestBody(params: CallVisionApiParams): any {
-  const { apiType, model, base64, prompt, maxTokens } = params;
-  const imageUrl = `data:image/jpeg;base64,${base64}`;
+  const { apiType, model, base64, prompt, maxTokens } = params
+  const imageUrl = `data:image/jpeg;base64,${base64}`
   if (apiType === 'responses') {
     return {
       model,
@@ -65,7 +65,7 @@ function buildRequestBody(params: CallVisionApiParams): any {
         },
       ],
       max_output_tokens: maxTokens,
-    };
+    }
   }
   return {
     model,
@@ -79,7 +79,7 @@ function buildRequestBody(params: CallVisionApiParams): any {
       },
     ],
     max_tokens: maxTokens,
-  };
+  }
 }
 
 /**
@@ -92,7 +92,7 @@ function buildRequestBody(params: CallVisionApiParams): any {
  * 返回：首个 JSON 字符串（不含前后噪音），由调用方 JSON.parse。
  */
 export async function callVisionApi(params: CallVisionApiParams): Promise<string> {
-  const { apiType, endpoint, apiKey } = params;
+  const { apiType, endpoint, apiKey } = params
 
   const response = await fetch(endpoint, {
     method: 'POST',
@@ -101,27 +101,27 @@ export async function callVisionApi(params: CallVisionApiParams): Promise<string
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(buildRequestBody(params)),
-  });
+  })
 
   if (!response.ok) {
-    const errText = await response.text();
-    logger.error('[vision] HTTP', response.status, errText);
-    throw new Error('AI 识别失败，请重试');
+    const errText = await response.text()
+    logger.error('[vision] HTTP', response.status, errText)
+    throw new Error('AI 识别失败，请重试')
   }
 
-  const data = await response.json();
-  const content = extractContent(data, apiType);
+  const data = await response.json()
+  const content = extractContent(data, apiType)
 
   if (!content) {
-    logger.error('[vision] 内容为空:', JSON.stringify(data));
-    throw new Error('AI 返回内容为空');
+    logger.error('[vision] 内容为空:', JSON.stringify(data))
+    throw new Error('AI 返回内容为空')
   }
 
-  const match = content.match(/\{[\s\S]*\}/);
+  const match = content.match(/\{[\s\S]*\}/)
   if (!match) {
-    logger.error('[vision] 未找到 JSON:', content);
-    throw new Error('AI 返回格式错误');
+    logger.error('[vision] 未找到 JSON:', content)
+    throw new Error('AI 返回格式错误')
   }
 
-  return match[0];
+  return match[0]
 }

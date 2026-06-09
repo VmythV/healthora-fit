@@ -8,13 +8,13 @@
 
 ## 📚 文档目录
 
-| 文档 | 说明 |
-|------|------|
-| [01-icon-design.md](./01-icon-design.md) | 应用图标设计指南 |
-| [02-signing-config.md](./02-signing-config.md) | 应用签名配置 |
-| [03-store-listing.md](./03-store-listing.md) | Google Play 商店资料 |
-| [04-privacy-policy.md](./04-privacy-policy.md) | 隐私政策 |
-| [05-build-guide.md](./05-build-guide.md) | 构建指南 |
+| 文档                                           | 说明                 |
+| ---------------------------------------------- | -------------------- |
+| [01-icon-design.md](./01-icon-design.md)       | 应用图标设计指南     |
+| [02-signing-config.md](./02-signing-config.md) | 应用签名配置         |
+| [03-store-listing.md](./03-store-listing.md)   | Google Play 商店资料 |
+| [04-privacy-policy.md](./04-privacy-policy.md) | 隐私政策             |
+| [05-build-guide.md](./05-build-guide.md)       | 构建指南             |
 
 ---
 
@@ -83,10 +83,10 @@
 
 ### 可用脚本
 
-| 脚本 | 用途 |
-|------|------|
-| `scripts/generate-keystore.sh` | 生成签名密钥库 |
-| `scripts/build-android.sh` | 构建 Android 应用 |
+| 脚本                           | 用途              |
+| ------------------------------ | ----------------- |
+| `scripts/generate-keystore.sh` | 生成签名密钥库    |
+| `scripts/build-android.sh`     | 构建 Android 应用 |
 
 ### EAS CLI 命令
 
@@ -180,5 +180,5 @@ npx eas-cli build:view [BUILD_ID] --json | jq -r '.artifacts.buildUrl'
 
 ---
 
-*文档版本：v1.0*
-*最后更新：2026-06-04*
+_文档版本：v1.0_
+_最后更新：2026-06-04_

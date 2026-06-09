@@ -1,20 +1,14 @@
 // components/ui/Loading.tsx
 // 加载组件
 
-import React from 'react';
-import {
-  View,
-  ActivityIndicator,
-  Text,
-  StyleSheet,
-  Modal,
-} from 'react-native';
-import { theme } from '@/constants/theme';
+import React from 'react'
+import { View, ActivityIndicator, Text, StyleSheet, Modal } from 'react-native'
+import { theme } from '@/constants/theme'
 
 interface LoadingProps {
-  visible: boolean;
-  message?: string;
-  overlay?: boolean;
+  visible: boolean
+  message?: string
+  overlay?: boolean
 }
 
 /**
@@ -29,42 +23,28 @@ interface LoadingProps {
  * <Loading visible={isLoading} overlay message="保存中..." />
  * ```
  */
-export function Loading({
-  visible,
-  message,
-  overlay = false,
-}: LoadingProps) {
-  if (!visible) return null;
+export function Loading({ visible, message, overlay = false }: LoadingProps) {
+  if (!visible) return null
 
   if (overlay) {
     return (
       <Modal transparent visible={visible}>
         <View style={styles.overlay}>
           <View style={styles.card}>
-            <ActivityIndicator
-              color={theme.colors.primary.main}
-              size="large"
-            />
-            {message && (
-              <Text style={styles.message}>{message}</Text>
-            )}
+            <ActivityIndicator color={theme.colors.primary.main} size="large" />
+            {message && <Text style={styles.message}>{message}</Text>}
           </View>
         </View>
       </Modal>
-    );
+    )
   }
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator
-        color={theme.colors.primary.main}
-        size="large"
-      />
-      {message && (
-        <Text style={styles.message}>{message}</Text>
-      )}
+      <ActivityIndicator color={theme.colors.primary.main} size="large" />
+      {message && <Text style={styles.message}>{message}</Text>}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -92,4 +72,4 @@ const styles = StyleSheet.create({
     color: theme.colors.text.secondary,
     marginTop: theme.spacing.base,
   },
-});
+})

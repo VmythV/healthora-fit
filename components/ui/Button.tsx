@@ -1,7 +1,7 @@
 // components/ui/Button.tsx
 // 按钮组件
 
-import React from 'react';
+import React from 'react'
 import {
   TouchableOpacity,
   Text,
@@ -9,22 +9,22 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
-} from 'react-native';
-import { theme } from '@/constants/theme';
+} from 'react-native'
+import { theme } from '@/constants/theme'
 
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
-type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
+type ButtonSize = 'sm' | 'md' | 'lg'
 
 interface ButtonProps {
-  title: string;
-  onPress: () => void;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
-  disabled?: boolean;
-  loading?: boolean;
-  icon?: React.ReactNode;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
+  title: string
+  onPress: () => void
+  variant?: ButtonVariant
+  size?: ButtonSize
+  disabled?: boolean
+  loading?: boolean
+  icon?: React.ReactNode
+  style?: ViewStyle
+  textStyle?: TextStyle
 }
 
 /**
@@ -53,7 +53,7 @@ export function Button({
   style,
   textStyle,
 }: ButtonProps) {
-  const isDisabled = disabled || loading;
+  const isDisabled = disabled || loading
 
   return (
     <TouchableOpacity
@@ -70,7 +70,9 @@ export function Button({
     >
       {loading ? (
         <ActivityIndicator
-          color={(variant === 'primary' || variant === 'danger') ? '#FFFFFF' : theme.colors.primary.main}
+          color={
+            variant === 'primary' || variant === 'danger' ? '#FFFFFF' : theme.colors.primary.main
+          }
           size="small"
         />
       ) : (
@@ -90,7 +92,7 @@ export function Button({
         </>
       )}
     </TouchableOpacity>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -159,4 +161,4 @@ const styles = StyleSheet.create({
   textWithIcon: {
     marginLeft: theme.spacing.sm,
   },
-});
+})

@@ -1,13 +1,13 @@
 // components/icons/PlateIcon.tsx
 // 餐盘图标
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Circle } from 'react-native-svg'
 
 interface PlateIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -54,7 +54,7 @@ export function PlateIcon({ size = 24, color = '#000000' }: PlateIconProps) {
         />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -62,4 +62,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

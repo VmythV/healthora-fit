@@ -6,27 +6,23 @@
 // - Props 不变，4 处使用点（app/(tabs)/index.tsx）零改动
 // - 配合 React.memo 防止 props 相等时重渲染
 
-import React, { useEffect } from 'react';
-import {
-  StyleSheet,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import React, { useEffect } from 'react'
+import { StyleSheet, TouchableOpacity, ViewStyle } from 'react-native'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   withSpring,
   withDelay,
-} from 'react-native-reanimated';
-import { theme } from '@/constants/theme';
+} from 'react-native-reanimated'
+import { theme } from '@/constants/theme'
 
 interface AnimatedCardProps {
-  children: React.ReactNode;
-  style?: ViewStyle;
-  onPress?: () => void;
-  delay?: number;
-  animationType?: 'fadeIn' | 'slideUp' | 'scale';
+  children: React.ReactNode
+  style?: ViewStyle
+  onPress?: () => void
+  delay?: number
+  animationType?: 'fadeIn' | 'slideUp' | 'scale'
 }
 
 function AnimatedCardImpl({
@@ -36,21 +32,21 @@ function AnimatedCardImpl({
   delay = 0,
   animationType = 'fadeIn',
 }: AnimatedCardProps) {
-  const opacity = useSharedValue(0);
-  const translateY = useSharedValue(animationType === 'slideUp' ? 30 : 0);
-  const scale = useSharedValue(animationType === 'scale' ? 0.9 : 1);
+  const opacity = useSharedValue(0)
+  const translateY = useSharedValue(animationType === 'slideUp' ? 30 : 0)
+  const scale = useSharedValue(animationType === 'scale' ? 0.9 : 1)
 
   useEffect(() => {
-    const opts = { duration: 300 };
-    opacity.value = withDelay(delay, withTiming(1, opts));
+    const opts = { duration: 300 }
+    opacity.value = withDelay(delay, withTiming(1, opts))
     if (animationType === 'slideUp') {
-      translateY.value = withDelay(delay, withTiming(0, opts));
+      translateY.value = withDelay(delay, withTiming(0, opts))
     } else if (animationType === 'scale') {
-      scale.value = withDelay(delay, withSpring(1));
+      scale.value = withDelay(delay, withSpring(1))
     }
     // 注意：未调用 .value = X 在卸载时 reset，
     // Reanimated 4 + Fabric 自动清理 shared value，无需手动 stop
-  }, [animationType, delay, opacity, translateY, scale]);
+  }, [animationType, delay, opacity, translateY, scale])
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,
@@ -58,26 +54,24 @@ function AnimatedCardImpl({
       { translateY: animationType === 'slideUp' ? translateY.value : 0 },
       { scale: animationType === 'scale' ? scale.value : 1 },
     ],
-  }));
+  }))
 
   const content = (
-    <Animated.View style={[styles.card, animatedStyle, style]}>
-      {children}
-    </Animated.View>
-  );
+    <Animated.View style={[styles.card, animatedStyle, style]}>{children}</Animated.View>
+  )
 
   if (onPress) {
     return (
       <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
         {content}
       </TouchableOpacity>
-    );
+    )
   }
 
-  return content;
+  return content
 }
 
-export const AnimatedCard = React.memo(AnimatedCardImpl);
+export const AnimatedCard = React.memo(AnimatedCardImpl)
 
 const styles = StyleSheet.create({
   card: {
@@ -86,4 +80,4 @@ const styles = StyleSheet.create({
     padding: theme.spacing.lg,
     ...theme.shadow.sm,
   },
-});
+})

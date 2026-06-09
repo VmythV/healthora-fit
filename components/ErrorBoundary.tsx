@@ -1,31 +1,31 @@
 // components/ErrorBoundary.tsx
 // 全局错误边界组件
 
-import { logger } from '@/utils/logger';
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { theme } from '@/constants/theme';
-import { Icon } from '@/components/icons';
+import { logger } from '@/utils/logger'
+import React, { Component, ErrorInfo, ReactNode } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { theme } from '@/constants/theme'
+import { Icon } from '@/components/icons'
 
 interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
+  children: ReactNode
+  fallback?: ReactNode
 }
 
 interface State {
-  hasError: boolean;
-  error: Error | null;
-  errorInfo: ErrorInfo | null;
+  hasError: boolean
+  error: Error | null
+  errorInfo: ErrorInfo | null
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props);
+    super(props)
     this.state = {
       hasError: false,
       error: null,
       errorInfo: null,
-    };
+    }
   }
 
   static getDerivedStateFromError(error: Error): State {
@@ -33,16 +33,16 @@ export class ErrorBoundary extends Component<Props, State> {
       hasError: true,
       error,
       errorInfo: null,
-    };
+    }
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    logger.error('[ErrorBoundary] Caught error:', error, errorInfo);
+    logger.error('[ErrorBoundary] Caught error:', error, errorInfo)
 
     this.setState({
       error,
       errorInfo,
-    });
+    })
   }
 
   handleRetry = (): void => {
@@ -50,13 +50,13 @@ export class ErrorBoundary extends Component<Props, State> {
       hasError: false,
       error: null,
       errorInfo: null,
-    });
-  };
+    })
+  }
 
   render(): ReactNode {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return this.props.fallback;
+        return this.props.fallback
       }
 
       return (
@@ -65,16 +65,12 @@ export class ErrorBoundary extends Component<Props, State> {
             <Icon name="tips" size={64} color={theme.colors.text.tertiary} />
           </View>
           <Text style={styles.title}>应用发生错误</Text>
-          <Text style={styles.message}>
-            {this.state.error?.message || '发生未知错误'}
-          </Text>
+          <Text style={styles.message}>{this.state.error?.message || '发生未知错误'}</Text>
 
           {__DEV__ && this.state.errorInfo && (
             <View style={styles.debugContainer}>
               <Text style={styles.debugTitle}>调试信息:</Text>
-              <Text style={styles.debugText}>
-                {this.state.errorInfo.componentStack}
-              </Text>
+              <Text style={styles.debugText}>{this.state.errorInfo.componentStack}</Text>
             </View>
           )}
 
@@ -82,10 +78,10 @@ export class ErrorBoundary extends Component<Props, State> {
             <Text style={styles.retryButtonText}>重试</Text>
           </TouchableOpacity>
         </View>
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 
@@ -141,4 +137,4 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: theme.fontWeight.medium,
   },
-});
+})

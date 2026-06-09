@@ -1,25 +1,18 @@
 // app/settings/about.tsx
 // 关于页面
 
-import { logger } from '@/utils/logger';
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Linking,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { Icon, BackIcon } from '@/components/icons';
+import { logger } from '@/utils/logger'
+import React from 'react'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { useRouter } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { Icon, BackIcon } from '@/components/icons'
 
 export default function AboutScreen() {
-  const { t } = useI18n();
-  const router = useRouter();
+  const { t } = useI18n()
+  const router = useRouter()
 
   const appInfo = {
     name: 'Healthora Fit',
@@ -29,13 +22,11 @@ export default function AboutScreen() {
     developer: 'Healthora Team',
     website: 'https://healthora.app',
     email: 'support@healthora.app',
-  };
+  }
 
   const openLink = (url: string) => {
-    Linking.openURL(url).catch((err) =>
-      logger.error('[Settings] Failed to open URL:', err)
-    );
-  };
+    Linking.openURL(url).catch((err) => logger.error('[Settings] Failed to open URL:', err))
+  }
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -82,10 +73,7 @@ export default function AboutScreen() {
         {/* 联系方式 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('settings.about.contact')}</Text>
-          <TouchableOpacity
-            style={styles.linkRow}
-            onPress={() => openLink(appInfo.website)}
-          >
+          <TouchableOpacity style={styles.linkRow} onPress={() => openLink(appInfo.website)}>
             <Text style={styles.linkLabel}>{t('settings.about.website')}</Text>
             <Text style={styles.linkValue}>{appInfo.website}</Text>
           </TouchableOpacity>
@@ -135,16 +123,12 @@ export default function AboutScreen() {
 
         {/* 版权信息 */}
         <View style={styles.copyrightSection}>
-          <Text style={styles.copyrightText}>
-            © 2024 {appInfo.developer}
-          </Text>
-          <Text style={styles.copyrightText}>
-            {t('settings.about.allRightsReserved')}
-          </Text>
+          <Text style={styles.copyrightText}>© 2024 {appInfo.developer}</Text>
+          <Text style={styles.copyrightText}>{t('settings.about.allRightsReserved')}</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -271,4 +255,4 @@ const styles = StyleSheet.create({
     color: theme.colors.text.tertiary,
     marginBottom: theme.spacing.xs,
   },
-});
+})

@@ -1,8 +1,8 @@
 // components/weight/WeightRecordForm.tsx
 // 体重记录表单
 
-import { logger } from '@/utils/logger';
-import React, { useState, useEffect } from 'react';
+import { logger } from '@/utils/logger'
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -10,22 +10,21 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useWeightRecords } from '@/hooks/useWeightRecords';
-import { useGoals } from '@/hooks/useGoals';
-import { WeightInput } from './WeightInput';
-import { showNotification, showConfirm } from '@/components/ui';
+} from 'react-native'
+import { useRouter } from 'expo-router'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useWeightRecords } from '@/hooks/useWeightRecords'
+import { useGoals } from '@/hooks/useGoals'
+import { WeightInput } from './WeightInput'
+import { showNotification } from '@/components/ui'
 
 interface WeightRecordFormProps {
-  initialWeight?: number;
-  recordId?: number; // 编辑模式
-  onSuccess?: () => void;
+  initialWeight?: number
+  recordId?: number // 编辑模式
+  onSuccess?: () => void
 }
 
 /**
@@ -33,47 +32,47 @@ interface WeightRecordFormProps {
  */
 export function WeightRecordForm({
   initialWeight = 70,
-  recordId,
+  _recordId,
   onSuccess,
 }: WeightRecordFormProps) {
-  const { t } = useI18n();
-  const router = useRouter();
-  const { createRecord, latestWeight } = useWeightRecords();
-  const { activeGoal } = useGoals();
+  const { t } = useI18n()
+  const router = useRouter()
+  const { addRecord, latestWeight } = useWeightRecords()
+  const { activeGoal } = useGoals()
 
-  const [weight, setWeight] = useState(initialWeight);
-  const [note, setNote] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [weight, setWeight] = useState(initialWeight)
+  const [note, setNote] = useState('')
+  const [saving, setSaving] = useState(false)
 
   // 获取上次记录和目标体重
-  const lastWeight = latestWeight?.weight;
-  const targetWeight = activeGoal?.targetWeight;
+  const lastWeight = latestWeight?.weight
+  const targetWeight = activeGoal?.targetWeight
 
   // 保存
   const handleSave = async () => {
     if (weight < 20 || weight > 300) {
-      showNotification(t('weight.invalidWeight'), 'error');
-      return;
+      showNotification(t('weight.invalidWeight'), 'error')
+      return
     }
 
-    setSaving(true);
+    setSaving(true)
     try {
-      await createRecord({
+      await addRecord({
         timestamp: new Date().toISOString(),
         weight,
         source: 'manual',
         note,
-      });
+      })
 
-      onSuccess?.();
-      router.back();
+      onSuccess?.()
+      router.back()
     } catch (error) {
-      logger.error('[WeightForm] 保存失败:', error);
-      showNotification(t('error.saveFailed'), 'error');
+      logger.error('[WeightForm] 保存失败:', error)
+      showNotification(t('error.saveFailed'), 'error')
     } finally {
-      setSaving(false);
+      setSaving(false)
     }
-  };
+  }
 
   return (
     <KeyboardAvoidingView
@@ -119,7 +118,7 @@ export function WeightRecordForm({
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -169,4 +168,4 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeight.semibold,
     color: '#FFFFFF',
   },
-});
+})

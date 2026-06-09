@@ -1,13 +1,13 @@
 // components/icons/CookieIcon.tsx
 // 饼干图标（加餐）
 
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import React from 'react'
+import { View, StyleSheet } from 'react-native'
+import Svg, { Path, Circle } from 'react-native-svg'
 
 interface CookieIconProps {
-  size?: number;
-  color?: string;
+  size?: number
+  color?: string
 }
 
 /**
@@ -38,7 +38,7 @@ export function CookieIcon({ size = 24, color = '#000000' }: CookieIconProps) {
         <Circle cx="12" cy="18" r="1" fill={color} />
       </Svg>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -46,4 +46,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+})

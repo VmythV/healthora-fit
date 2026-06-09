@@ -7,50 +7,43 @@
 // - renderItem / keyExtractor / handleDelete 改 useCallback
 // - 趋势（依赖 records[index+1]）在 renderItem 内联计算
 
-import React, { useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-  ListRenderItem,
-} from 'react-native';
-import { theme } from '@/constants/theme';
-import { useI18n } from '@/hooks/useI18n';
-import { useWeightRecords } from '@/hooks/useWeightRecords';
-import { WeightRecord } from '@/types/weight';
-import { Card, Empty } from '@/components/ui';
-import { Icon, TrendUpIcon, TrendDownIcon, TrendFlatIcon } from '@/components/icons';
-import { showConfirm } from '@/components/ui';
+import React, { useCallback } from 'react'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ListRenderItem } from 'react-native'
+import { theme } from '@/constants/theme'
+import { useI18n } from '@/hooks/useI18n'
+import { useWeightRecords } from '@/hooks/useWeightRecords'
+import { WeightRecord } from '@/types/weight'
+import { Card, Empty } from '@/components/ui'
+import { Icon, TrendUpIcon, TrendDownIcon, TrendFlatIcon } from '@/components/icons'
+import { showConfirm } from '@/components/ui'
 
 interface WeightRecordListProps {
-  onRecordPress?: (record: WeightRecord) => void;
+  onRecordPress?: (record: WeightRecord) => void
 }
 
 // 模块级 helper
 function formatTime(timestamp: string): string {
-  const date = new Date(timestamp);
-  return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+  const date = new Date(timestamp)
+  return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
 }
 
 function formatDate(timestamp: string, todayLabel: string, yesterdayLabel: string): string {
-  const date = new Date(timestamp);
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  if (date.toDateString() === today.toDateString()) return todayLabel;
-  if (date.toDateString() === yesterday.toDateString()) return yesterdayLabel;
-  return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+  const date = new Date(timestamp)
+  const today = new Date()
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+  if (date.toDateString() === today.toDateString()) return todayLabel
+  if (date.toDateString() === yesterday.toDateString()) return yesterdayLabel
+  return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
 }
 
 interface WeightRowProps {
-  item: WeightRecord;
-  dateLabel: string;
-  kgLabel: string;
-  trendDiff: number | null;
-  onPress?: (record: WeightRecord) => void;
-  onDelete: (id: number) => void;
+  item: WeightRecord
+  dateLabel: string
+  kgLabel: string
+  trendDiff: number | null
+  onPress?: (record: WeightRecord) => void
+  onDelete: (id: number) => void
 }
 
 const WeightRow = React.memo(function WeightRow({
@@ -61,8 +54,8 @@ const WeightRow = React.memo(function WeightRow({
   onPress,
   onDelete,
 }: WeightRowProps) {
-  const handlePress = useCallback(() => onPress?.(item), [item, onPress]);
-  const handleDelete = useCallback(() => onDelete(item.id), [item.id, onDelete]);
+  const handlePress = useCallback(() => onPress?.(item), [item, onPress])
+  const handleDelete = useCallback(() => onDelete(item.id), [item.id, onDelete])
 
   return (
     <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
@@ -92,8 +85,8 @@ const WeightRow = React.memo(function WeightRow({
                       trendDiff > 0
                         ? theme.colors.error
                         : trendDiff < 0
-                        ? theme.colors.success
-                        : theme.colors.text.tertiary,
+                          ? theme.colors.success
+                          : theme.colors.text.tertiary,
                   },
                 ]}
               >
@@ -104,7 +97,8 @@ const WeightRow = React.memo(function WeightRow({
               <View style={styles.noteContainer}>
                 <Icon name="note" size={14} color={theme.colors.text.tertiary} />
                 <Text style={styles.noteText} numberOfLines={1}>
-                  {' '}{item.note}
+                  {' '}
+                  {item.note}
                 </Text>
               </View>
             )}
@@ -115,7 +109,8 @@ const WeightRow = React.memo(function WeightRow({
             <View style={styles.noteContainer}>
               <Icon name="note" size={14} color={theme.colors.text.tertiary} />
               <Text style={styles.noteText} numberOfLines={1}>
-                {' '}{item.note}
+                {' '}
+                {item.note}
               </Text>
             </View>
           </View>
@@ -126,15 +121,15 @@ const WeightRow = React.memo(function WeightRow({
         </TouchableOpacity>
       </Card>
     </TouchableOpacity>
-  );
-});
+  )
+})
 
 /**
  * 体重记录列表
  */
 export function WeightRecordList({ onRecordPress }: WeightRecordListProps) {
-  const { t } = useI18n();
-  const { records, loading, deleteRecord } = useWeightRecords();
+  const { t } = useI18n()
+  const { records, loading, deleteRecord } = useWeightRecords()
 
   const handleDelete = useCallback(
     async (id: number) => {
@@ -144,21 +139,19 @@ export function WeightRecordList({ onRecordPress }: WeightRecordListProps) {
         type: 'danger',
         confirmText: t('common.delete'),
         cancelText: t('common.cancel'),
-      });
-      if (ok) deleteRecord(id);
+      })
+      if (ok) deleteRecord(id)
     },
     [t, deleteRecord]
-  );
+  )
 
-  const todayLabel = t('common.today');
-  const yesterdayLabel = t('common.yesterday');
+  const todayLabel = t('common.today')
+  const yesterdayLabel = t('common.yesterday')
 
   const renderItem: ListRenderItem<WeightRecord> = useCallback(
     ({ item, index }) => {
       // 趋势：当前 vs 上一条（index+1 是更早的记录，因 DESC 排序）
-      const trendDiff = index < records.length - 1
-        ? item.weight - records[index + 1].weight
-        : null;
+      const trendDiff = index < records.length - 1 ? item.weight - records[index + 1].weight : null
       return (
         <WeightRow
           item={item}
@@ -168,21 +161,15 @@ export function WeightRecordList({ onRecordPress }: WeightRecordListProps) {
           onPress={onRecordPress}
           onDelete={handleDelete}
         />
-      );
+      )
     },
     [records, todayLabel, yesterdayLabel, t, onRecordPress, handleDelete]
-  );
+  )
 
-  const keyExtractor = useCallback((item: WeightRecord) => item.id.toString(), []);
+  const keyExtractor = useCallback((item: WeightRecord) => item.id.toString(), [])
 
   if (!loading && records.length === 0) {
-    return (
-      <Empty
-        icon="weight"
-        title={t('weight.noRecord')}
-        description={t('common.comingSoon')}
-      />
-    );
+    return <Empty icon="weight" title={t('weight.noRecord')} description={t('common.comingSoon')} />
   }
 
   return (
@@ -193,7 +180,7 @@ export function WeightRecordList({ onRecordPress }: WeightRecordListProps) {
       contentContainerStyle={styles.list}
       showsVerticalScrollIndicator={false}
     />
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -270,4 +257,4 @@ const styles = StyleSheet.create({
     right: theme.spacing.sm,
     padding: theme.spacing.xs,
   },
-});
+})

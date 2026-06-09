@@ -1,20 +1,20 @@
 // components/calendar/CollapsibleCalendar/DayCell.tsx
 // 单日单元格（月视图 + 周视图共用）
 
-import React, { memo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { theme } from '@/constants/theme';
+import React, { memo } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { theme } from '@/constants/theme'
 
-export const DAY_CELL_H = 44;
+export const DAY_CELL_H = 44
 
 interface Props {
-  day: number;
-  isToday: boolean;
-  isSelected: boolean;
-  isMarked: boolean;
-  isOtherMonth: boolean;
-  isFuture: boolean;
-  onPress: () => void;
+  day: number
+  isToday: boolean
+  isSelected: boolean
+  isMarked: boolean
+  isOtherMonth: boolean
+  isFuture: boolean
+  onPress: () => void
 }
 
 function DayCellImpl({
@@ -54,18 +54,13 @@ function DayCellImpl({
       </View>
       {/* 右上角小角标：有记录但未选中（选中态吞掉 dot 容易看不清，挪到右上角） */}
       {isMarked && !isOtherMonth && !isFuture && (
-        <View
-          style={[
-            styles.dot,
-            isSelected && styles.dotSelected,
-          ]}
-        />
+        <View style={[styles.dot, isSelected && styles.dotSelected]} />
       )}
     </TouchableOpacity>
-  );
+  )
 }
 
-export const DayCell = memo(DayCellImpl);
+export const DayCell = memo(DayCellImpl)
 
 const styles = StyleSheet.create({
   cell: {
@@ -120,4 +115,4 @@ const styles = StyleSheet.create({
   dotSelected: {
     backgroundColor: '#FFFFFF',
   },
-});
+})
