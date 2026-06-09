@@ -25,7 +25,7 @@ export default function WeightRecordScreen() {
   }>()
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
       <WeightRecordForm
         recordId={params.recordId ? Number(params.recordId) : undefined}
         initialWeight={params.weight ? Number(params.weight) : 70}

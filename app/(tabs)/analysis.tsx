@@ -233,7 +233,7 @@ export default function AnalysisScreen() {
       : null
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.header}>
         <Text style={styles.title}>{t('analysis.title')}</Text>
       </View>

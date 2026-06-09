@@ -108,7 +108,7 @@ export default function DietRecordScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       {/* 图片选择区域 */}
       {!photoUri && (
         <View style={styles.imageSection}>

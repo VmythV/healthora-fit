@@ -29,7 +29,7 @@ export default function ExerciseRecordScreen() {
   }>()
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+    <SafeAreaView style={{ flex: 1 }} edges={['top', 'bottom']}>
       <ExerciseRecordForm
         recordId={params.recordId ? Number(params.recordId) : undefined}
         initialType={params.exerciseType}

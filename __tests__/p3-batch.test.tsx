@@ -170,19 +170,30 @@ describe('P3-49: screenOptions 常量化', () => {
   })
 })
 
-// ===== P3-50: SafeAreaView edges =====
-describe('P3-50: SafeAreaView edges', () => {
-  it('app/(tabs)/* 与 app/settings/* 5+5 个 SafeAreaView 都有 edges', () => {
-    const tabsFiles = [
+// ===== P3-50: SafeAreaView edges（修复后） =====
+// 历史：原 edges={['bottom']} 漏写 top，Android 全面屏标题被摄像头遮挡。
+// 现统一为 edges={['top', 'bottom']}，正负安全区都生效。
+describe('P3-50: SafeAreaView edges 包含 top', () => {
+  it('app/* SafeAreaView edges 至少包含 top（Android 全面屏要求）', () => {
+    const allFiles = [
       '../app/(tabs)/index.tsx',
       '../app/(tabs)/analysis.tsx',
       '../app/(tabs)/settings.tsx',
       '../app/(tabs)/record.tsx',
+      '../app/(tabs)/calendar.tsx',
+      '../app/settings/ai-config.tsx',
+      '../app/settings/goals.tsx',
+      '../app/settings/health-connect.tsx',
+      '../app/settings/week-start.tsx',
+      '../app/settings/about.tsx',
+      '../app/diet/record.tsx',
+      '../app/exercise/record.tsx',
+      '../app/weight/record.tsx',
     ]
-    for (const rel of tabsFiles) {
+    for (const rel of allFiles) {
       const src = fs.readFileSync(path.resolve(__dirname, rel), 'utf8')
-      // 应有 edges={['bottom']} 或 edges={['top']}
-      expect(src).toMatch(/edges=\{(\[['"]bottom['"]\]|\[['"]top['"]\])\}/)
+      // edges 必须含 'top'（刘海/打孔/全面屏要求），可同时含 'bottom'
+      expect(src).toMatch(/edges=\{[^}]*['"]top['"]/)
     }
   })
 })
